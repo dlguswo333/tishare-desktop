@@ -15,4 +15,6 @@ npm run electron
 npm start
 # electron-builder will build into executables or installers. Refer to its document for detail.
 npx electron-builder --win --x64
+# Or from npm script.
+npm run builder
 ```
