@@ -1,0 +1,87 @@
+*{
+  box-sizing: border-box;
+}
+.App {
+  width: 100vw;
+  height: 100vh;
+  justify-content: center;
+  background-color: #303333;
+  text-align: center;
+  padding: 20px;
+  overflow: hidden;
+}
+
+.Box1{
+  width: 95%;
+  background-color: #282c34;
+  align-items: center;
+  margin: 10px auto;
+  padding: 10px;
+  box-shadow: 4px 4px 0 0 #00000044;
+}
+
+.Box2{
+  width: 95%;
+  margin: 10px auto;
+  color: #d1d1d1;
+  text-align: center;
+  padding: 5px 10px;
+  border-left: 2px solid purple;
+}
+
+.Box3{
+  display: flex;
+  margin: 0 auto;
+}
+
+.Box4{
+  text-align: left;
+}
+
+.Box5{
+  text-align: right;
+  color: #d1d1d1;
+}
+
+.Progress{
+  width: 80%;
+  height: 20px;
+  margin: 10px auto;
+  color: purple;
+}
+
+.PathInput{
+  width: 100%;
+  background-color: #21212188;
+  outline: none;
+  border-width: 0 0 2px 0;
+  border-color: gray;
+  color: gray;
+  font-size: 12pt;
+  line-height: 12pt;
+  transition: 0.2s;
+}
+.PathInput:focus{
+  border-color: purple;
+}
+
+button{
+  background-color: #00000000;
+  border: 1px solid gray;
+  color: #B0B0B0;
+  min-width: fit-content;
+  border-color: gray;
+  transition: 0.2s;
+  text-align: center;
+  padding: 5px 10px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+button:hover{
+  background-color: #00000088;
+  border-color: purple;
+  color: purple;  
+}
+button:disabled{
+  background-color: gray;
+}
