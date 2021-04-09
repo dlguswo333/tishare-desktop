@@ -13,6 +13,6 @@ npm run electron
 ```bash
 # Run react build
 npm start
-# electron-packager will build into executables. Refer to its document for detail.
-npx electron-packager
+# electron-builder will build into executables or installers. Refer to its document for detail.
+npx electron-builder --win --x64
 ```
