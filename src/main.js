@@ -5,7 +5,6 @@ const existsSync = require('fs').existsSync;
 const path = require('path');
 const isDev = require('electron-is-dev');
 // Enable remote module to make life easier.
-require('@electron/remote/main').initialize();
 
 var mainWindow = null;
 
@@ -19,7 +18,8 @@ function createWindow() {
     height: 650,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
-      enableRemoteModule: true,
+      enableRemoteModule: false,
+      nodeIntegration: false,
       contextIsolation: false
     }
   });
@@ -67,4 +67,19 @@ app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') {
     app.quit();
   }
+});
+
+// Handle inter process communications with renderer processes.
+ipcMain.handle('open-file', () => {
+  return dialog.showOpenDialogSync({
+    title: "Open File(s)",
+    properties: ["openFile", "multiSelections"]
+  });
+});
+
+ipcMain.handle('open-folder', () => {
+  return dialog.showOpenDialogSync({
+    title: "Open Folder(s)",
+    properties: ["openDirectory", "multiSelections"]
+  });
 });
