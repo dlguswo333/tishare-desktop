@@ -51,10 +51,10 @@ function App() {
   // useEffect is something like componentDidMount in React class component.
   // Add something that needs to be called after loading this component such as getting the network list.
   useEffect(() => {
-    getNetworks();
     setTimeout(async () => {
       const ret = await ipcRenderer.invoke('is-server-socket-open');
       setServerSocketOpen(ret);
+      getNetworks();
     }, 1000);
   });
 
