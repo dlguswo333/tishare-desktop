@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 // Below lines are importing modules from window object.
 // Look at 'preload.js' for more understanding.
-const networking = window.networking;
-console.log(networking);
+// const networking = window.networking;
 const ipcRenderer = window.ipcRenderer;
 
 function App() {
   const [fileList, setFileList] = useState([]);
-  const [myIp, setMyIp] = useState(null);
+  const [ip, setIp] = useState(null);
+  const [networks, setNetworks] = useState([]);
+  const [serverSocketOpen, setServerSocketOpen] = useState(false);
+
   // Select local files.
   const openFile = async () => {
     var ret = await ipcRenderer.invoke('open-file');
@@ -16,8 +18,9 @@ function App() {
       setFileList([...fileList, ...ret]);
   };
 
-  const openFolder = async () => {
-    var ret = await ipcRenderer.invoke('open-folder');
+  // Select local directories.
+  const openDirectory = async () => {
+    var ret = await ipcRenderer.invoke('open-directory');
     if (ret)
       setFileList([...fileList, ...ret]);
   };
@@ -26,8 +29,33 @@ function App() {
     return <div className="FileElement">{file}</div>;
   });
 
-  const listNetworks = networking.getMyNetwork().map((network) => {
-    return <div>{network.name} {network.ip} {network.netmask}</div>;
+  const getNetworks = async () => {
+    const ret = await ipcRenderer.invoke('get-networks');
+    if (ret)
+      setNetworks([...ret]);
+  }
+
+  const listNetworks = networks.map((network) => {
+    return <div key={network.ip}>{network.name} {network.ip} {network.netmask}</div>;
+  });
+
+  const initServerSocket = async () => {
+    // const ret = await ipcRenderer.invoke('init-server-socket', ip);
+    const ret = ipcRenderer.invoke('init-server-socket', networks[0].ip);
+  }
+
+  const closeServerSocket = async () => {
+    const ret = ipcRenderer.invoke('close-server-socket');
+  }
+
+  // useEffect is something like componentDidMount in React class component.
+  // Add something that needs to be called after loading this component such as getting the network list.
+  useEffect(() => {
+    getNetworks();
+    setTimeout(async () => {
+      const ret = await ipcRenderer.invoke('is-server-socket-open');
+      setServerSocketOpen(ret);
+    }, 1000);
   });
 
   return (
@@ -37,8 +65,10 @@ function App() {
       </div>
       <div className="Box1">
         <button onClick={openFile}>Open File</button>
-        <button onClick={openFolder}>Open Folder</button>
-        <button onClick={() => { networking.initServerSocket(myIp); }}>Open Server</button>
+        <button onClick={openDirectory}>Open Directory</button>
+        <button onClick={initServerSocket}>Open Server</button>
+        <button onClick={closeServerSocket}>Close Server</button>
+        <div className={serverSocketOpen ? "ServerStatOpen" : "ServerStatClose"} />
       </div>
       <div className="FileList">
         {listFiles}

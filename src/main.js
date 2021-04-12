@@ -3,6 +3,7 @@ const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const fs = require('fs').promises;
 const existsSync = require('fs').existsSync;
 const path = require('path');
+const networking = require('./networking');
 const isDev = require('electron-is-dev');
 // Enable remote module to make life easier.
 
@@ -64,10 +65,12 @@ app.whenReady().then(() => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', function () {
+  if (networking.isServerSocketListening())
+    networking.closeServerSocket();
   if (process.platform !== 'darwin') {
     app.quit();
   }
-});
+})
 
 // Handle inter process communications with renderer processes.
 ipcMain.handle('open-file', () => {
@@ -75,11 +78,28 @@ ipcMain.handle('open-file', () => {
     title: "Open File(s)",
     properties: ["openFile", "multiSelections"]
   });
-});
+})
 
-ipcMain.handle('open-folder', () => {
+ipcMain.handle('open-directory', () => {
   return dialog.showOpenDialogSync({
-    title: "Open Folder(s)",
+    title: "Open Directory(s)",
     properties: ["openDirectory", "multiSelections"]
   });
-});
+})
+
+ipcMain.handle('get-networks', () => {
+  return networking.getMyNetworks();
+})
+
+ipcMain.handle('init-server-socket', (event, arg) => {
+  const ip = arg;
+  networking.initServerSocket(ip);
+})
+
+ipcMain.handle('close-server-socket', () => {
+  networking.closeServerSocket();
+})
+
+ipcMain.handle('is-server-socket-open', () => {
+  return networking.isServerSocketListening();
+})

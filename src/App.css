@@ -40,6 +40,19 @@
   white-space: nowrap;
 }
 
+.ServerStatOpen{
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: green;
+}
+.ServerStatClose{
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: red;
+}
+
 button{
   background-color: #00000000;
   border: 1px solid gray;

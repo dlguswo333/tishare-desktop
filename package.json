@@ -17,7 +17,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "electron": "electron --trace-warnings .",
-    "builder": "electron-builder"
+    "builder": "npm run build && electron-builder"
   },
   "build": {
     "files": [
