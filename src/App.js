@@ -40,23 +40,25 @@ function App() {
   });
 
   const initServerSocket = async () => {
-    // const ret = await ipcRenderer.invoke('init-server-socket', ip);
-    const ret = ipcRenderer.invoke('init-server-socket', networks[0].ip);
+    ipcRenderer.invoke('init-server-socket', networks[0].ip);
   }
 
   const closeServerSocket = async () => {
-    const ret = ipcRenderer.invoke('close-server-socket');
+    ipcRenderer.invoke('close-server-socket');
   }
 
   // useEffect is something like componentDidMount in React class component.
   // Add something that needs to be called after loading this component such as getting the network list.
   useEffect(() => {
-    setTimeout(async () => {
+    const intervalFun = async () => {
       const ret = await ipcRenderer.invoke('is-server-socket-open');
       setServerSocketOpen(ret);
       getNetworks();
-    }, 1000);
-  });
+    }
+    intervalFun();
+    const intervalHandler = setInterval(() => { intervalFun(); }, 1000);
+    return () => clearInterval(intervalHandler);
+  }, []);
 
   return (
     <div className="App">

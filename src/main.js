@@ -74,14 +74,14 @@ app.on('window-all-closed', function () {
 
 // Handle inter process communications with renderer processes.
 ipcMain.handle('open-file', () => {
-  return dialog.showOpenDialogSync({
+  return dialog.showOpenDialogSync(mainWindow, {
     title: "Open File(s)",
     properties: ["openFile", "multiSelections"]
   });
 })
 
 ipcMain.handle('open-directory', () => {
-  return dialog.showOpenDialogSync({
+  return dialog.showOpenDialogSync(mainWindow, {
     title: "Open Directory(s)",
     properties: ["openDirectory", "multiSelections"]
   });

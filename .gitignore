@@ -6,7 +6,9 @@
 .pnp.js
 
 # testing
-/coverage
+/src/test.js
+/src/test.py
+file
 
 # production
 /build
