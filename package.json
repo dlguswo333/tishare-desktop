@@ -26,7 +26,6 @@
   "build": {
     "files": [
       "build/**/*",
-      "package.json",
       "src/*"
     ],
     "win": {

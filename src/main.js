@@ -1,13 +1,24 @@
 // Modules to control application life and create native browser window
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
-const fs = require('fs').promises;
-const existsSync = require('fs').existsSync;
 const path = require('path');
-const networking = require('./networking');
+const network = require('./Network');
+const { Sender } = require('./Sender');
+const { Receiver } = require('./Receiver');
 const isDev = require('electron-is-dev');
-// Enable remote module to make life easier.
 
 var mainWindow = null;
+/**
+ * @type {Sender}
+ */
+var sender = null;
+/**
+ * @type {Receiver}
+ */
+var receiver = null;
+/**
+ * @type {String}
+ */
+var myId = '';
 
 function createWindow() {
   // Create the browser window.
@@ -24,8 +35,6 @@ function createWindow() {
       contextIsolation: false
     }
   });
-  // removeMenu will remove debugger menu too. Comment the below line if not wanted.
-  // mainWindow.removeMenu();
 
   if (isDev) {
     console.log('Running in development');
@@ -35,6 +44,8 @@ function createWindow() {
   }
   else {
     console.log('Running in production');
+    // removeMenu will remove debugger menu too. Comment the below line if not wanted.
+    mainWindow.removeMenu();
     // When in production, run react build first.
     // The mian electron window will load the react built packs like below.
     mainWindow.loadFile(path.join(__dirname, '../build/index.html')).then(() => {
@@ -65,8 +76,8 @@ app.whenReady().then(() => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', function () {
-  if (networking.isServerSocketListening())
-    networking.closeServerSocket();
+  if (receiver && receiver.isExposed())
+    receiver.closeServerSocket();
   if (process.platform !== 'darwin') {
     app.quit();
   }
@@ -88,18 +99,22 @@ ipcMain.handle('open-directory', () => {
 })
 
 ipcMain.handle('get-networks', () => {
-  return networking.getMyNetworks();
+  return network.getMyNetworks();
 })
 
 ipcMain.handle('init-server-socket', (event, arg) => {
   const ip = arg;
-  networking.initServerSocket(ip);
+  receiver = new Receiver(ip, myId);
 })
 
 ipcMain.handle('close-server-socket', () => {
-  networking.closeServerSocket();
+  network.closeServerSocket();
 })
 
 ipcMain.handle('is-server-socket-open', () => {
-  return networking.isServerSocketListening();
+  return network.isServerSocketListening();
+})
+
+ipcMain.handle('set-id', (event, arg) => {
+  myId = arg;
 })

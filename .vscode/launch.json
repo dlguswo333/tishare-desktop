@@ -16,6 +16,12 @@
         "<node_internals>/**"
       ],
       "program": "${workspaceFolder}\\src\\main.js"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Run Current File",
+      "program": "${file}"
     }
   ]
 }
