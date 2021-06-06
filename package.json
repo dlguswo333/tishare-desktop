@@ -1,5 +1,5 @@
 {
-  "name": "senddone-desktop",
+  "name": "tishare-desktop",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -8,13 +8,13 @@
     "web-vitals": "^1.1.0"
   },
   "devDependencies": {
+    "electron": "^12.0.10",
+    "electron-builder": "^22.10.5",
     "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "electron": "^12.0.2",
-    "electron-builder": "^22.10.5"
+    "react-dom": "^17.0.1"
   },
   "homepage": "./",
-  "main": "src/main.js",
+  "main": "src/back/main.js",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

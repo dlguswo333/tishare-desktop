@@ -51,7 +51,7 @@ function App() {
   // Add something that needs to be called after loading this component such as getting the network list.
   useEffect(() => {
     const intervalFun = async () => {
-      const ret = await ipcRenderer.invoke('is-server-socket-open');
+      const ret = await ipcRenderer.invoke('is-server-open');
       setServerSocketOpen(ret);
       getNetworks();
     }

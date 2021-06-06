@@ -1,5 +1,7 @@
-# SendDone-Desktop
-This is a reporitory for SendDone, desktop version.<br>
+# tiShare-Desktop
+This is a reporitory for tiShare, desktop version.<br>
+tiShare is inspired by my former team project, [sendDone](https://github.com/La-Beaute/SendDone-Desktop).
+<br>
 
 ## How to Run Debug
 ```bash
