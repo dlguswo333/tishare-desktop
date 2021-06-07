@@ -1,33 +1,12 @@
 const os = require('os');
 const net = require('net');
-const PORT = 8531;
-const CHUNKSIZE = 4 * 1024 * 1024;
-const HEADER_END = '\n\n';
-const VERSION = '0.1.0';
-const STATE = {
-  ERR_FS: -2,
-  ERR_NET: -1,
-  IDLE: 0,
-
-  SEND_REQUEST: 1,
-  SEND: 2,
-  SEND_REJECT: 3,
-  SEND_COMPLETE: 4,
-  SEND_PAUSE: 5,
-  SEND_END: 6,
-
-  RECV_WAIT: 7,
-  RECV: 8,
-  RECV_COMPLETE: 9,
-  RECV_PAUSE: 10,
-  RECV_END: 11
-};
-const OS = os.platform();
+const dgram = require('dgram');
+const { PORT, OS, VERSION, HEADER_END, SCANTIME } = require('../defs');
 /**
  * Return an array of dictionary each looks like: { name, ip, netmask }.
  * @returns {Array.<{name:String, ip:String, netmask:String}>} Array of networks.
  */
-function getMyNetworks() {
+function getNetworks() {
   var array = [];
   const interfaces = os.networkInterfaces();
   for (const network in interfaces) {
@@ -76,44 +55,32 @@ function _splitHeader(buf) {
  * @param {scanCallback} callback Callback function to call when found a device.
  */
 function scan(ip, netmask, myId, callback) {
-  let currentIp = _IpStringToNumber(ip) & _IpStringToNumber(netmask);
-  let broadcastIp = _IpStringToNumber(_IpBroadcastIp(ip, netmask));
-  let ipAsNumber = _IpStringToNumber(ip);
-  while (broadcastIp > currentIp) {
-    if (ipAsNumber !== currentIp) {
-      console.log('trying ', _IpNumberToString(currentIp));
-      const socket = net.createConnection(PORT, _IpNumberToString(currentIp));
-      let recvBuf = Buffer.from([]);
-      socket.on('connect', () => {
-        let header = {
-          app: "SendDone",
-          version: VERSION,
-          class: "scan",
-          id: myId,
-          os: OS
-        };
-        socket.write(JSON.stringify(header) + HEADER_END);
-      });
-      socket.on('data', (data) => {
-        recvBuf = Buffer.concat([recvBuf, data]);
-        const ret = _splitHeader(recvBuf);
-        if (ret) {
-          let recvHeader = JSON.parse(ret.header);
-          if (recvHeader && recvHeader.app === 'SendDone' && recvHeader.class === 'ok') {
-            if (callback)
-              callback(socket.remoteAddress, recvheader.version, recvHeader.id, recvHeader.os);
-          }
-        }
-      })
-      socket.on('error', () => {
-        // Do nothing.
-      });
-      socket.on('close', () => {
-        socket.end();
-      });
-    }
-    currentIp++;
-  }
+  const broadcastIp = _IpBroadcastIp(ip, netmask);
+  const socket = dgram.createSocket('udp4');
+
+  // Bind socket.
+  // Binding is necessary to set the socket broadcast mode.
+  socket.bind(ip, () => {
+    socket.setBroadcast(true);
+    const header = {
+      app: "SendDone",
+      version: VERSION,
+      class: "scan",
+      id: myId,
+      os: OS
+    };
+    socket.on('message', (msg, rinfo) => {
+      const recvHeader = JSON.parse(msg.toString('utf-8'));
+      if (callback)
+        callback(rinfo.address, recvHeader.version, recvHeader.id, recvHeader.os);
+    });
+    socket.send(JSON.stringify(header), PORT, broadcastIp);
+
+    // Close socket after some time.
+    setTimeout(() => {
+      socket.close();
+    }, SCANTIME);
+  });
 }
 
 /**
@@ -158,4 +125,4 @@ function _IpBroadcastIp(ip, netmask) {
   return _IpNumberToString((_IpStringToNumber(ip) | (2 ** 32 - 1 - _IpStringToNumber(netmask))) >>> 0);
 }
 
-module.exports = { PORT, STATE, VERSION, HEADER_END, CHUNKSIZE, OS, getMyNetworks, scan, _splitHeader };
+module.exports = { getNetworks, scan, _splitHeader, _IpBroadcastIp };
