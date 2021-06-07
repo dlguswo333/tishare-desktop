@@ -1,0 +1,26 @@
+const PORT = 9238;
+const CHUNKSIZE = 2097152;
+const HEADER_END = '\n\n';
+const STATE = {
+  ERR_FS: "ERR_FS",
+  ERR_NET: "ERR_NET",
+  IDLE: "IDLE",
+
+  SEND_WAIT: "SEND_WAIT",
+  SEND: "SEND",
+  SEND_REJECT: "SEND_REJECT",
+  SEND_COMPLETE: "SEND_COMPLETE",
+  SENDER_PAUSE: "SENDER_PAUSE",
+  SENDER_END: "SENDER_END",
+
+  RECV_WAIT: "RECV_WAIT",
+  RECV: "RECV",
+  RECV_COMPLETE: "RECV_COMPLETE",
+  RECVER_PAUSE: "RECVER_PAUSE",
+  RECVER_END: "RECVER_END"
+};
+const OS = require('os').platform();
+const { version: VERSION } = require('../package.json');
+const SCANTIME = 3000;
+
+module.exports = { PORT, CHUNKSIZE, HEADER_END, STATE, OS, VERSION, SCANTIME };

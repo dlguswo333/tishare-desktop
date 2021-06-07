@@ -20,7 +20,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Run Current File",
+      "name": "Run Current Node js File",
       "program": "${file}"
     }
   ]

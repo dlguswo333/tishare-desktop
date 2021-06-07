@@ -4,11 +4,6 @@ const path = require('path');
 const { PORT, STATE, VERSION, HEADER_END, OS, _splitHeader, } = require('./Network');
 
 class Receiver {
-  /**
-   * 
-   * @param {string} ip 
-   * @param {string} myId 
-   */
   constructor() {
     this._state = STATE.IDLE;
     this._myId = '';

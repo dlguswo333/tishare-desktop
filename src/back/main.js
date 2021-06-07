@@ -168,7 +168,7 @@ ipcMain.handle('closeServerSocket', () => {
   return false;
 })
 
-ipcMain.handle('is-server-open', () => {
+ipcMain.handle('isServerOpen', () => {
   return receiver && receiver.isOpen();
 })
 
