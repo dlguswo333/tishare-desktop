@@ -2,8 +2,11 @@ const PORT = 9238;
 const CHUNKSIZE = 2097152;
 const HEADER_END = '\n\n';
 const STATE = {
-  ERR_FS: "ERR_FS",
-  ERR_NET: "ERR_NET",
+  ERR_FILE_SYSTEM: "ERR_FILE_SYSTEM",
+  ERR_NETWORK: "ERR_NETWORK",
+  ERR_ID: "ERR_ID",
+  ERR_IP: "ERR_IP",
+  INITING: "INITING",
   IDLE: "IDLE",
 
   SEND_WAIT: "SEND_WAIT",
@@ -21,6 +24,6 @@ const STATE = {
 };
 const OS = require('os').platform();
 const { version: VERSION } = require('../package.json');
-const SCANTIME = 3000;
-
-module.exports = { PORT, CHUNKSIZE, HEADER_END, STATE, OS, VERSION, SCANTIME };
+const SCANTIMEOUT = 3000;
+const MAX_NUM_JOBS = 2;
+module.exports = { PORT, CHUNKSIZE, HEADER_END, STATE, OS, VERSION, SCANTIMEOUT, MAX_NUM_JOBS };

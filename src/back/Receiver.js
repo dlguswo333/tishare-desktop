@@ -1,21 +1,18 @@
 const fs = require('fs').promises;
 const net = require('net');
 const path = require('path');
-const { PORT, STATE, VERSION, HEADER_END, OS, _splitHeader, } = require('./Network');
+const { _splitHeader } = require('./Network');
+const { VERSION, HEADER_END, OS, STATE } = require('../defs');
 
 class Receiver {
-  constructor() {
+  /**
+   * 
+   * @param {net.Socket} socket 
+   */
+  constructor(socket) {
     this._state = STATE.IDLE;
-    this._myId = '';
-    /**
-     * @type {net.Server}
-     */
-    this._serverSocket = null;
-    /**
-     * This is a socket created when a client connects to my server socket.
-     * @type {net.Socket}
-     */
-    this._recvSocket = null;
+    /** @type {net.Socket} */
+    this._recvSocket = socket;
     /**
      * Send Request header.
      * @type {{app: string, version:string, class:string, id:string, itemArray:Array.<>}}
@@ -101,7 +98,7 @@ class Receiver {
         console.error(err);
         this._recvSocket.end();
         this._recvSocket = null;
-        this._state = STATE.ERR_NET;
+        this._state = STATE.ERR_NETWORK;
       }
     }
   }
@@ -194,11 +191,11 @@ class Receiver {
                 socket.on('close', () => {
                   if (!(this._state === STATE.RECV_DONE || this._state === STATE.RECEIVER_END || this._state === STATE.SENDER_END))
                     // Unexpected close event.
-                    this._state = STATE.ERR_NET;
+                    this._state = STATE.ERR_NETWORK;
                   socket.end();
                 });
                 socket.on('error', (err) => {
-                  this._state = STATE.ERR_NET;
+                  this._state = STATE.ERR_NETWORK;
                 });
                 haveParsedHeader = false;
                 break;
@@ -273,7 +270,7 @@ class Receiver {
                     if (err.code !== 'EEXIST') {
                       // Making directory failed.
                       // Even making directory failed means there are serious issues.
-                      this._state = STATE.ERR_FS;
+                      this._state = STATE.ERR_FILE_SYSTEM;
                       this._recvSocket.destroy();
                       return;
                     }
@@ -605,4 +602,4 @@ class Receiver {
 }
 
 
-module.exports = { Receiver };
+module.exports = Receiver;
