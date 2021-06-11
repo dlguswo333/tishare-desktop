@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './style/App.css';
+import './style/App.scss';
 // Below lines are importing modules from window object.
 // Look at 'preload.js' for more understanding.
 // const networking = window.networking;
@@ -13,15 +13,17 @@ function App() {
 
   // Select local files.
   const openFile = async () => {
-    var ret = await ipcRenderer.invoke('open-file');
-    if (ret)
+    /** @type {any[]} */
+    var ret = await ipcRenderer.invoke('openFile');
+    if (ret.length > 0)
       setFileList([...fileList, ...ret]);
   };
 
   // Select local directories.
   const openDirectory = async () => {
-    var ret = await ipcRenderer.invoke('open-directory');
-    if (ret)
+    /** @type {any[]} */
+    var ret = await ipcRenderer.invoke('openDirectory');
+    if (ret.length > 0)
       setFileList([...fileList, ...ret]);
   };
 
@@ -47,18 +49,6 @@ function App() {
     ipcRenderer.invoke('close-server-socket');
   }
 
-  // useEffect is something like componentDidMount in React class component.
-  // Add something that needs to be called after loading this component such as getting the network list.
-  useEffect(() => {
-    const intervalFun = async () => {
-      const ret = await ipcRenderer.invoke('is-server-open');
-      setServerSocketOpen(ret);
-      getNetworks();
-    }
-    intervalFun();
-    const intervalHandler = setInterval(() => { intervalFun(); }, 1000);
-    return () => clearInterval(intervalHandler);
-  }, []);
 
   return (
     <div className="App">

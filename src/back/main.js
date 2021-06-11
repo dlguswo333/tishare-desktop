@@ -3,22 +3,12 @@ const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const fs = require('fs').promises;
 const path = require('path');
 const network = require('./Network');
-const { Sender } = require('./Sender');
-const { Receiver } = require('./Receiver');
 const isDev = require('electron-is-dev');
 
 /**
  * @type {BrowserWindow}
  */
 var mainWindow = null;
-/**
- * @type {Sender}
- */
-var sender = null;
-/**
- * @type {Receiver}
- */
-var receiver = new Receiver();
 
 function createWindow() {
   // Create the browser window.

@@ -6,20 +6,19 @@
   height: 100%;
   background-color: white;
   overflow: hidden;
-}
-.Head {
-  width: 100%;
-  max-height: 60px;
-  border-bottom: 1px solid black;
-}
-
-.Box1 {
-  width: 95%;
-  display: flex;
-  border: 1px solid black;
-  align-items: center;
-  margin: 10px auto;
-  padding: 10px;
+  .Head {
+    width: 100%;
+    max-height: 60px;
+    border-bottom: 1px solid black;
+  }
+  .Box1 {
+    width: 95%;
+    display: flex;
+    border: 1px solid black;
+    align-items: center;
+    margin: 10px auto;
+    padding: 10px;
+  }
 }
 
 .FileList {
