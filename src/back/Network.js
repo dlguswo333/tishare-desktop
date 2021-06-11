@@ -28,7 +28,7 @@ function getNetworks() {
  * split and separate a header from buf and return the header as string and sliced buf.
  * Return null if cannot find HEADER_END.
  * @param {Buffer} buf 
- * @returns {{header:String, buf:Buffer}|null}
+ * @returns {{header:String, buf:Buffer}|undefined}
  */
 function _splitHeader(buf) {
   const endInd = buf.indexOf(HEADER_END, 0, 'utf-8');
@@ -36,7 +36,7 @@ function _splitHeader(buf) {
     const header = buf.toString('utf8', 0, endInd);
     return { header: header, buf: buf.slice(endInd + 2) };
   };
-  return null;
+  return undefined;
 }
 
 /**
@@ -46,7 +46,6 @@ function _splitHeader(buf) {
  * @param {String} deviceId 
  * @param {String} deviceOs 
  */
-
 /**
  * 
  * @param {String} ip 
