@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './App.css';
+import './style/App.css';
 // Below lines are importing modules from window object.
 // Look at 'preload.js' for more understanding.
 // const networking = window.networking;

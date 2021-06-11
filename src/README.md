@@ -1,14 +1,4 @@
-# Section
-> [1. Basic Idea](#1-basic-idea)<br>
-> [2. Scan](#2-scan)<br>
-> [3. Send Request](#3-send-request)<br>
-> [4. While Sending and Receiving](#4-while-sending-and-receiving)<br>
-
-`src/networking.js` is the underline implementation of TCP networks and file write and read.<br>
-Receiver always opens a server socket, and sender always connects to the server socket as a client.<br>
-Why? Because that is easier and more natural than the opposite way.<br>
-Think of a mouth and an ear. Mouth always initiate communication, and ear responds to the mouth.<br> 
-To communicate at any arbitrary time, ear has to be open always, while mouth does not have to be.
+This README describes the implementations and logics behind `SendDone`.
 <br>
 
 # 1. Basic Idea
