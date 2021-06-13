@@ -26,7 +26,7 @@ function getNetworks() {
 
 /**
  * split and separate a header from buf and return the header as string and sliced buf.
- * Return null if cannot find HEADER_END.
+ * Return undefined if cannot find HEADER_END.
  * @param {Buffer} buf 
  * @returns {{header:String, buf:Buffer}|undefined}
  */
