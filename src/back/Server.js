@@ -8,10 +8,10 @@ class Server {
    * @param {string} id 
    */
   constructor(id) {
-    this.state = STATE.INITING;
+    this._state = STATE.INITING;
     if (!id) {
       // Cannot initialize Server without ID.
-      this.state = STATE.ERR_ID;
+      this._state = STATE.ERR_ID;
       return;
     }
     /** @type {string} */
@@ -20,7 +20,7 @@ class Server {
     this._scannee = null;
     /** @type {net.Server} */
     this._serverSocket = null;
-    this.state = STATE.IDLE;
+    this._state = STATE.IDLE;
     /** @type {Object.<number, Receiver>} */
     this.jobs = {};
     /** @type {number} */
@@ -47,7 +47,7 @@ class Server {
    */
   open(ip) {
     if (!ip) {
-      this.state = STATE.ERR_IP;
+      this._state = STATE.ERR_IP;
       return false;
     }
     if (this._serverSocket)
@@ -66,6 +66,12 @@ class Server {
       const receiver = new Receiver(socket);
       this.jobs[this._nextNum++] = receiver;
     });
+
+    this._serverSocket.on('error', (err) => {
+      console.error(err.message);
+      this._state = STATE.ERR_NETWORK;
+    });
+
     this._serverSocket.listen(PORT, ip);
   }
 
@@ -86,7 +92,7 @@ class Server {
   }
 
   getState() {
-    return this.state;
+    return this._state;
   }
 
   /**
@@ -127,6 +133,14 @@ class Server {
         this._scannee.send(sendHeader, rinfo.port, rinfo.address);
       });
     });
+  }
+
+  /**
+   * Get whether Server is open.
+   * @returns {boolean}
+   */
+  isOpen() {
+    return this._serverSocket && this._serverSocket.listening;
   }
 
   _destoryScannee() {
