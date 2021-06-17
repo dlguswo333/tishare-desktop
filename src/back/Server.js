@@ -4,18 +4,10 @@ const Receiver = require('./Receiver');
 const { PORT, OS, VERSION, STATE, MAX_NUM_JOBS } = require('../defs');
 
 class Server {
-  /**
-   * @param {string} id 
-   */
-  constructor(id) {
+  constructor() {
     this._state = STATE.INITING;
-    if (!id) {
-      // Cannot initialize Server without ID.
-      this._state = STATE.ERR_ID;
-      return;
-    }
     /** @type {string} */
-    this.myId = id;
+    this.myId = "";
     /** @type {dgram.Socket} */
     this._scannee = null;
     /** @type {net.Server} */
@@ -46,6 +38,10 @@ class Server {
    * @returns {boolean} The result of the execution.
    */
   open(ip) {
+    if (!this.myId) {
+      this._state = STATE.ERR_ID;
+      return false;
+    }
     if (!ip) {
       this._state = STATE.ERR_IP;
       return false;

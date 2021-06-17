@@ -4,11 +4,11 @@ const fs = require('fs').promises;
 const path = require('path');
 const network = require('./Network');
 const isDev = require('electron-is-dev');
+const Server = require('./Server');
 
-/**
- * @type {BrowserWindow}
- */
+/** @type {BrowserWindow} */
 var mainWindow = null;
+var server = new Server();
 
 function createWindow() {
   // Create the browser window.
@@ -22,7 +22,7 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       enableRemoteModule: false,
       nodeIntegration: false,
-      contextIsolation: false
+      contextIsolation: true
     },
     show: false
   });
@@ -72,8 +72,6 @@ app.whenReady().then(() => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', function () {
-  if (receiver && receiver.isOpen())
-    receiver.closeServerSocket();
   if (process.platform !== 'darwin') {
     app.quit();
   }
@@ -138,21 +136,20 @@ ipcMain.handle('openDirectory', async () => {
   return ret;
 })
 
-ipcMain.handle('get-networks', () => {
-  return network.getMyNetworks();
+ipcMain.handle('getNetworks', () => {
+  return network.getNetworks();
 })
 
-ipcMain.handle('openServerSocket', (event, myIp) => {
-  if (receiver.isOpen()) {
-    receiver.closeServerSocket();
+ipcMain.handle('openServer', (event, myIp) => {
+  if (server.isOpen()) {
+    return true;
   }
-  receiver.openServerSocket(myIp);
-  return true;
+  return server.open(myIp);
 })
 
-ipcMain.handle('closeServerSocket', () => {
-  if (receiver) {
-    receiver.closeServerSocket();
+ipcMain.handle('closeServer', () => {
+  if (server) {
+    server.close();
     return true;
   }
   return false;
@@ -162,9 +159,9 @@ ipcMain.handle('isServerOpen', () => {
   return receiver && receiver.isOpen();
 })
 
-ipcMain.handle('set-id', (event, myId) => {
+ipcMain.handle('setServerId', (event, myId) => {
   if (myId)
-    receiver.setMyId(myId);
+    server.setMyId(myId);
 })
 
 ipcMain.handle('send', (event, ip, items, myId) => {
