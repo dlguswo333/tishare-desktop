@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Nav from './Nav';
 import './style/App.scss';
 // Below lines are importing modules from window object.
 // Look at 'preload.js' for more understanding.
@@ -66,33 +67,37 @@ function App() {
 
   return (
     <div className="App">
-      <div className="Head">
-        <select className="Networks"
-          onChange={(e) => {
-            const [ip, netmask] = e.target.value.split('|');
-            setMyIp(ip);
-            setMyNetmask(netmask);
-          }}
-        >
-          {listNetworks}
-        </select>
-        <span className="Item">
-          My IP: {myIp}
-        </span>
-        <span className="Item">
-          My ID: {myId}
-        </span>
+      <div className="NavGhost" />
+      <div className="Main">
+        <div className="Head">
+          <select className="Networks"
+            onChange={(e) => {
+              const [ip, netmask] = e.target.value.split('|');
+              setMyIp(ip);
+              setMyNetmask(netmask);
+            }}
+          >
+            {listNetworks}
+          </select>
+          <span className="Item">
+            My IP: {myIp}
+          </span>
+          <span className="Item">
+            My ID: {myId}
+          </span>
+        </div>
+        <div className="Box1">
+          <button onClick={openFile}>Open File</button>
+          <button onClick={openDirectory}>Open Directory</button>
+          <button onClick={openServer}>Open Server</button>
+          <button onClick={closeServer}>Close Server</button>
+          <div className={isServerOpen ? "ServerStatOpen" : "ServerStatClose"} />
+        </div>
+        <div className="FileList">
+          {listFiles}
+        </div>
       </div>
-      <div className="Box1">
-        <button onClick={openFile}>Open File</button>
-        <button onClick={openDirectory}>Open Directory</button>
-        <button onClick={openServer}>Open Server</button>
-        <button onClick={closeServer}>Close Server</button>
-        <div className={isServerOpen ? "ServerStatOpen" : "ServerStatClose"} />
-      </div>
-      <div className="FileList">
-        {listFiles}
-      </div>
+      <Nav />
     </div>
   );
 };

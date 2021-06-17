@@ -13,7 +13,7 @@ var server = new Server();
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    title: 'SendDone Desktop',
+    title: 'tiShare',
     minWidth: 800,
     minHeight: 600,
     width: 800,
