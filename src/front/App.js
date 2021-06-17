@@ -7,14 +7,17 @@ const ipcRenderer = window.ipcRenderer;
 
 function App() {
   const [fileList, setFileList] = useState([]);
-  const [ip, setIp] = useState(null);
+  const [myId, setMyId] = useState("");
+  const [myIp, setMyIp] = useState("");
+  const [myNetmask, setMyNetmask] = useState("");
+  /** @type {[{name:string, ip:string, netmask:string}[], Function]} */
   const [networks, setNetworks] = useState([]);
-  const [serverSocketOpen, setServerSocketOpen] = useState(false);
+  const [isServerOpen, setIsServerOpen] = useState(false);
 
   // Select local files.
   const openFile = async () => {
     /** @type {any[]} */
-    var ret = await ipcRenderer.invoke('openFile');
+    var ret = await ipcRenderer.openFile();
     if (ret.length > 0)
       setFileList([...fileList, ...ret]);
   };
@@ -22,7 +25,7 @@ function App() {
   // Select local directories.
   const openDirectory = async () => {
     /** @type {any[]} */
-    var ret = await ipcRenderer.invoke('openDirectory');
+    var ret = await ipcRenderer.openDirectory();
     if (ret.length > 0)
       setFileList([...fileList, ...ret]);
   };
@@ -32,35 +35,60 @@ function App() {
   });
 
   const getNetworks = async () => {
-    const ret = await ipcRenderer.invoke('get-networks');
+    const ret = await ipcRenderer.getNetworks();
     if (ret)
-      setNetworks([...ret]);
+      setNetworks(ret);
   }
 
   const listNetworks = networks.map((network) => {
-    return <div key={network.ip}>{network.name} {network.ip} {network.netmask}</div>;
+    return <option key={network.ip} value={network.ip + '|' + network.netmask} > {network.name} | {network.ip}</option >;
   });
 
-  const initServerSocket = async () => {
-    ipcRenderer.invoke('init-server-socket', networks[0].ip);
+  const openServer = async () => {
+    ipcRenderer.openServer(myIp);
   }
 
-  const closeServerSocket = async () => {
-    ipcRenderer.invoke('close-server-socket');
+  const closeServer = async () => {
+    ipcRenderer.closeServer();
   }
+
+  useEffect(() => {
+    getNetworks();
+  }, []);
+
+  useEffect(() => {
+    if (networks.length > 0) {
+      setMyIp(networks[0].ip);
+      setMyNetmask(networks[0].netmask);
+    }
+  }, [networks]);
 
 
   return (
     <div className="App">
       <div className="Head">
-        {listNetworks}
+        <select className="Networks"
+          onChange={(e) => {
+            const [ip, netmask] = e.target.value.split('|');
+            setMyIp(ip);
+            setMyNetmask(netmask);
+          }}
+        >
+          {listNetworks}
+        </select>
+        <span className="Item">
+          My IP: {myIp}
+        </span>
+        <span className="Item">
+          My ID: {myId}
+        </span>
       </div>
       <div className="Box1">
         <button onClick={openFile}>Open File</button>
         <button onClick={openDirectory}>Open Directory</button>
-        <button onClick={initServerSocket}>Open Server</button>
-        <button onClick={closeServerSocket}>Close Server</button>
-        <div className={serverSocketOpen ? "ServerStatOpen" : "ServerStatClose"} />
+        <button onClick={openServer}>Open Server</button>
+        <button onClick={closeServer}>Close Server</button>
+        <div className={isServerOpen ? "ServerStatOpen" : "ServerStatClose"} />
       </div>
       <div className="FileList">
         {listFiles}
