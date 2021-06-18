@@ -1,18 +1,26 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './style/Nav.scss';
 
+
 function Nav() {
-  const [hover, setHover] = useState(false);
+  let hover = false;
+  const [grow, setGrow] = useState(false);
+
+
   return (
-    <nav className={hover ? "Nav Grow" : "Nav"}
+    <nav className={grow ? "Nav Grow" : "Nav"}
       onMouseEnter={() => {
-        setHover(true);
+        hover = true;
+        setGrow(true);
       }}
       onMouseLeave={() => {
-        setHover(false);
+        hover = false;
+        setTimeout(() => {
+          if (!hover)
+            setGrow(false);
+        }, 400);
       }}
     >
-
 
     </nav>
   )
