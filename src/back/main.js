@@ -156,7 +156,7 @@ ipcMain.handle('closeServer', () => {
 })
 
 ipcMain.handle('isServerOpen', () => {
-  return receiver && receiver.isOpen();
+  return server && server.isOpen();
 })
 
 ipcMain.handle('setServerId', (event, myId) => {

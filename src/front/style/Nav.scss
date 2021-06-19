@@ -4,24 +4,56 @@
   right: calc(100% - #{v.$navWidth});
   top: 0;
   min-width: v.$navGrowWidth;
-  height: 120vh;
-  backdrop-filter: blur(5px);
-  background-color: #eeea;
+  height: 100vh;
+  backdrop-filter: blur(2px);
+  background-color: #eff5;
   transition: 0.6s;
   box-shadow: 1px 1px 3px black;
   overflow-x: hidden;
   overflow-y: hidden;
-  &::-webkit-scrollbar {
-    width: 12px;
+  display: flex;
+  flex-direction: column;
+  .Head {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: v.$navWidth;
+    justify-content: center;
+    background-color: #9992;
+    .Settings {
+      margin-right: auto;
+      width: v.$navWidth;
+      height: v.$navWidth;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      &:hover {
+        filter: invert(0.8);
+      }
+    }
+    .Menu {
+      margin-left: auto;
+      width: v.$navWidth;
+      height: v.$navWidth;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      .Circle {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        width: calc(#{v.$navWidth} / 4);
+        height: calc(#{v.$navWidth} / 4);
+        border-radius: 50%;
+        background-color: crimson;
+      }
+    }
   }
-  &::-webkit-scrollbar-thumb {
-    background-color: #3333;
-  }
-  &::-webkit-scrollbar-thumb:active {
-    background-color: #3339;
+  .Body {
+    overflow-y: auto;
+    padding: 5px;
   }
 }
 .Grow {
   right: calc(100% - #{v.$navGrowWidth});
-  overflow-y: auto;
 }
