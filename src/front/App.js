@@ -115,13 +115,13 @@ function App() {
             My ID: {myId}
           </span>
           {isServerOpen ?
-            <button className="ServerButton"
+            <button className="ServerButton ServerOpen"
               onClick={closeServer}
             >
               Close me <span className="Open"></span>
             </button>
             :
-            <button className="ServerButton"
+            <button className="ServerButton ServerClose"
               onClick={openServer}
             >
               Open me <span className="Close"></span>

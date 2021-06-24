@@ -55,17 +55,34 @@
         justify-content: center;
         font-size: 1.05rem;
         line-height: 25px;
+        transition: 0.3s;
+        &:hover {
+          background-color: #aaa;
+          color: #edd;
+        }
         span {
           display: inline-block;
           width: 15px;
           height: 15px;
           border-radius: 50%;
+          &.Open {
+            background-color: #0b0;
+          }
+          &.Close {
+            background-color: #f00;
+          }
         }
-        .Open {
-          background-color: #0b0;
+      }
+      .ServerOpen {
+        box-shadow: 2px 2px 3px #0b0;
+        &:hover {
+          box-shadow: 2px 2px 3px #322;
         }
-        .Close {
-          background-color: #f00;
+      }
+      .ServerClose {
+        box-shadow: 2px 2px 3px #322;
+        &:hover {
+          box-shadow: 2px 2px 3px #0b0;
         }
       }
     }
@@ -96,38 +113,4 @@
   padding: 5px;
   overflow: hidden;
   white-space: nowrap;
-}
-
-.ServerStatOpen {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background-color: green;
-}
-.ServerStatClose {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background-color: red;
-}
-
-button {
-  background-color: #00000000;
-  border: 1px solid gray;
-  color: black;
-  min-width: fit-content;
-  border-color: gray;
-  transition: 0.2s;
-  text-align: center;
-  padding: 5px 10px;
-  overflow: hidden;
-  white-space: nowrap;
-}
-button:hover {
-  background-color: #33333388;
-  border-color: purple;
-  color: purple;
-}
-button:disabled {
-  background-color: gray;
 }
