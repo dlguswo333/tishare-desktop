@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Nav from './Nav';
+import ItemView from './ItemView';
 import './style/App.scss';
 // Below lines are importing modules from window object.
 // Look at 'preload.js' for more understanding.
@@ -7,7 +8,7 @@ import './style/App.scss';
 const ipcRenderer = window.ipcRenderer;
 
 function App() {
-  const [fileList, setFileList] = useState([]);
+  const [items, setItems] = useState({});
   const [myId, setMyId] = useState("");
   const [myIp, setMyIp] = useState("");
   const [myNetmask, setMyNetmask] = useState("");
@@ -17,23 +18,26 @@ function App() {
 
   // Select local files.
   const openFile = async () => {
-    /** @type {any[]} */
+    /** @type {Object.<string, any>} */
     var ret = await ipcRenderer.openFile();
-    if (ret.length > 0)
-      setFileList([...fileList, ...ret]);
+    setItems(Object.assign({}, ret, items));
   };
 
   // Select local directories.
   const openDirectory = async () => {
-    /** @type {any[]} */
+    /** @type {Object.<string, any>} */
     var ret = await ipcRenderer.openDirectory();
-    if (ret.length > 0)
-      setFileList([...fileList, ...ret]);
+    setItems(Object.assign({}, ret, items));
   };
 
-  const listFiles = fileList.map((file) => {
-    return <div className="FileElement">{file}</div>;
-  });
+  const listFiles = () => {
+    let ret = [];
+    for (let itemName in items) {
+      ret.push(<div>{itemName}</div>);
+    }
+    console.log(ret);
+    return ret;
+  }
 
   const changeMyId = (id) => {
     if (id) {
@@ -77,8 +81,6 @@ function App() {
 
   useEffect(() => {
     const timer = setInterval(async () => {
-      const ret = await ipcRenderer.isServerOpen();
-      console.log(ret);
       setIsServerOpen((await ipcRenderer.isServerOpen()));
     }, 1000);
 
@@ -98,7 +100,7 @@ function App() {
     <div className="App">
       <div className="NavGhost" />
       <div className="Main">
-        <div className="Head">
+        <div className="MainHead">
           <span className="Item">
             {"My IP: "}
             <select className="Networks"
@@ -117,23 +119,26 @@ function App() {
           {isServerOpen ?
             <button className="ServerButton ServerOpen"
               onClick={closeServer}
+              title='Close this device from the network.'
             >
               Close me <span className="Open"></span>
             </button>
             :
             <button className="ServerButton ServerClose"
               onClick={openServer}
+              title='Open this device to the network.'
             >
               Open me <span className="Close"></span>
             </button>
           }
         </div>
-        <div className="Box1">
-          <button onClick={openFile}>Open File</button>
-          <button onClick={openDirectory}>Open Directory</button>
-        </div>
-        <div className="FileList">
-          {listFiles}
+        <div className="MainBody">
+          <div className="ItemGrid">
+            <ItemView items={items} openFile={openFile} openDirectory={openDirectory} />
+          </div>
+          <div className="ClientGrid">
+
+          </div>
         </div>
       </div>
       <Nav />

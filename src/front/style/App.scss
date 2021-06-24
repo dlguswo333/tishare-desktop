@@ -28,7 +28,7 @@
   }
   .Main {
     flex: 1;
-    .Head {
+    .MainHead {
       width: 100%;
       display: flex;
       flex-direction: column;
@@ -54,11 +54,12 @@
         min-height: 25px;
         justify-content: center;
         font-size: 1.05rem;
+        font-weight: bold;
         line-height: 25px;
         transition: 0.3s;
         &:hover {
           background-color: #aaa;
-          color: #edd;
+          color: white;
         }
         span {
           display: inline-block;
@@ -86,13 +87,14 @@
         }
       }
     }
-    .Box1 {
-      width: 95%;
-      display: flex;
-      border: 1px solid black;
-      align-items: center;
-      margin: 10px auto;
+    .MainBody {
+      display: grid;
+      grid-template-columns: 6fr 4fr;
       padding: 10px;
+      .ItemGrid {
+        width: 100%;
+        height: 100%;
+      }
     }
   }
 }
@@ -113,4 +115,8 @@
   padding: 5px;
   overflow: hidden;
   white-space: nowrap;
+}
+
+button {
+  outline: none;
 }

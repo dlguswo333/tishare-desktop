@@ -1,0 +1,40 @@
+.ItemView {
+  .ItemViewHead {
+    display: flex;
+    flex-direction: row;
+    .Buttons {
+      border: none;
+      margin-left: auto;
+      padding: 0;
+      overflow: hidden;
+      button {
+        padding: 5px 10px;
+        font-size: 1.02rem;
+        font-weight: bold;
+        transition: 0.3s;
+        &:hover {
+          background-color: #999;
+          color: white;
+        }
+        &:first-child {
+          border: 2px solid black;
+          border-radius: 200px 0 0 200px;
+        }
+        &:not(:first-child):not(:last-child) {
+          border-width: 2px 2px 2px 0;
+          border-style: solid;
+          border-color: black;
+          border-radius: 0;
+        }
+        &:last-child {
+          border-width: 2px 2px 2px 0;
+          border-style: solid;
+          border-color: black;
+          border-radius: 0 200px 200px 0;
+        }
+      }
+    }
+  }
+  .ItemViewBody {
+  }
+}
