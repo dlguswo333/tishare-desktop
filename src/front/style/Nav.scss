@@ -20,24 +20,26 @@
     height: v.$navWidth;
     justify-content: center;
     background-color: #9992;
-    .Settings {
-      margin-right: auto;
+    * {
       width: v.$navWidth;
       height: v.$navWidth;
       display: flex;
       align-items: center;
       justify-content: center;
-      &:hover {
-        filter: invert(0.8);
+    }
+    .Settings {
+      margin-right: auto;
+      .Icon {
+        stroke: black;
+        fill: black;
+      }
+      .Icon:hover {
+        stroke: red;
+        fill: red;
       }
     }
     .Menu {
       margin-left: auto;
-      width: v.$navWidth;
-      height: v.$navWidth;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       .Circle {
         position: absolute;
         top: 2px;
@@ -46,6 +48,9 @@
         height: calc(#{v.$navWidth} / 4);
         border-radius: 50%;
         background-color: crimson;
+      }
+      .Icon {
+        stroke: black;
       }
     }
   }

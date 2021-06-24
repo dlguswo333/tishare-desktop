@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './style/Nav.scss';
-import { ReactComponent as MenuSvg } from './style/menu.svg';
-import { ReactComponent as SettingsSvg } from './style/settings.svg';
+import { ReactComponent as MenuIcon } from './icons/Menu.svg';
+import { ReactComponent as SettingsIcon } from './icons/Settings.svg';
 
 function Nav() {
   let hover = false;
@@ -29,10 +29,10 @@ function Nav() {
     >
       <div className="Head">
         <div className="Settings">
-          <SettingsSvg />
+          <SettingsIcon />
         </div>
         <div className="Menu">
-          <MenuSvg />
+          <MenuIcon />
           {noti && <div className="Circle" />}
         </div>
       </div>
