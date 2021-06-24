@@ -30,13 +30,20 @@ function App() {
     setItems(Object.assign({}, ret, items));
   };
 
-  const listFiles = () => {
-    let ret = [];
-    for (let itemName in items) {
-      ret.push(<div>{itemName}</div>);
+  /**
+   * @param {Object.<string, bool>|undefined} checked
+   */
+  const deleteChecked = (checked) => {
+    const ret = items;
+    if (checked === undefined) {
+      setItems({});
     }
-    console.log(ret);
-    return ret;
+    else {
+      for (let itemName in checked) {
+        delete ret[itemName];
+      }
+      setItems(ret);
+    }
   }
 
   const changeMyId = (id) => {
@@ -134,9 +141,14 @@ function App() {
         </div>
         <div className="MainBody">
           <div className="ItemGrid">
-            <ItemView items={items} openFile={openFile} openDirectory={openDirectory} />
+            <ItemView
+              items={items}
+              openFile={openFile}
+              openDirectory={openDirectory}
+              deleteChecked={deleteChecked}
+            />
           </div>
-          <div className="ClientGrid">
+          <div className="DeviceGrid">
 
           </div>
         </div>

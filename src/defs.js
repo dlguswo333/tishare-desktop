@@ -26,4 +26,24 @@ const OS = require('os').platform();
 const { version: VERSION } = require('../package.json');
 const SCANTIMEOUT = 3000;
 const MAX_NUM_JOBS = 2;
-module.exports = { PORT, CHUNKSIZE, HEADER_END, STATE, OS, VERSION, SCANTIMEOUT, MAX_NUM_JOBS };
+/**
+ * Print file size in pretty.
+ * @param {number} size 
+ * @returns {string}
+ */
+const printSize = (size) => {
+  if (size >= 1024) {
+    size /= 1024;
+    if (size >= 1024) {
+      size /= 1024;
+      if (size >= 1024) {
+        size /= 1024;
+        return size.toFixed(2) + ' GB';
+      }
+      return size.toFixed(2) + ' MB';
+    }
+    return size.toFixed(2) + ' KB';
+  }
+  return size + ' B';
+}
+module.exports = { PORT, CHUNKSIZE, HEADER_END, STATE, OS, VERSION, SCANTIMEOUT, MAX_NUM_JOBS, printSize };
