@@ -20,7 +20,7 @@
     height: v.$navWidth;
     justify-content: center;
     background-color: #9992;
-    * {
+    .Icon {
       width: v.$navWidth;
       height: v.$navWidth;
       display: flex;
@@ -28,17 +28,17 @@
       justify-content: center;
     }
     .Settings {
+      stroke: black;
+      fill: black;
       margin-right: auto;
-      .Icon {
-        stroke: black;
-        fill: black;
-      }
-      .Icon:hover {
+      cursor: pointer;
+      &:hover {
         stroke: red;
         fill: red;
       }
     }
     .Menu {
+      stroke: black;
       margin-left: auto;
       .Circle {
         position: absolute;
@@ -48,9 +48,6 @@
         height: calc(#{v.$navWidth} / 4);
         border-radius: 50%;
         background-color: crimson;
-      }
-      .Icon {
-        stroke: black;
       }
     }
   }

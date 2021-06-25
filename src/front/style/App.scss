@@ -58,12 +58,13 @@
         font-size: 1.05rem;
         font-weight: bold;
         line-height: 25px;
-        transition: 0.3s;
+        transition: v.$slowTransition;
         cursor: pointer;
         &:hover {
           background-color: #ccc;
         }
         &:active {
+          transition: v.$fastTransition;
           background-color: #999;
           color: white;
         }

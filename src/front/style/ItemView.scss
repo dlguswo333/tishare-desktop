@@ -17,12 +17,13 @@
       button {
         padding: 5px 10px;
         font-size: 1.02rem;
-        transition: 0.3s;
+        transition: v.$slowTransition;
         cursor: pointer;
         &:hover {
           background-color: #ccc;
         }
         &:active {
+          transition: v.$fastTransition;
           background-color: #999;
           color: white;
         }
@@ -67,12 +68,13 @@
       overflow-x: hidden;
       background-color: white;
       .ItemInfo {
-        white-space: nowrap;
         overflow: hidden;
-        text-overflow: ellipsis;
         flex: 1;
         .ItemName {
-          font-size: 0.95rem;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          font-size: 0.98rem;
         }
         .ItemProperty {
           color: #999;
@@ -84,6 +86,9 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        input[type="checkbox"] {
+          transform: scale(1.2);
+        }
       }
       &:nth-child(even) {
         background-color: #eee;

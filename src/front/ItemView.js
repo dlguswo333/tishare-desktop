@@ -21,7 +21,7 @@ function ItemView({ items, openFile, openDirectory, deleteChecked }) {
       const item = items[itemName];
       ret.push(
         <div className='ItemElement' key={itemName}>
-          <div className='ItemInfo'>
+          <div className='ItemInfo' title={itemName}>
             <div className='ItemName'>
               {(item.type === 'directory' ? '📁 ' : '📄 ') + itemName}
             </div>
