@@ -10,40 +10,26 @@
     flex-direction: row;
     padding: 10px;
     .Buttons {
-      border: none;
       margin-left: auto;
       padding: 0;
       overflow: hidden;
       button {
-        padding: 5px 10px;
+        padding: 8px 16px;
         font-size: 1.02rem;
-        transition: v.$slowTransition;
+        color: white;
+        transition: v.$fastTransition;
+        background-color: #47c;
         cursor: pointer;
+        border: none;
+        border-radius: 300px;
         &:hover {
-          background-color: #ccc;
+          background-color: #25f;
         }
         &:active {
-          transition: v.$fastTransition;
-          background-color: #999;
-          color: white;
+          background-color: #00f;
         }
-        &:first-child {
-          border-width: 2px 0 2px 2px;
-          border-style: solid;
-          border-color: black;
-          border-radius: 200px 0 0 200px;
-        }
-        &:not(:first-child):not(:last-child) {
-          border-width: 2px 0 2px 0;
-          border-style: solid;
-          border-color: black;
-          border-radius: 0;
-        }
-        &:last-child {
-          border-width: 2px 2px 2px 0;
-          border-style: solid;
-          border-color: black;
-          border-radius: 0 200px 200px 0;
+        &:not(:last-child) {
+          margin-right: 10px;
         }
       }
     }
