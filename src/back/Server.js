@@ -35,9 +35,10 @@ class Server {
   /**
    * Open myself to the network.
    * @param {string} ip
+   * @param {Function} callback
    * @returns {boolean} The result of the execution.
    */
-  open(ip) {
+  open(ip, callback) {
     if (!this.myId) {
       this._state = STATE.ERR_ID;
       return false;
@@ -46,6 +47,7 @@ class Server {
       this._state = STATE.ERR_IP;
       return false;
     }
+    this._initScannee(ip, callback);
     if (this._serverSocket)
       return true;
     this._serverSocket = net.createServer();
@@ -69,6 +71,7 @@ class Server {
     });
 
     this._serverSocket.listen(PORT, ip);
+    return true;
   }
 
   /**
@@ -126,7 +129,7 @@ class Server {
           id: this.myId,
           os: OS
         };
-        this._scannee.send(sendHeader, rinfo.port, rinfo.address);
+        this._scannee.send(JSON.stringify(sendHeader), rinfo.port, rinfo.address);
       });
     });
   }

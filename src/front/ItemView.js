@@ -83,7 +83,6 @@ function ItemView({ items, openFile, openDirectory, deleteChecked }) {
   }
 
   useEffect(() => {
-
     if (Object.keys(items).length > 0 && Object.keys(items).length === Object.keys(checked).length) {
       setCheckAll(true);
     }

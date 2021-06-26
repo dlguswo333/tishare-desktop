@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Nav from './Nav';
 import ItemView from './ItemView';
+import DeviceView from './DeviceView';
 import './style/App.scss';
 // Below lines are importing modules from window object.
 // Look at 'preload.js' for more understanding.
@@ -149,7 +150,11 @@ function App() {
             />
           </div>
           <div className="DeviceGrid">
-
+            <DeviceView
+              myIp={myIp}
+              myNetmask={myNetmask}
+              myId={myId}
+            />
           </div>
         </div>
       </div>

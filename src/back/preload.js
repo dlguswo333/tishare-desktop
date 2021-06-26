@@ -22,6 +22,15 @@ contextBridge.exposeInMainWorld('ipcRenderer',
     },
     isServerOpen: async () => {
       return (await ipcRenderer.invoke('isServerOpen'));
+    },
+    scan: (myIp, netmask, myId) => {
+      ipcRenderer.invoke('scan', myIp, netmask, myId);
+    },
+    scanCallback: (callback) => {
+      ipcRenderer.on('scannedDevice', callback);
+    },
+    removeScanCallback: () => {
+      ipcRenderer.removeAllListeners('scannedDevice');
     }
   }
 )

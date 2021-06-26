@@ -144,7 +144,9 @@ ipcMain.handle('openServer', (event, myIp) => {
   if (server.isOpen()) {
     return true;
   }
-  return server.open(myIp);
+  return server.open(myIp, (deviceIp, deviceVersion, deviceId, deviceOs) => {
+    mainWindow.webContents.send('scannedDevice', deviceIp, deviceVersion, deviceId, deviceOs);
+  });
 })
 
 ipcMain.handle('closeServer', () => {
