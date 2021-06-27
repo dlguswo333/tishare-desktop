@@ -1,9 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import './style/Nav.scss';
 import { ReactComponent as MenuIcon } from './icons/Menu.svg';
 import { ReactComponent as SettingsIcon } from './icons/Settings.svg';
+import './style/Nav.scss';
 
-function Nav() {
+/**
+ * 
+ * @param {object} props 
+ * @param {Function} props.toggleSettings 
+ * @returns 
+ */
+function Nav({ toggleSettings }) {
   let hover = false;
   const [grow, setGrow] = useState(false);
   const [noti, setNoti] = useState(false);
@@ -28,7 +34,9 @@ function Nav() {
       }}
     >
       <div className="Head">
-        <div className="Settings">
+        <div className="Settings"
+          onClick={toggleSettings}
+        >
           <SettingsIcon />
         </div>
         <div className="Menu">

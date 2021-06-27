@@ -2,14 +2,16 @@ import React, { useState, useEffect } from 'react';
 import Nav from './Nav';
 import ItemView from './ItemView';
 import DeviceView from './DeviceView';
+import Settings from './Settings';
 import './style/App.scss';
+
 // Below lines are importing modules from window object.
 // Look at 'preload.js' for more understanding.
-// const networking = window.networking;
 const ipcRenderer = window.ipcRenderer;
 
 function App() {
   const [items, setItems] = useState({});
+  const [showSettings, setShowSettings] = useState(false);
   const [myId, setMyId] = useState("");
   const [myIp, setMyIp] = useState("");
   const [myNetmask, setMyNetmask] = useState("");
@@ -74,6 +76,10 @@ function App() {
     const ret = await ipcRenderer.closeServer();
     if (!ret)
       console.error('tried to open server but returned false');
+  }
+
+  const toggleSettings = () => {
+    setShowSettings(!showSettings);
   }
 
   useEffect(() => {
@@ -158,7 +164,8 @@ function App() {
           </div>
         </div>
       </div>
-      <Nav />
+      <Nav toggleSettings={toggleSettings} />
+      {showSettings && <Settings setShowSettings={setShowSettings} />}
     </div>
   );
 };
