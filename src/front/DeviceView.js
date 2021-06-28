@@ -32,7 +32,7 @@ function DeviceView({ myIp, myNetmask, myId }) {
               {device.id}
             </div>
             <div className='DeviceInfo'>
-              {`IP: ${device.ip} version: ${device.version}`}
+              {`IP: ${device.ip} Version: ${device.version}`}
             </div>
           </div>
         </div>
@@ -42,6 +42,8 @@ function DeviceView({ myIp, myNetmask, myId }) {
   }
 
   const scan = () => {
+    setSelected(null);
+    setDevices({});
     ipcRenderer.scan(myIp, myNetmask, myId);
   }
 
@@ -67,6 +69,9 @@ function DeviceView({ myIp, myNetmask, myId }) {
         </div>
       </div>
       <div className='DeviceViewBody'>
+        <div className='Head'>
+          Devices
+        </div>
         {showDevices()}
       </div>
     </div>

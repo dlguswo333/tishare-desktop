@@ -224,14 +224,14 @@ ipcMain.handle('scan', (event, myIp, netmask, myId) => {
   });
 })
 
-ipcMain.handle('setDownloadDirectory', () => {
+ipcMain.handle('setRecvDir', () => {
   let ret = dialog.showOpenDialogSync(mainWindow, {
-    title: "Set Download Directory",
+    title: "Set Receive Directory",
     properties: ["openDirectory"]
   });
   if (ret)
     return ret[0];
-  return '';
+  return null;
 })
 
 ipcMain.handle('setMyId', (event, myId) => {

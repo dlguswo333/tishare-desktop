@@ -117,7 +117,7 @@ function ItemView({ items, openFile, openDirectory, deleteChecked }) {
       <div className='ItemViewBody'>
         <div className={'ItemElement Head' + (scrollable ? ' Scrollable' : '')}>
           <div className='ItemInfo'>
-
+            Items
           </div>
           <div className='ItemCheck'>
             <input type='checkbox' checked={checkAll}

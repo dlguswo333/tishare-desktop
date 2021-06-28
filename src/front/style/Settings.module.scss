@@ -50,9 +50,12 @@
         justify-content: center;
         min-width: 60%;
         user-select: text;
-        font-size: 1.01rem;
-        line-height: 1.01rem;
+        font-size: 1.02rem;
+        line-height: 1.02rem;
+        padding: 5px;
         margin-bottom: 5px;
+        border: 1px solid #333;
+        border-radius: 8px;
       }
       button {
         padding: 5px 10px;

@@ -14,14 +14,14 @@ import style from './style/Settings.module.scss';
  * @param {Function} props.setShowSettings 
  */
 function Settings({ setShowSettings }) {
-  const [tmpRecvPath, setTmpRecvPath] = useState(null);
+  const [tmpRecvDir, setTmpRecvDir] = useState(null);
   const [tmpMyId, setTmpMyId] = useState(null);
   const [IdEmptyWarn, setIdEmptyWarn] = useState(false);
-  const [recvPathEmptyWarn, setRecvPathEmptyWarn] = useState(false);
+  const [recvDirEmptyWarn, setRecvDirEmptyWarn] = useState(false);
 
   const resetWarns = () => {
     setIdEmptyWarn(false);
-    setRecvPathEmptyWarn(false);
+    setRecvDirEmptyWarn(false);
   }
 
   const save = () => {
@@ -31,21 +31,21 @@ function Settings({ setShowSettings }) {
       return;
     }
     window.localStorage.setItem('myId', tmpMyId);
-    if (!tmpRecvPath) {
-      setRecvPathEmptyWarn(true);
+    if (!tmpRecvDir) {
+      setRecvDirEmptyWarn(true);
       return;
     }
-    window.localStorage.setItem('recvPath', tmpRecvPath);
+    window.localStorage.setItem('recvDir', tmpRecvDir);
     setShowSettings(false);
   }
 
   useEffect(() => {
     let tmp = window.localStorage.getItem('myId');
     if (tmp)
-      setTmpRecvPath(tmp);
-    tmp = window.localStorage.getItem('recvPath');
+      setTmpMyId(tmp);
+    tmp = window.localStorage.getItem('recvDir');
     if (tmp)
-      setTmpRecvPath(tmp);
+      setTmpRecvDir(tmp);
   }, []);
 
   return (
@@ -70,16 +70,24 @@ function Settings({ setShowSettings }) {
           </div>
           <div className={style.SettingsElement}>
             <div className={style.Head}>
-              Receive Path
-              {recvPathEmptyWarn && <span className={style.Warn}>Set your Receive Path.</span>}
+              Receive Directory
+              {recvDirEmptyWarn && <span className={style.Warn}>Set your Receive Path.</span>}
             </div>
             <input type='text'
-              readOnly={true}
+              readOnly
               className={style.Body}
-              placeholder={tmpRecvPath}
-              onChange={(e) => { setTmpRecvPath(e.target.value); }}
+              value={tmpRecvDir}
+              onChange={(e) => { setTmpRecvDir(e.target.value); }}
             />
-            <button>Find</button>
+            <button
+              onClick={async () => {
+                const ret = await window.ipcRenderer.setRecvDir();
+                if (ret)
+                  setTmpRecvDir(ret);
+              }}
+            >
+              Find
+            </button>
           </div>
         </div>
         <div className={style.SettingsFoot}>

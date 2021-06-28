@@ -37,7 +37,7 @@ function App() {
    * @param {Object.<string, bool>|undefined} checked
    */
   const deleteChecked = (checked) => {
-    const ret = items;
+    const ret = { ...items };
     if (checked === undefined) {
       setItems({});
     }
@@ -99,8 +99,10 @@ function App() {
     }, 1000);
 
     const id = window.localStorage.getItem('myId');
-    if (!id)
-      changeMyId('12345');
+    if (!id) {
+      const tmp = Math.floor(Math.random() * (0xffff - 0x1000) + 0x1000).toString(16);
+      changeMyId(tmp);
+    }
     else
       changeMyId(id);
 

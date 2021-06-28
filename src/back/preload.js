@@ -20,6 +20,9 @@ contextBridge.exposeInMainWorld('ipcRenderer',
     setServerId: async (myId) => {
       return (await ipcRenderer.invoke('setServerId', myId));
     },
+    setRecvDir: async () => {
+      return (await ipcRenderer.invoke('setRecvDir'));
+    },
     isServerOpen: async () => {
       return (await ipcRenderer.invoke('isServerOpen'));
     },
