@@ -49,6 +49,10 @@ function App() {
     }
   }
 
+  /**
+   * Change ID in state and also server ID.
+   * @param {string} id 
+   */
   const changeMyId = (id) => {
     if (id) {
       setMyId(id);
@@ -91,6 +95,10 @@ function App() {
       setMyIp(networks[0].ip);
       setMyNetmask(networks[0].netmask);
     }
+    else {
+      setMyIp(null);
+      setMyNetmask(null);
+    }
   }, [networks]);
 
   useEffect(() => {
@@ -98,6 +106,12 @@ function App() {
       setIsServerOpen((await ipcRenderer.isServerOpen()));
     }, 1000);
 
+    return () => {
+      clearInterval(timer);
+    }
+  }, []);
+
+  useEffect(() => {
     const id = window.localStorage.getItem('myId');
     if (!id) {
       const tmp = Math.floor(Math.random() * (0xffff - 0x1000) + 0x1000).toString(16);
@@ -105,11 +119,7 @@ function App() {
     }
     else
       changeMyId(id);
-
-    return () => {
-      clearInterval(timer);
-    }
-  }, []);
+  }, [showSettings]);
 
 
   return (
@@ -124,6 +134,10 @@ function App() {
                 const [ip, netmask] = e.target.value.split('|');
                 setMyIp(ip);
                 setMyNetmask(netmask);
+                if (isServerOpen) {
+                  // Close the server which is open to the previous IP.
+                  closeServer();
+                }
               }}
             >
               {listNetworks}
