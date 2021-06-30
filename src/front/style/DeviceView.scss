@@ -22,6 +22,21 @@
     overflow: hidden;
     padding: 5px;
     box-shadow: 0 1px 3px black;
+    .Head {
+      width: 100%;
+      display: flex;
+      font-weight: bold;
+      color: black;
+      padding: 5px;
+      border-bottom: 1px solid #999;
+      margin-bottom: 5px;
+      span {
+        color: #f00;
+        font-size: 0.95rem;
+        font-weight: normal;
+        padding-left: 10px;
+      }
+    }
     .DeviceElement {
       width: 100%;
       display: flex;
@@ -61,15 +76,6 @@
     .Selected {
       background-color: #f5f5f5;
       border-right: 5px solid #25c;
-    }
-    .Head {
-      width: 100%;
-      display: flex;
-      font-weight: bold;
-      color: black;
-      padding: 5px;
-      border-bottom: 1px solid #999;
-      margin-bottom: 5px;
     }
   }
 }

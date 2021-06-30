@@ -1,7 +1,8 @@
 const net = require('net');
 const fs = require('fs').promises;
 const { Stats } = require('fs');
-const { PORT, STATE, HEADER_END, VERSION, CHUNKSIZE, _splitHeader } = require('./Network');
+const { PORT, STATE, HEADER_END, VERSION, CHUNKSIZE } = require('../defs');
+const { _splitHeader } = require('./Network');
 
 /**
  * @typedef {{dir:string, path:string, type:string, size:number, items:Object.<string, any>}} item
@@ -15,13 +16,13 @@ class Sender {
   constructor(myId) {
     this._state = STATE.IDLE;
     if (!myId) {
-      this._state = STATE.ERR_FS;
+      this._state = STATE.ERR_ID;
       return;
     }
-    /**
-     * @type {string} my id.
-     */
+    /** @type {string} my ID. */
     this._myId = myId;
+    /** @type {string} _receiver ID. */
+    this._receiverId = null;
     /**
      * @type {boolean} 
      */
@@ -76,24 +77,6 @@ class Sender {
      * @type {number} 
      */
     this._prevSpeed = 0;
-
-    this._onWriteError = (err) => {
-      if (err) {
-        console.error('Sender: Error Occurred during writing to Socket.');
-        console.error(err);
-        this._socket.destroy();
-        this._state = STATE.ERR_NET;
-      }
-    }
-
-    /**
-     * Handle on corrupted data from receiver.
-     * NOTE that it does not set message.
-     */
-    this._handleNetworkErr = () => {
-      this._state = STATE.ERR_NET;
-      this._socket.end();
-    }
   }
 
   /**
@@ -101,9 +84,11 @@ class Sender {
    * Call this API from UI.
    * @param {Object.<string, {dir:string, path:string, type:string, size:number}>} items
    * @param {string} receiverIp 
+   * @param {string} receiverId 
    */
-  async send(items, receiverIp) {
-    this._state = STATE.SEND_REQUEST;
+  async send(items, receiverIp, receiverId) {
+    this._state = STATE.SEND_WAIT;
+    this._receiverId = receiverId;
     this._itemArray = [];
     this._index = 0;
     this._speedBytes = 0;
@@ -111,7 +96,7 @@ class Sender {
     await this._createItemArray(items);
     if (this.getTotalNumItems() === 0) {
       // Nothing to send and consider it send complete.
-      this._state = STATE.SEND_DONE;
+      this._state = STATE.SEND_COMPLETE;
       return;
     }
 
@@ -144,7 +129,7 @@ class Sender {
       }
       this._recvBuf = ret.buf;
       switch (this._state) {
-        case STATE.SEND_REQUEST:
+        case STATE.SEND_WAIT:
           switch (recvHeader.class) {
             case 'ok':
               this._state = STATE.SEND;
@@ -158,7 +143,7 @@ class Sender {
             default:
               // What the hell?
               console.error('header class value error: Unexpected value ' + recvHeader.class);
-              this._state = STATE.ERR_NET;
+              this._state = STATE.ERR_NETWORK;
               this._socket.end();
               return;
           }
@@ -170,10 +155,10 @@ class Sender {
               this._send();
               break;
             case 'stop':
-              this._state = STATE.RECEIVER_STOP;
+              this._state = STATE.RECVER_PAUSE;
               break
             case 'end':
-              this._state = STATE.RECEIVER_END;
+              this._state = STATE.RECVER_END;
               this._socket.end();
               break
             case 'next':
@@ -191,7 +176,7 @@ class Sender {
               return;
           }
           break;
-        case STATE.RECEIVER_STOP:
+        case STATE.RECVER_PAUSE:
           switch (recvHeader.class) {
             case 'ok':
               // Receiver wants to resume from stop.
@@ -199,16 +184,16 @@ class Sender {
               this._send();
               break;
             case 'end':
-              this._state = STATE.RECEIVER_END;
+              this._state = STATE.RECVER_END;
             default:
               // What the hell?
               break;
           }
           break;
-        case STATE.SENDER_STOP:
+        case STATE.SENDER_PAUSE:
           switch (recvHeader.class) {
             case 'end':
-              this._state = STATE.RECEIVER_END;
+              this._state = STATE.RECVER_END;
               break;
             // Ignore any other classes.
           }
@@ -221,9 +206,9 @@ class Sender {
     });
 
     this._socket.on('close', () => {
-      if (!(this._state === STATE.SEND_DONE || this._state === STATE.RECEIVER_END || this._state === STATE.SENDER_END))
+      if (!(this._state === STATE.SEND_COMPLETE || this._state === STATE.RECVER_END || this._state === STATE.SENDER_END))
         // Unexpected close event.
-        this._state = STATE.ERR_NET;
+        this._state = STATE.ERR_NETWORK;
       this._socket.end();
     });
 
@@ -231,7 +216,7 @@ class Sender {
       if (err.code === 'ETIMEDOUT') {
         console.error('Sender: failed to connect due to timeout');
       }
-      this._state = STATE.ERR_NET;
+      this._state = STATE.ERR_NETWORK;
     })
   }
 
@@ -249,7 +234,7 @@ class Sender {
    * @returns {boolean}
    */
   resume() {
-    if (this._state === STATE.SENDER_STOP) {
+    if (this._state === STATE.SENDER_PAUSE) {
       this._state = STATE.SEND;
       this._send();
       return true;
@@ -261,12 +246,12 @@ class Sender {
    * @returns {boolean}
    */
   async end() {
-    if (this._state === STATE.SEND || this._state === STATE.SEND_REQUEST || this._state === STATE.SENDER_STOP || this._state === STATE.RECEIVER_STOP) {
+    if (this._state === STATE.SEND || this._state === STATE.SEND_WAIT || this._state === STATE.SENDER_PAUSE || this._state === STATE.RECVER_PAUSE) {
+      this._endFlag = true;
       if (this._itemHandle) {
         await this._itemHandle.close();
       }
-      this._endFlag = true;
-      if (this._state === STATE.SENDER_STOP || this._state === STATE.RECEIVER_STOP) {
+      if (this._state === STATE.SENDER_PAUSE || this._state === STATE.RECVER_PAUSE) {
         // Send end header immediately while stop.
         let header = { class: 'end' };
         this._socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this._onWriteError);
@@ -333,7 +318,10 @@ class Sender {
    */
   getState() {
     if (this._state === STATE.SEND_REQUEST) {
-      return { state: this._state };
+      return {
+        state: this._state,
+        id: this._receiverId
+      };
     }
     if (this._state === STATE.SEND) {
       let itemName = '';
@@ -348,7 +336,7 @@ class Sender {
         speed: this.getSpeed(),
         progress: this.getItemProgress(),
         totalProgress: this.getTotalProgress(),
-        name: itemName
+        itemName: itemName
       };
     }
     return { state: this._state };
@@ -358,19 +346,19 @@ class Sender {
     let header = null;
     if (this._endFlag) {
       this._endFlag = false;
-      this._state = STATE.RECEIVER_END;
+      this._state = STATE.SENDER_END;
       header = { class: 'end' };
       this._socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this._onWriteError);
       return;
     }
     if (this._stopFlag) {
       this._stopFlag = false;
-      this._state = STATE.SENDER_STOP;
+      this._state = STATE.SENDER_PAUSE;
       header = { class: 'stop' };
       this._socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this._onWriteError);
       return;
     }
-    if (this._state === STATE.SENDER_STOP) {
+    if (this._state === STATE.SENDER_PAUSE) {
       // What the hell?
       // Do not do anything.
       return;
@@ -378,7 +366,7 @@ class Sender {
     if (this._index >= this._itemArray.length) {
       // End of send.
       console.log('Sender: Send complete');
-      this._state = STATE.SEND_DONE;
+      this._state = STATE.SEND_COMPLETE;
       header = { class: 'done' };
       this._socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this._onWriteError);
       return;
@@ -534,6 +522,24 @@ class Sender {
   _goToNextItem() {
     this._index++;
     this._itemHandle = null;
+  }
+
+  _onWriteError = (err) => {
+    if (err) {
+      console.error('Sender: Error Occurred during writing to Socket.');
+      console.error(err);
+      this._socket.destroy();
+      this._state = STATE.ERR_NETWORK;
+    }
+  }
+
+  /**
+     * Handle on corrupted data from receiver.
+     * NOTE that it does not set message.
+     */
+  _handleNetworkErr = () => {
+    this._state = STATE.ERR_NETWORK;
+    this._socket.end();
   }
 }
 

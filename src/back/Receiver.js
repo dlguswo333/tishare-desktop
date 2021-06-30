@@ -86,7 +86,6 @@ class Receiver {
     this._prevSpeed = 0;
   }
 
-
   /**
    * Initialize Receiver by adding event listeners.
    * Call it after contructor.
@@ -95,7 +94,7 @@ class Receiver {
     this._socket.on('data', async (data) => {
       let ret = null;
       this._recvBuf = Buffer.concat([this._recvBuf, data]);
-      if (this._haveParsedHeader) {
+      if (!this._haveParsedHeader) {
         // Try to parse header and save into header.
         ret = _splitHeader(recvBuf);
         if (!ret) {
@@ -147,11 +146,6 @@ class Receiver {
           }
         case STATE.RECV:
         case STATE.SENDER_STOP:
-          if (!this._isRecvSocket(socket)) {
-            // Destroy this malicious socket.
-            this_socket.destroy();
-            return;
-          }
           switch (this._recvHeader.class) {
             case 'ok':
               if (this._state === STATE.SENDER_STOP)
@@ -173,7 +167,7 @@ class Receiver {
                   } finally {
                     this._itemHandle = null;
                     this._itemFlag = 'next';
-                    this._writeOnRecvSocket();
+                    this._writeOnSocket();
                     return;
                   }
                 }
@@ -182,7 +176,7 @@ class Receiver {
                 this._itemWrittenBytes += recvBuf.length;
                 recvBuf = Buffer.from([]);
                 this._itemFlag = 'ok';
-                this._writeOnRecvSocket();
+                this._writeOnSocket();
               }
               break;
             case 'new':
@@ -205,7 +199,7 @@ class Receiver {
                   }
                 }
                 this._itemFlag = 'ok';
-                this._writeOnRecvSocket();
+                this._writeOnSocket();
               }
               else if (this._recvHeader.type === 'file') {
                 try {
@@ -217,11 +211,13 @@ class Receiver {
                   this._itemHandle = await fs.open(path.join(this._recvPath, this._itemName), 'wx');
                 } catch (err) {
                   // File already exists.
-                  // TODO Implement.
+                  // TODO Implement handling.
+                  // 1. Ignore the file.
+                  // 2. Create the file with another name.
                   this._itemHandle = null;
                   this._haveParsedHeader = false;
                   this._itemFlag = 'next';
-                  this._writeOnRecvSocket();
+                  this._writeOnSocket();
                   return;
                 }
                 this._haveParsedHeader = false;
@@ -229,7 +225,7 @@ class Receiver {
                 this._itemSize = this._recvHeader.size;
                 recvBuf = Buffer.from([]);
                 this._itemFlag = 'ok';
-                this._writeOnRecvSocket();
+                this._writeOnSocket();
               }
               break;
             case 'done':
@@ -285,33 +281,6 @@ class Receiver {
   }
 
   /**
-   * Close the server socket.
-   */
-  closeServerSocket() {
-    if (this._serverSocket) {
-      this._serverSocket.close(() => { this._serverSocket = null; });
-    }
-  }
-
-  /**
-   * Return whether the server socket is not null and it is listening.
-   * @returns {boolean}
-   */
-  isOpen() {
-    return this._serverSocket && this._serverSocket.listening;
-  }
-
-  /**
-   * Change this my id.
-   * @param {string} newId 
-   */
-  setMyId(newId) {
-    if (!newId)
-      return false;
-    this._myId = newId;
-    return true;
-  }
-  /**
    * @returns {Array<{name:String, type:String, size:number}>}
    */
   getitemArray() {
@@ -358,7 +327,8 @@ class Receiver {
         speed: this.getSpeed(),
         progress: this.getItemProgress(),
         totalProgress: this.getTotalProgress(),
-        name: this._itemName
+        id: this._sendRequestHeader.id,
+        itemName: this._itemName,
       };
     }
     if (this._state === STATE.RECV_WAIT) {
@@ -426,7 +396,7 @@ class Receiver {
       this._endFlag = true;
       if (this._state === STATE.SENDER_STOP || this._state === STATE.RECEIVER_STOP) {
         // Send end header immediately while stop.
-        this._writeOnRecvSocket();
+        this._writeOnSocket();
       }
       return true;
     }
@@ -469,7 +439,7 @@ class Receiver {
   /**
    * Special method for writing to recvSocket while receiving.
    */
-  _writeOnRecvSocket() {
+  _writeOnSocket() {
     let header = null;
     if (this._endFlag) {
       this._endFlag = false;

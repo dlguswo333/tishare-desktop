@@ -5,18 +5,17 @@ const { PORT, OS, VERSION, STATE, MAX_NUM_JOBS } = require('../defs');
 
 class Server {
   constructor() {
-    this._state = STATE.INITING;
+    this._state = STATE.IDLE;
     /** @type {string} */
-    this.myId = "";
+    this.myId = '';
     /** @type {dgram.Socket} */
     this._scannee = null;
     /** @type {net.Server} */
     this._serverSocket = null;
-    this._state = STATE.IDLE;
     /** @type {Object.<number, Receiver>} */
     this.jobs = {};
     /** @type {number} */
-    this._nextNum = 0;
+    this._nextInd = 1;
   }
 
   /**
@@ -62,7 +61,7 @@ class Server {
         return;
       }
       const receiver = new Receiver(socket);
-      this.jobs[this._nextNum++] = receiver;
+      this.jobs[this._nextInd++] = receiver;
     });
 
     this._serverSocket.on('error', (err) => {
@@ -90,8 +89,22 @@ class Server {
     return true;
   }
 
-  getState() {
-    return this._state;
+  /**
+   * Return State of Receivers or a Receiver with the index.
+   * @param {number} ind 
+   */
+  getState(ind) {
+    if (ind === undefined) {
+      let ret = {};
+      for (const receiver in this.jobs) {
+        ret[receiver] = this.jobs[receiver].getState();
+      }
+      return ret;
+    }
+    if (this.jobs[ind]) {
+      return this.jobs[ind].getState();
+    }
+    return undefined;
   }
 
   /**
@@ -147,6 +160,19 @@ class Server {
       this._scannee.close();
       this._scannee = null;
     }
+  }
+
+  /**
+   * Delete a Receiver from jobs.
+   * @param {number} ind 
+   * @returns {boolean} Whether the execution has been successful.
+   */
+  delete(ind) {
+    if (this.jobs[ind]) {
+      delete this.jobs[ind];
+      return true;
+    }
+    return false;
   }
 }
 

@@ -173,6 +173,7 @@ function App() {
           </div>
           <div className="DeviceGrid">
             <DeviceView
+              items={items}
               myIp={myIp}
               myNetmask={myNetmask}
               myId={myId}

@@ -6,23 +6,25 @@ const ipcRenderer = window.ipcRenderer;
 /**
  * 
  * @param {Object} props 
+ * @param {Object} props.items 
  * @param {string} props.myIp 
  * @param {string} props.myNetmask 
  * @param {string} props.myId 
  * @returns 
  */
-function DeviceView({ myIp, myNetmask, myId }) {
+function DeviceView({ items, myIp, myNetmask, myId }) {
   const [devices, setDevices] = useState({});
-  const [selected, setSelected] = useState(null);
+  const [selectedIp, setSelectedIp] = useState(null);
+  const [noDeviceWarn, setNoDeviceWarn] = useState(false);
 
   const showDevices = () => {
     const ret = [];
     for (let ip in devices) {
       const device = devices[ip];
       ret.push(
-        <div className={'DeviceElement' + (selected === ip ? ' Selected' : '')} key={ip}
+        <div className={'DeviceElement' + (selectedIp === ip ? ' Selected' : '')} key={ip}
           onClick={() => {
-            setSelected(ip);
+            setSelectedIp(ip);
           }}
         >
           <div className='DeviceOs'>
@@ -43,9 +45,18 @@ function DeviceView({ myIp, myNetmask, myId }) {
   }
 
   const scan = () => {
-    setSelected(null);
+    setSelectedIp(null);
     setDevices({});
     ipcRenderer.scan(myIp, myNetmask, myId);
+  }
+
+  const send = () => {
+    if (!selectedIp) {
+      setNoDeviceWarn(true);
+      return;
+    }
+    setNoDeviceWarn(false);
+    ipcRenderer.send(items, selectedIp, devices[selectedIp].id);
   }
 
   useEffect(() => {
@@ -68,12 +79,13 @@ function DeviceView({ myIp, myNetmask, myId }) {
       <div className='DeviceViewHead'>
         <div className='Buttons'>
           <ThemeButton onClick={scan} value='Scan' />
-          <ThemeButton value='Send' />
+          <ThemeButton onClick={send} value='Send' />
         </div>
       </div>
       <div className='DeviceViewBody'>
         <div className='Head'>
           Devices
+          {noDeviceWarn && <span>Select Device to send.</span>}
         </div>
         {showDevices()}
       </div>

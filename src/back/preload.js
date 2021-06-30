@@ -34,6 +34,15 @@ contextBridge.exposeInMainWorld('ipcRenderer',
     },
     removeScanCallback: () => {
       ipcRenderer.removeAllListeners('scannedDevice');
+    },
+    send: (items, receiverIp, receiverId) => {
+      ipcRenderer.invoke('send', items, receiverIp, receiverId);
+    },
+    getServerState: async () => {
+      return (await ipcRenderer.invoke('getServerState'));
+    },
+    getClientState: async () => {
+      return (await ipcRenderer.invoke('getClientState'));
     }
   }
 )

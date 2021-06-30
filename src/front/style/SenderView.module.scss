@@ -1,0 +1,28 @@
+@use "variables" as v;
+.ReceiverView {
+  width: 95%;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  padding: 5px;
+  border-radius: 10px;
+  background-color: #fff;
+  .Head {
+    display: flex;
+    flex-direction: row;
+    padding: 5px;
+  }
+  .Body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .Foot {
+    display: flex;
+    flex-direction: row;
+    button {
+      flex: 1;
+      padding: 5px;
+    }
+  }
+}

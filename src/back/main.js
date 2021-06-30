@@ -5,12 +5,14 @@ const path = require('path');
 const network = require('./Network');
 const isDev = require('electron-is-dev');
 const Server = require('./Server');
+const Client = require('./Client');
 
 /** @type {BrowserWindow} */
 var mainWindow = null;
-var server = new Server();
+const server = new Server();
+const client = new Client();
 
-function createWindow() {
+function createMainWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     title: 'tiShare',
@@ -35,14 +37,11 @@ function createWindow() {
     mainWindow.maximize();
   }
   else {
-    console.log('Running in production');
     // removeMenu will remove debugger menu too. Comment the below line if not wanted.
     mainWindow.removeMenu();
     // When in production, run react build first.
     // The main electron window will load the react built packs like below.
-    mainWindow.loadFile(path.join(__dirname, '../build/index.html')).then(() => {
-      console.log('Loaded index.html');
-    }).catch(() => {
+    mainWindow.loadFile(path.join(__dirname, '../build/index.html')).catch(() => {
       console.log('Loading index.html failed');
     });
   }
@@ -53,7 +52,7 @@ function createWindow() {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  mainWindow = createWindow();
+  mainWindow = createMainWindow();
   mainWindow.once('ready-to-show', () => {
     // Show the window only after fully loaded.
     mainWindow.show();
@@ -63,7 +62,7 @@ app.whenReady().then(() => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) {
-      mainWindow = createWindow();
+      mainWindow = createMainWindow();
     }
   })
 });
@@ -166,12 +165,10 @@ ipcMain.handle('setServerId', (event, myId) => {
     server.setMyId(myId);
 })
 
-ipcMain.handle('send', (event, ip, items, myId) => {
-  // set receiver busy.
-  receiver.setStateBusy();
-  if (!sender) {
-    sender = new Sender(myId);
-    sender.send(items, ip);
+ipcMain.handle('send', (event, items, ip, id) => {
+  if (client) {
+    console.log(items, ip, id);
+    client.send(items, ip, id);
   }
 })
 
@@ -183,9 +180,16 @@ ipcMain.handle('setReceiverIdle', () => {
   receiver.setStateIdle();
 })
 
-ipcMain.handle('getSendState', () => {
-  if (sender) {
-    return sender.getState();
+ipcMain.handle('getServerState', () => {
+  if (server) {
+    return server.getState();
+  }
+  return undefined;
+})
+
+ipcMain.handle('getClientState', () => {
+  if (client) {
+    return client.getState();
   }
   return undefined;
 })
