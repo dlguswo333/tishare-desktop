@@ -21,15 +21,16 @@
     flex-direction: column;
     overflow: hidden;
     padding: 5px;
-    box-shadow: 1px 1px 3px black;
+    box-shadow: 0 1px 3px black;
     .DeviceElement {
       width: 100%;
       display: flex;
       flex-direction: row;
-      border: none;
       padding: 5px 0;
       transition: v.$fastTransition;
-      border-bottom: 1px solid #999;
+      border: 1px solid #999;
+      border-radius: 2px;
+      overflow: hidden;
       .DeviceOs {
         display: flex;
         align-items: center;

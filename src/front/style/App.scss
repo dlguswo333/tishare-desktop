@@ -35,8 +35,10 @@
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      border-bottom: 1px solid black;
+      background-color: #16f;
+      box-shadow: 0 1px 4px black;
       padding: 5px 10px;
+      color: white;
       .Networks {
         padding: 5px 10px;
         border-radius: 5px;
@@ -51,6 +53,7 @@
         top: 10px;
         right: 20px;
         border: 2px solid #211a;
+        background-color: #fff;
         padding: 5px 10px;
         border-radius: 25px;
         min-height: 25px;
@@ -61,12 +64,11 @@
         transition: v.$slowTransition;
         cursor: pointer;
         &:hover {
-          background-color: #ccc;
+          background-color: #ddd;
         }
         &:active {
           transition: v.$fastTransition;
-          background-color: #999;
-          color: white;
+          background-color: #bbb;
         }
         span {
           display: inline-block;
@@ -82,15 +84,15 @@
         }
       }
       .ServerOpen {
-        box-shadow: 2px 2px 3px #0b0;
+        box-shadow: 0 2px 3px #0b0;
         &:hover {
-          box-shadow: 2px 2px 3px #322;
+          box-shadow: 0 2px 3px #322;
         }
       }
       .ServerClose {
-        box-shadow: 2px 2px 3px #322;
+        box-shadow: 0 2px 3px #322;
         &:hover {
-          box-shadow: 2px 2px 3px #0b0;
+          box-shadow: 0 2px 3px #0b0;
         }
       }
     }
