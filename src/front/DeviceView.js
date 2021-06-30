@@ -50,9 +50,15 @@ function DeviceView({ myIp, myNetmask, myId }) {
 
   useEffect(() => {
     ipcRenderer.scanCallback((event, deviceIp, deviceVersion, deviceId, deviceOs) => {
-      let tmp = { ...devices };
+      let tmp = {};
       tmp[deviceIp] = { ip: deviceIp, version: deviceVersion, id: deviceId, os: deviceOs };
-      setDevices(tmp);
+      /**
+       * Passing a function inside setState,
+       * updating 'devices' using scan callback works as expected,
+       * and unnecessary adding and removing callback is deleted.
+       * Refer to the link: https://ko.reactjs.org/docs/hooks-faq.html#what-can-i-do-if-my-effect-dependencies-change-too-often
+       */
+      setDevices((devices) => Object.assign({}, devices, tmp));
     });
     return () => { ipcRenderer.removeScanCallback(); };
   }, []);
