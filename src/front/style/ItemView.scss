@@ -13,25 +13,6 @@
       margin-left: auto;
       padding: 0;
       overflow: hidden;
-      button {
-        padding: 8px 16px;
-        font-size: 1.02rem;
-        color: white;
-        transition: v.$fastTransition;
-        background-color: #47c;
-        cursor: pointer;
-        border: none;
-        border-radius: 300px;
-        &:hover {
-          background-color: #25f;
-        }
-        &:active {
-          background-color: #00f;
-        }
-        &:not(:last-child) {
-          margin-right: 10px;
-        }
-      }
     }
   }
   .ItemViewBody {

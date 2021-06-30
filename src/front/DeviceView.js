@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import ThemeButton from './ThemeButton';
 import './style/DeviceView.scss';
 const ipcRenderer = window.ipcRenderer;
 
@@ -56,16 +57,12 @@ function DeviceView({ myIp, myNetmask, myId }) {
     return () => { ipcRenderer.removeScanCallback(); };
   }, []);
 
-  useEffect(() => {
-    console.log(devices);
-  }, [devices]);
-
   return (
     <div className='DeviceView'>
       <div className='DeviceViewHead'>
         <div className='Buttons'>
-          <button onClick={scan}>Scan</button>
-          <button >Send</button>
+          <ThemeButton onClick={scan} value='Scan' />
+          <ThemeButton value='Send' />
         </div>
       </div>
       <div className='DeviceViewBody'>

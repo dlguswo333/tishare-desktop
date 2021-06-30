@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import ThemeButton from './ThemeButton';
 import { printSize } from '../defs';
 import './style/ItemView.scss';
 /**
@@ -102,16 +103,16 @@ function ItemView({ items, openFile, openDirectory, deleteChecked }) {
     <div className='ItemView'>
       <div className='ItemViewHead'>
         <div className='Buttons'>
-          <button onClick={openFile}>+ File</button>
-          <button onClick={openDirectory}>+ Directory</button>
-          <button onClick={() => {
+          <ThemeButton onClick={openFile} value='+ File' />
+          <ThemeButton onClick={openDirectory} value='+ Directory' />
+          <ThemeButton onClick={() => {
             if (checkAll)
               deleteChecked(undefined);
             else
               deleteChecked(checked);
             setChecked({});
           }
-          }>- Checked</button>
+          } value='- Checked' />
         </div>
       </div>
       <div className='ItemViewBody'>

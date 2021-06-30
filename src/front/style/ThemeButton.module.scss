@@ -1,0 +1,20 @@
+@use "variables" as v;
+.ThemeButton {
+  padding: 8px 16px;
+  font-size: 1.02rem;
+  color: white;
+  transition: v.$fastTransition;
+  background-color: #28f;
+  cursor: pointer;
+  border: none;
+  border-radius: 3px;
+  &:hover {
+    background-color: #25f;
+  }
+  &:active {
+    background-color: #00f;
+  }
+  &:not(:last-child) {
+    margin-right: 10px;
+  }
+}

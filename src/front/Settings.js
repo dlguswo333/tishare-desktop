@@ -49,7 +49,7 @@ function Settings({ setShowSettings }) {
   }, []);
 
   return (
-    <div>
+    <>
       <Blind />
       <div className={style.Settings}>
         <div className={style.SettingsHead}>
@@ -97,7 +97,7 @@ function Settings({ setShowSettings }) {
           <button onClick={save}>Save</button>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 
