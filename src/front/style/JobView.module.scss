@@ -5,10 +5,10 @@
   margin-top: 10px;
   display: flex;
   flex-direction: column;
-  border-radius: 10px;
-  background-color: #eef;
+  border-radius: 2px;
   color: black;
   box-shadow: 1px 1px 3px black;
+  background-color: white;
   overflow: hidden;
   .Head {
     display: flex;
@@ -16,27 +16,46 @@
     align-items: center;
     justify-content: center;
     padding: 5px;
+    font-size: 1.04rem;
+    font-weight: bold;
   }
   .Body {
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
+    .Element {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 90%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
   .Foot {
     display: flex;
     flex-direction: row;
     button {
       flex: 1;
-      padding: 5px;
+      padding: 8px;
       border: none;
-      background-color: #eee;
-      border-top: 1px solid #999;
+      transition: v.$fastTransition;
+    }
+    .Pos {
+      color: white;
+      background-color: #1a3;
       &:hover {
-        background-color: #fff;
+        background-color: #092;
+      }
+    }
+    .Neg {
+      color: black;
+      background-color: #ddd;
+      &:hover {
+        background-color: #ccc;
       }
     }
   }
-}
-.RecvView {
 }
