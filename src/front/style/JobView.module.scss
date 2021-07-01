@@ -1,0 +1,42 @@
+@use "variables" as v;
+.JobView {
+  width: 95%;
+  min-height: 150px;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+  background-color: #eef;
+  color: black;
+  box-shadow: 1px 1px 3px black;
+  overflow: hidden;
+  .Head {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+  }
+  .Body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .Foot {
+    display: flex;
+    flex-direction: row;
+    button {
+      flex: 1;
+      padding: 5px;
+      border: none;
+      background-color: #eee;
+      border-top: 1px solid #999;
+      &:hover {
+        background-color: #fff;
+      }
+    }
+  }
+}
+.RecvView {
+}
