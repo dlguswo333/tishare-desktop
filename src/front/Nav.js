@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import SenderView from './SenderView';
-import ReceiverView from './ReceiverView';
+import SendView from './SendView';
+import RecvView from './RecvView';
 import { ReactComponent as MenuIcon } from './icons/Menu.svg';
 import { ReactComponent as SettingsIcon } from './icons/Settings.svg';
+import { MAX_NUM_JOBS } from '../defs';
 import './style/Nav.scss';
 const ipcRenderer = window.ipcRenderer;
 
+let hover = false;
 /**
  * @param {object} props 
  * @param {Function} props.toggleSettings 
  * @returns 
  */
 function Nav({ toggleSettings }) {
-  let hover = false;
   const [grow, setGrow] = useState(false);
   const [noti, setNoti] = useState(false);
   const [senders, setSenders] = useState({});
@@ -22,7 +23,7 @@ function Nav({ toggleSettings }) {
     let ret = [];
     for (const key in senders) {
       ret.push(
-        <SenderView state={senders[key]} />
+        <SendView state={senders[key]} key={key} />
       )
     }
     return ret;
@@ -32,7 +33,7 @@ function Nav({ toggleSettings }) {
     let ret = [];
     for (const key in receivers) {
       ret.push(
-        <ReceiverView state={receivers[key]} />
+        <RecvView state={receivers[key]} key={key} />
       )
     }
     return ret;
@@ -44,8 +45,8 @@ function Nav({ toggleSettings }) {
   }, [grow]);
 
   useEffect(() => {
-    const timer = setTimeout(async () => {
-      let ret = await ipcRenderer.getServerState();
+    const timer = setInterval(async () => {
+      let ret = await ipcRenderer.getClientState();
       if (ret)
         setSenders(ret);
       else
@@ -56,7 +57,7 @@ function Nav({ toggleSettings }) {
       else
         setReceivers({});
     }, 900);
-    return () => { clearTimeout(timer); };
+    return () => { clearInterval(timer); };
   }, []);
 
   return (
@@ -85,6 +86,9 @@ function Nav({ toggleSettings }) {
         </div>
       </div>
       <div className="Body">
+        <SendView state={{ state: 'SEND', speed: 1, progress: 50, id: 'opponent', itemName: 'dajfklajlfajdskfj.jpg' }} />
+        <RecvView state={{ state: 'RECV', speed: 1, progress: 100, id: 'opponent' }} />
+        <RecvView state={{ state: 'RECV', speed: 1, progress: 100, id: 'opponent' }} />
         {showSenders()}
         {showReceivers()}
       </div>
