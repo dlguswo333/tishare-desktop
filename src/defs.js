@@ -24,17 +24,11 @@ const STATE = {
   // For Receiver and Sender
   SENDING: "SENDING",
   SEND_REJECT: "SEND_REJECT",
-  SEND_WAIT: "SEND_WAIT", // Will be deprecated
-  SEND_COMPLETE: "SEND_COMPLETE", // Will be deprecated
   SENDER_PAUSE: "SENDER_PAUSE", // Will be deprecated
-  SENDER_END: "SENDER_END", // Will be deprecated
 
   // For Receiver
   RECVING: "RECVING",
-  RECV_WAIT: "RECV_WAIT", // Will be deprecated
-  RECV_COMPLETE: "RECV_COMPLETE", // Will be deprecated
   RECVER_PAUSE: "RECVER_PAUSE", // Will be deprecated
-  RECVER_END: "RECVER_END" // Will be deprecated
 };
 const OS = require('os').platform();
 const { version: VERSION } = require('../package.json');

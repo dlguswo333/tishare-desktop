@@ -21,6 +21,8 @@ class Receiver {
      * @type {{app: string, version:string, class:string, id:string, itemArray:Array.<>}}
      */
     this._sendRequestHeader = null;
+    /** @type {string} */
+    this._senderId = null;
     /** @type {Object} */
     this._recvHeader = null;
     /**
@@ -123,8 +125,9 @@ class Receiver {
                 console.error('Header error. Not valid.');
                 this_socket.end();
               }
+              this._senderId = this._sendRequestHeader.id;
               this._itemArray = this._recvHeader.itemArray;
-              this._state = STATE.RECV_WAIT;
+              this._state = STATE.WAITING;
               this._haveParsedHeader = false;
               break;
             default:
@@ -133,10 +136,10 @@ class Receiver {
               return;
           }
           break;
-        case STATE.RECV_WAIT:
+        case STATE.WAITING:
           switch (this._recvHeader.class) {
             case 'end':
-              this._state = STATE.SENDER_END;
+              this._state = STATE.OTHER_END;
               this_socket.end();
               return;
             default:
@@ -242,7 +245,7 @@ class Receiver {
               this._haveParsedHeader = false;
               break;
             case 'end':
-              this._state = STATE.SENDER_END;
+              this._state = STATE.OTHER_END;
               this._socket = null;
               break;
           }
@@ -250,14 +253,11 @@ class Receiver {
         case STATE.RECEIVER_STOP:
           switch (this._recvHeader.class) {
             case 'end':
-              this._state = STATE.SENDER_END;
+              this._state = STATE.OTHER_END;
               this._socket = null;
               break;
             // Ignore any other classes.
           }
-          break;
-        case STATE.RECV_BUSY:
-          this_socket.end();
           break;
         default:
           // What the hell?
@@ -268,7 +268,7 @@ class Receiver {
     });
 
     this._socket.on('close', () => {
-      if (!(this._state === STATE.RECV_DONE || this._state === STATE.RECEIVER_END || this._state === STATE.SENDER_END))
+      if (!(this._state === STATE.RECV_DONE || this._state === STATE.MY_END || this._state === STATE.OTHER_END))
         // Unexpected close event.
         this._state = STATE.ERR_NETWORK;
       this_socket.end();
@@ -327,37 +327,18 @@ class Receiver {
         speed: this.getSpeed(),
         progress: this.getItemProgress(),
         totalProgress: this.getTotalProgress(),
-        id: this._sendRequestHeader.id,
+        id: this._senderId,
         itemName: this._itemName,
       };
     }
-    if (this._state === STATE.RECV_WAIT) {
+    if (this._state === STATE.WAITING) {
       return {
         state: this._state,
-        id: this._sendRequestHeader.id,
+        id: this._senderId,
         itemArray: this._sendRequestHeader.itemArray
       }
     }
-    return { state: this._state };
-  }
-
-  /**
-   * Set the current state to IDLE.
-   * This is needed to reinitialize the state so after an error or complete,
-   * user has been acknowledged about the status and okay to do another job.
-   */
-  setStateIdle() {
-    this._state = STATE.IDLE;
-  }
-
-  /**
-   * Set the current state to BUSY.
-   * This is going to be called before the app is going into send mode,
-   * to prevent receiving activated while sending.
-   */
-  setStateBusy() {
-    if (this._state === STATE.IDLE)
-      this._state = STATE.RECV_BUSY;
+    return { state: this._state, id: this._senderId };
   }
 
   /**
@@ -409,7 +390,7 @@ class Receiver {
    * @returns {boolean} Return the result of the function.
    */
   acceptRecv(downloadPath) {
-    if (this._state !== STATE.RECV_WAIT || this._socket === null) {
+    if (this._state !== STATE.WAITING || this._socket === null) {
       return false;
     }
     this._state = STATE.RECVING;
@@ -426,7 +407,7 @@ class Receiver {
    * @returns {boolean} Return the result of the function.
    */
   rejectRecv() {
-    if (this._state !== STATE.RECV_WAIT || this._socket === null) {
+    if (this._state !== STATE.WAITING || this._socket === null) {
       return false;
     }
     this._state = STATE.IDLE;
@@ -443,7 +424,7 @@ class Receiver {
     let header = null;
     if (this._endFlag) {
       this._endFlag = false;
-      this._state = STATE.RECEIVER_END;
+      this._state = STATE.MY_END;
       header = { class: 'end' };
       this._socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this._onWriteError);
       return;
@@ -460,7 +441,7 @@ class Receiver {
         header = { class: this._itemFlag };
         this._socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this._onWriteError);
         break;
-      case STATE.RECEIVER_END:
+      case STATE.MY_END:
         header = { class: 'end' };
         this._socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this._onWriteError);
         break;

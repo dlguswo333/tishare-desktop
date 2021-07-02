@@ -55,8 +55,8 @@ class Server {
       // Let server and client do both receiving and sending.
       // But is it really necessary?
 
-      if (Object.keys(this.jobs).length >= MAX_NUM_JOBS) {
-        // Do not accept more than limit.
+      if (Object.keys(this.jobs).length >= MAX_NUM_JOBS || this._state.startsWith('ERR')) {
+        // Do not accept more than limit or Server is in error state.
         socket.destroy();
         return;
       }
@@ -70,6 +70,7 @@ class Server {
     });
 
     this._serverSocket.listen(PORT, ip);
+    this._state = STATE.IDLE;
     return true;
   }
 
@@ -79,7 +80,9 @@ class Server {
    */
   close() {
     if (this._serverSocket) {
-      this._serverSocket.close();
+      this._serverSocket.close((err) => {
+        console.error(err);
+      });
       this._serverSocket = null;
     }
     if (this._scannee) {

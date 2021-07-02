@@ -87,7 +87,7 @@ class Sender {
    * @param {string} receiverId 
    */
   async send(items, receiverIp, receiverId) {
-    this._state = STATE.SEND_WAIT;
+    this._state = STATE.WAITING;
     this._receiverId = receiverId;
     this._itemArray = [];
     this._index = 0;
@@ -96,7 +96,7 @@ class Sender {
     await this._createItemArray(items);
     if (this.getTotalNumItems() === 0) {
       // Nothing to send and consider it send complete.
-      this._state = STATE.SEND_COMPLETE;
+      this._state = STATE.COMPLETE;
       return;
     }
 
@@ -129,7 +129,7 @@ class Sender {
       }
       this._recvBuf = ret.buf;
       switch (this._state) {
-        case STATE.SEND_WAIT:
+        case STATE.WAITING:
           switch (recvHeader.class) {
             case 'ok':
               this._state = STATE.SENDING;
@@ -158,7 +158,7 @@ class Sender {
               this._state = STATE.RECVER_PAUSE;
               break
             case 'end':
-              this._state = STATE.RECVER_END;
+              this._state = STATE.OTHER_END;
               this._socket.end();
               break
             case 'next':
@@ -184,7 +184,7 @@ class Sender {
               this._send();
               break;
             case 'end':
-              this._state = STATE.RECVER_END;
+              this._state = STATE.OTHER_END;
             default:
               // What the hell?
               break;
@@ -193,7 +193,7 @@ class Sender {
         case STATE.SENDER_PAUSE:
           switch (recvHeader.class) {
             case 'end':
-              this._state = STATE.RECVER_END;
+              this._state = STATE.OTHER_END;
               break;
             // Ignore any other classes.
           }
@@ -206,7 +206,7 @@ class Sender {
     });
 
     this._socket.on('close', () => {
-      if (!(this._state === STATE.SEND_COMPLETE || this._state === STATE.RECVER_END || this._state === STATE.SENDER_END))
+      if (!(this._state === STATE.COMPLETE || this._state === STATE.OTHER_END || this._state === STATE.MY_END))
         // Unexpected close event.
         this._state = STATE.ERR_NETWORK;
       this._socket.end();
@@ -246,7 +246,7 @@ class Sender {
    * @returns {boolean}
    */
   async end() {
-    if (this._state === STATE.SENDING || this._state === STATE.SEND_WAIT || this._state === STATE.SENDER_PAUSE || this._state === STATE.RECVER_PAUSE) {
+    if (this._state === STATE.SENDING || this._state === STATE.WAITING || this._state === STATE.SENDER_PAUSE || this._state === STATE.RECVER_PAUSE) {
       this._endFlag = true;
       if (this._itemHandle) {
         await this._itemHandle.close();
@@ -339,14 +339,14 @@ class Sender {
         itemName: itemName
       };
     }
-    return { state: this._state };
+    return { state: this._state, id: this._receiverId };
   }
 
   async _send() {
     let header = null;
     if (this._endFlag) {
       this._endFlag = false;
-      this._state = STATE.SENDER_END;
+      this._state = STATE.MY_END;
       header = { class: 'end' };
       this._socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this._onWriteError);
       return;
@@ -366,7 +366,7 @@ class Sender {
     if (this._index >= this._itemArray.length) {
       // End of send.
       console.log('Sender: Send complete');
-      this._state = STATE.SEND_COMPLETE;
+      this._state = STATE.COMPLETE;
       header = { class: 'done' };
       this._socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this._onWriteError);
       return;

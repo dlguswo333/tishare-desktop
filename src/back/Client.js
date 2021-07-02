@@ -57,13 +57,25 @@ class Client {
     sender.send(items, receiverIp, receiverId);
     return ind;
   }
+  /**
+   * End sending.
+   * Call this while the state is 'WAITING', 'SENDING'.
+   * @param {number} ind 
+   * @returns {boolean} Whether the execution has been successful.
+   */
+  endSender(ind) {
+    if (this.jobs[ind]) {
+      return this.jobs[ind].end();
+    }
+    return false;
+  }
 
   /**
    * Delete a Sender from jobs.
    * @param {number} ind 
    * @returns {boolean} Whether the execution has been successful.
    */
-  delete(ind) {
+  deleteSender(ind) {
     if (this.jobs[ind]) {
       delete this.jobs[ind];
       return true;
