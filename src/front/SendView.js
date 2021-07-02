@@ -1,35 +1,103 @@
 import React from 'react';
-import { STATE } from '../defs';
+import { STATE, printSize } from '../defs';
 import style from './style/JobView.module.scss';
+const ipcRenderer = window.ipcRenderer;
 
 /**
  * @param {object} props 
  * @param {object} props.state
  * @param {string} props.state.state
- * @param {string} props.state.speed
- * @param {string} props.state.progress
+ * @param {number} props.state.speed
+ * @param {number} props.state.progress
+ * @param {string} props.state.itemName
+ * @param {string} props.state.totalProgress
  * @param {string} props.state.id
+ * @param {number} props.ind
  */
-function SenderView({ state }) {
+function SenderView({ state, ind }) {
 
   const showBody = () => {
-    if (state.state === STATE.SEND_WAIT) {
+    if (state.state === STATE.WAITING)
       return (
-        <div className={style.Body}>
-          Waiting for Accept...
-        </div>
+        'Waiting to be accepted...'
       )
-    }
+    if (state.state === STATE.SENDING)
+      return (
+        <>
+          <div className={style.Element} title={state.itemName}>
+            {state.itemName}
+          </div>
+          <div className={style.Element}>
+            <progress value={state.progress} max={100}></progress>
+            {`${printSize(state.speed)}/S`}
+          </div>
+        </>
+      )
+    if (state.state === STATE.COMPLETE)
+      return (
+        <>
+          <div className={style.Element} title={state.itemName}>
+            Sending has been complete.
+          </div>
+        </>
+      )
+    if (state.state === STATE.MY_END)
+      return (
+        <>
+          <div className={style.Element}>
+            Sending has been canceled.
+          </div>
+        </>
+      )
+    if (state.state === STATE.OTHER_END)
+      return (
+        <>
+          <div className={style.Element}>
+            {state.id} has canceled receiving.
+          </div>
+        </>
+      )
   }
 
-  const showButtons = () => {
-    if (state.state === STATE.SEND_WAIT) {
+  const showFoot = () => {
+    if (state.state === STATE.WAITING)
       return (
-        <div className={style.Foot}>
-          <button>Cancel</button>
-        </div>
+        <button className={style.Neg}>CANCEL</button>
       )
-    }
+    if (state.state === STATE.SENDING)
+      return (
+        <>
+          <button className={style.Neg}
+            onClick={() => {
+              ipcRenderer.endSender(ind);
+            }}
+          >CANCEL</button>
+        </>
+      )
+    if (state.state === STATE.COMPLETE)
+      return (
+        <button className={style.Pos}
+          onClick={() => {
+            ipcRenderer.deleteSender(ind);
+          }}
+        >OK</button>
+      )
+    if (state.state === STATE.MY_END)
+      return (
+        <button className={style.Pos}
+          onClick={() => {
+            ipcRenderer.deleteSender(ind);
+          }}
+        >OK</button>
+      )
+    if (state.state === STATE.OTHER_END)
+      return (
+        <button className={style.Pos}
+          onClick={() => {
+            ipcRenderer.deleteSender(ind);
+          }}
+        >OK</button>
+      )
   }
 
   return (
@@ -37,9 +105,13 @@ function SenderView({ state }) {
       <div className={style.Head}>
         Sending to {state.id}
       </div>
-      {showBody()}
-      {showButtons()}
-    </div>
+      <div className={style.Body}>
+        {showBody()}
+      </div>
+      <div className={style.Foot}>
+        {showFoot()}
+      </div>
+    </div >
   );
 }
 

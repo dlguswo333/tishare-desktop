@@ -3,7 +3,7 @@ import SendView from './SendView';
 import RecvView from './RecvView';
 import { ReactComponent as MenuIcon } from './icons/Menu.svg';
 import { ReactComponent as SettingsIcon } from './icons/Settings.svg';
-import { MAX_NUM_JOBS } from '../defs';
+// import { MAX_NUM_JOBS } from '../defs';
 import './style/Nav.scss';
 const ipcRenderer = window.ipcRenderer;
 
@@ -23,7 +23,7 @@ function Nav({ toggleSettings }) {
     let ret = [];
     for (const key in senders) {
       ret.push(
-        <SendView state={senders[key]} key={key} />
+        <SendView state={senders[key]} ind={key} key={key} />
       )
     }
     return ret;
@@ -33,7 +33,7 @@ function Nav({ toggleSettings }) {
     let ret = [];
     for (const key in receivers) {
       ret.push(
-        <RecvView state={receivers[key]} key={key} />
+        <RecvView state={receivers[key]} ind={key} key={key} />
       )
     }
     return ret;
@@ -86,9 +86,9 @@ function Nav({ toggleSettings }) {
         </div>
       </div>
       <div className="Body">
-        <SendView state={{ state: 'SEND', speed: 1, progress: 50, id: 'opponent', itemName: 'dajfklajlfajdskfj.jpg' }} />
-        <RecvView state={{ state: 'RECV', speed: 1, progress: 100, id: 'opponent' }} />
-        <RecvView state={{ state: 'RECV', speed: 1, progress: 100, id: 'opponent' }} />
+        <SendView state={{ state: 'SENDING', speed: 1, progress: 50, id: 'opponent', itemName: 'dajfklajlfajdskfj.jpg' }} />
+        <RecvView state={{ state: 'RECVING', speed: 1, progress: 100, id: 'opponent' }} />
+        <RecvView state={{ state: 'RECVING', speed: 1, progress: 100, id: 'opponent' }} />
         {showSenders()}
         {showReceivers()}
       </div>

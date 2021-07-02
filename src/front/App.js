@@ -12,7 +12,7 @@ const ipcRenderer = window.ipcRenderer;
 function App() {
   const [items, setItems] = useState({});
   const [showSettings, setShowSettings] = useState(false);
-  const [myId, setMyId] = useState("");
+  const [myId, _setMyId] = useState("");
   const [myIp, setMyIp] = useState("");
   const [myNetmask, setMyNetmask] = useState("");
   /** @type {[{name:string, ip:string, netmask:string}[], Function]} */
@@ -53,10 +53,10 @@ function App() {
    * Change ID in state and also server ID.
    * @param {string} id 
    */
-  const changeMyId = (id) => {
+  const setMyId = (id) => {
     if (id) {
-      setMyId(id);
-      ipcRenderer.setServerId(id);
+      _setMyId(id);
+      ipcRenderer.setMyId(id);
     }
   }
 
@@ -115,10 +115,10 @@ function App() {
     const id = window.localStorage.getItem('myId');
     if (!id) {
       const tmp = Math.floor(Math.random() * (0xffff - 0x1000) + 0x1000).toString(16);
-      changeMyId(tmp);
+      setMyId(tmp);
     }
     else
-      changeMyId(id);
+      setMyId(id);
   }, [showSettings]);
 
 

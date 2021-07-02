@@ -160,23 +160,25 @@ ipcMain.handle('isServerOpen', () => {
   return server && server.isOpen();
 })
 
-ipcMain.handle('setServerId', (event, myId) => {
-  if (myId)
+ipcMain.handle('scan', (event, myIp, netmask, myId) => {
+  network.scan(myIp, netmask, myId, (deviceIp, deviceVersion, deviceId, deviceOs) => {
+    mainWindow.webContents.send('scannedDevice', deviceIp, deviceVersion, deviceId, deviceOs);
+  });
+})
+
+ipcMain.handle('setMyId', (event, myId) => {
+  if (myId) {
     server.setMyId(myId);
+    client.setMyId(myId);
+    return true;
+  }
+  return false;
 })
 
 ipcMain.handle('send', (event, items, ip, id) => {
   if (client) {
     client.send(items, ip, id);
   }
-})
-
-ipcMain.handle('setReceiverBusy', () => {
-  receiver.setStateBusy();
-})
-
-ipcMain.handle('setReceiverIdle', () => {
-  receiver.setStateIdle();
 })
 
 ipcMain.handle('getServerState', () => {
@@ -193,16 +195,17 @@ ipcMain.handle('getClientState', () => {
   return undefined;
 })
 
-ipcMain.handle('endSend', () => {
-  if (sender) {
-    sender.end();
+ipcMain.handle('endSender', (ind) => {
+  if (client) {
+    client.end();
     sender = null;
   }
 })
 
-ipcMain.handle('getRecvState', () => {
-  const state = receiver.getState();
-  return state;
+ipcMain.handle('deleteSender', (ind) => {
+  if (client) {
+    client.deleteSender()
+  }
 })
 
 ipcMain.handle('endRecv', () => {
@@ -221,11 +224,6 @@ ipcMain.handle('rejectRecv', () => {
   }
 })
 
-ipcMain.handle('scan', (event, myIp, netmask, myId) => {
-  network.scan(myIp, netmask, myId, (deviceIp, deviceVersion, deviceId, deviceOs) => {
-    mainWindow.webContents.send('scannedDevice', deviceIp, deviceVersion, deviceId, deviceOs);
-  });
-})
 
 ipcMain.handle('setRecvDir', () => {
   let ret = dialog.showOpenDialogSync(mainWindow, {

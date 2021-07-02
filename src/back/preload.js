@@ -17,8 +17,8 @@ contextBridge.exposeInMainWorld('ipcRenderer',
     closeServer: async () => {
       return (await ipcRenderer.invoke('closeServer'));
     },
-    setServerId: async (myId) => {
-      return (await ipcRenderer.invoke('setServerId', myId));
+    setMyId: async (myId) => {
+      return (await ipcRenderer.invoke('setMyId', myId));
     },
     setRecvDir: async () => {
       return (await ipcRenderer.invoke('setRecvDir'));
@@ -43,6 +43,12 @@ contextBridge.exposeInMainWorld('ipcRenderer',
     },
     getClientState: async () => {
       return (await ipcRenderer.invoke('getClientState'));
+    },
+    endSender: (ind) => {
+      ipcRenderer.invoke('endSender', ind);
+    },
+    deleteSender: (ind) => {
+      ipcRenderer.invoke('deleteSender', ind);
     }
   }
 )
