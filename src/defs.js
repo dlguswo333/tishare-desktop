@@ -14,6 +14,7 @@ const STATE = {
   IDLE: "IDLE",
 
   // For Receiver and Sender
+  WAITING: "WAITING",
   MY_STOP: "MY_STOP",
   MY_END: "MY_END",
   OTHER_STOP: "OTHER_STOP",
@@ -21,16 +22,16 @@ const STATE = {
   COMPLETE: "COMPLETE",
 
   // For Receiver and Sender
-  SEND_WAIT: "SEND_WAIT",
-  SENDING: "SEND",
+  SENDING: "SENDING",
   SEND_REJECT: "SEND_REJECT",
+  SEND_WAIT: "SEND_WAIT", // Will be deprecated
   SEND_COMPLETE: "SEND_COMPLETE", // Will be deprecated
   SENDER_PAUSE: "SENDER_PAUSE", // Will be deprecated
   SENDER_END: "SENDER_END", // Will be deprecated
 
   // For Receiver
-  RECV_WAIT: "RECV_WAIT",
   RECVING: "RECVING",
+  RECV_WAIT: "RECV_WAIT", // Will be deprecated
   RECV_COMPLETE: "RECV_COMPLETE", // Will be deprecated
   RECVER_PAUSE: "RECVER_PAUSE", // Will be deprecated
   RECVER_END: "RECVER_END" // Will be deprecated
