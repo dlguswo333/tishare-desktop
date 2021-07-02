@@ -47,11 +47,13 @@ function Nav({ toggleSettings }) {
   useEffect(() => {
     const timer = setInterval(async () => {
       let ret = await ipcRenderer.getClientState();
+      console.log(ret);
       if (ret)
         setSenders(ret);
       else
         setSenders({});
       ret = await ipcRenderer.getServerState();
+      console.log(ret);
       if (ret)
         setReceivers(ret);
       else
@@ -86,9 +88,11 @@ function Nav({ toggleSettings }) {
         </div>
       </div>
       <div className="Body">
+        {/*
         <SendView state={{ state: 'SENDING', speed: 1, progress: 50, id: 'opponent', itemName: 'dajfklajlfajdskfj.jpg' }} />
-        <RecvView state={{ state: 'RECVING', speed: 1, progress: 100, id: 'opponent' }} />
-        <RecvView state={{ state: 'RECVING', speed: 1, progress: 100, id: 'opponent' }} />
+        <RecvView state={{ state: 'WAITING', speed: 1, progress: 100, id: 'opponent', itemName: 'dajfklajlfajdskfj.jpg' }} />
+        <RecvView state={{ state: 'RECVING', speed: 1, progress: 100, id: 'opponent', itemName: 'dajfklajlfajdskfj.jpg' }} />
+        */}
         {showSenders()}
         {showReceivers()}
       </div>

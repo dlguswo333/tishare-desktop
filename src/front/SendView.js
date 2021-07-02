@@ -15,7 +15,6 @@ const ipcRenderer = window.ipcRenderer;
  * @param {number} props.ind
  */
 function SenderView({ state, ind }) {
-
   const showBody = () => {
     if (state.state === STATE.WAITING)
       return (
@@ -31,12 +30,15 @@ function SenderView({ state, ind }) {
             <progress value={state.progress} max={100}></progress>
             {`${printSize(state.speed)}/S`}
           </div>
+          <div className={style.Element}>
+            {state.totalProgress}
+          </div>
         </>
       )
     if (state.state === STATE.COMPLETE)
       return (
         <>
-          <div className={style.Element} title={state.itemName}>
+          <div className={style.Element}>
             Sending has been complete.
           </div>
         </>

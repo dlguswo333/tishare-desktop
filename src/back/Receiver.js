@@ -86,6 +86,7 @@ class Receiver {
      * @type {number} 
      */
     this._prevSpeed = 0;
+    this._init();
   }
 
   /**
@@ -98,7 +99,7 @@ class Receiver {
       this._recvBuf = Buffer.concat([this._recvBuf, data]);
       if (!this._haveParsedHeader) {
         // Try to parse header and save into header.
-        ret = _splitHeader(recvBuf);
+        ret = _splitHeader(this._recvBuf);
         if (!ret) {
           // The header is still splitted. Wait for more data by return.
           return;
@@ -106,7 +107,7 @@ class Receiver {
         try {
           this._recvHeader = JSON.parse(ret.header);
           this._haveParsedHeader = true;
-          recvBuf = ret.buf;
+          this._recvBuf = ret.buf;
         } catch (err) {
           this._state = STATE.ERR_NETWORK;
           console.error('Header parsing error. Not JSON format.');
@@ -123,7 +124,7 @@ class Receiver {
               this._sendRequestHeader = this._recvHeader;
               if (!this._validateSendRequestHeader(this._sendRequestHeader)) {
                 console.error('Header error. Not valid.');
-                this_socket.end();
+                this._socket.end();
               }
               this._senderId = this._sendRequestHeader.id;
               this._itemArray = this._recvHeader.itemArray;
@@ -132,7 +133,7 @@ class Receiver {
               break;
             default:
               // What the hell?
-              this_socket.end();
+              this._socket.end();
               return;
           }
           break;
@@ -140,11 +141,11 @@ class Receiver {
           switch (this._recvHeader.class) {
             case 'end':
               this._state = STATE.OTHER_END;
-              this_socket.end();
+              this._socket.end();
               return;
             default:
               // What the hell?
-              this_socket.end();
+              this._socket.end();
               return;
           }
         case STATE.RECVING:
@@ -153,11 +154,11 @@ class Receiver {
             case 'ok':
               if (this._state === STATE.SENDER_STOP)
                 this._state = STATE.RECVING;
-              if (recvBuf.length === this._recvHeader.size) {
+              if (this._recvBuf.length === this._recvHeader.size) {
                 // One whole chunk received.
                 // Write chunk on disk.
                 try {
-                  await this._itemHandle.appendFile(recvBuf);
+                  await this._itemHandle.appendFile(this._recvBuf);
                 } catch (err) {
                   // Appending to file error.
                   // In this error, there is nothing SendDone can do about it.
@@ -175,9 +176,9 @@ class Receiver {
                   }
                 }
                 this._haveParsedHeader = false;
-                this._speedBytes += recvBuf.length;
-                this._itemWrittenBytes += recvBuf.length;
-                recvBuf = Buffer.from([]);
+                this._speedBytes += this._recvBuf.length;
+                this._itemWrittenBytes += this._recvBuf.length;
+                this._recvBuf = Buffer.from([]);
                 this._itemFlag = 'ok';
                 this._writeOnSocket();
               }
@@ -226,7 +227,7 @@ class Receiver {
                 this._haveParsedHeader = false;
                 this._itemWrittenBytes = 0;
                 this._itemSize = this._recvHeader.size;
-                recvBuf = Buffer.from([]);
+                this._recvBuf = Buffer.from([]);
                 this._itemFlag = 'ok';
                 this._writeOnSocket();
               }
@@ -236,9 +237,8 @@ class Receiver {
                 // Close previous item handle.
                 await this._itemHandle.close();
               }
-              this._state = STATE.RECV_DONE;
-              this._socket = null;
-              this_socket.end();
+              this._state = STATE.COMPLETE;
+              this._socket.end();
               break;
             case 'stop':
               this._state = STATE.SENDER_STOP;
@@ -262,16 +262,16 @@ class Receiver {
         default:
           // What the hell?
           // Unhandled Receiver state case.
-          this_socket.end();
+          this._socket.end();
           break;
       }
     });
 
     this._socket.on('close', () => {
-      if (!(this._state === STATE.RECV_DONE || this._state === STATE.MY_END || this._state === STATE.OTHER_END))
+      if (!(this._state === STATE.COMPLETE || this._state === STATE.MY_END || this._state === STATE.OTHER_END))
         // Unexpected close event.
         this._state = STATE.ERR_NETWORK;
-      this_socket.end();
+      this._socket.end();
     });
 
     this._socket.on('error', (err) => {
@@ -335,7 +335,7 @@ class Receiver {
       return {
         state: this._state,
         id: this._senderId,
-        itemArray: this._sendRequestHeader.itemArray
+        // itemArray: this._sendRequestHeader.itemArray
       }
     }
     return { state: this._state, id: this._senderId };
@@ -389,12 +389,12 @@ class Receiver {
    * The module is going to change current state and be ready to receive.
    * @returns {boolean} Return the result of the function.
    */
-  acceptRecv(downloadPath) {
+  acceptRecv(recvPath) {
     if (this._state !== STATE.WAITING || this._socket === null) {
       return false;
     }
     this._state = STATE.RECVING;
-    this._recvPath = downloadPath;
+    this._recvPath = recvPath;
     this._numRecvItem = 0;
     this._speedBytes = 0;
     this._itemFlag = 'ok';

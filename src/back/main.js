@@ -195,32 +195,43 @@ ipcMain.handle('getClientState', () => {
   return undefined;
 })
 
-ipcMain.handle('endSender', (ind) => {
+ipcMain.handle('endSender', (_, ind) => {
   if (client) {
-    client.end();
-    sender = null;
+    return client.endSender(ind);
   }
+  return false;
 })
 
-ipcMain.handle('deleteSender', (ind) => {
+ipcMain.handle('deleteSender', (_, ind) => {
   if (client) {
-    client.deleteSender()
+    return client.deleteSender(ind);
+  }
+  return false;
+})
+
+ipcMain.handle('endRecver', (_, ind) => {
+  if (server) {
+    return server.endRecver(ind);
+  }
+  return false;
+})
+
+ipcMain.handle('deleteRecver', (_, ind) => {
+  if (server) {
+    return server.deleteRecver(ind);
+  }
+  return false;
+})
+
+ipcMain.handle('acceptRecv', (_, ind, recvDir) => {
+  if (server) {
+    server.acceptRecv(ind, (recvDir ? recvDir : app.getPath('downloads')));
   }
 })
 
-ipcMain.handle('endRecv', () => {
-  receiver.end();
-})
-
-ipcMain.handle('acceptRecv', (event, downloadDirectory) => {
-  if (receiver) {
-    receiver.acceptRecv(downloadDirectory ? downloadDirectory : app.getPath('downloads'));
-  }
-})
-
-ipcMain.handle('rejectRecv', () => {
-  if (receiver) {
-    receiver.rejectRecv();
+ipcMain.handle('rejectRecv', (_, ind) => {
+  if (server) {
+    server.rejectRecv(ind);
   }
 })
 
@@ -233,10 +244,6 @@ ipcMain.handle('setRecvDir', () => {
   if (ret)
     return ret[0];
   return null;
-})
-
-ipcMain.handle('setMyId', (event, myId) => {
-  receiver.setMyId(myId);
 })
 
 ipcMain.handle('showMessage', (event, message) => {

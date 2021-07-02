@@ -13,11 +13,15 @@
   .Head {
     display: flex;
     flex-direction: row;
+    align-self: center;
     align-items: center;
     justify-content: center;
     padding: 5px;
     font-size: 1.04rem;
     font-weight: bold;
+    overflow: hidden;
+    width: 95%;
+    border-bottom: 1px solid #999;
   }
   .Body {
     flex: 1;

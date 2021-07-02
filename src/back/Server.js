@@ -166,11 +166,43 @@ class Server {
   }
 
   /**
+   * Accept receiving.
+   * @param {number} ind 
+   */
+  acceptRecv(ind, recvDir) {
+    if (this.jobs[ind]) {
+      this.jobs[ind].acceptRecv(recvDir);
+    }
+  }
+
+  /**
+   * Reject receiving.
+   * @param {number} ind 
+   */
+  rejectRecv(ind) {
+    if (this.jobs[ind]) {
+      this.jobs[ind].rejectRecv();
+    }
+  }
+
+  /**
+   * End receiving.
+   * Call this while the state is 'WAITING', 'RECVING'.
+   * @param {number} ind
+   * @returns {boolean} Whether the execution has been successful.
+   */
+  endRecver(ind) {
+    if (this.jobs[ind]) {
+      return this.jobs[ind].end();
+    }
+    return false;
+  }
+  /**
    * Delete a Receiver from jobs.
    * @param {number} ind 
    * @returns {boolean} Whether the execution has been successful.
    */
-  delete(ind) {
+  deleteRecver(ind) {
     if (this.jobs[ind]) {
       delete this.jobs[ind];
       return true;
