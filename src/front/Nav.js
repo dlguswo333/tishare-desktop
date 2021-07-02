@@ -3,6 +3,7 @@ import SendView from './SendView';
 import RecvView from './RecvView';
 import { ReactComponent as MenuIcon } from './icons/Menu.svg';
 import { ReactComponent as SettingsIcon } from './icons/Settings.svg';
+import { ReactComponent as PinIcon } from './icons/Pin.svg';
 // import { MAX_NUM_JOBS } from '../defs';
 import './style/Nav.scss';
 const ipcRenderer = window.ipcRenderer;
@@ -15,6 +16,7 @@ let hover = false;
  */
 function Nav({ toggleSettings }) {
   const [grow, setGrow] = useState(false);
+  const [pin, setPin] = useState(false);
   const [noti, setNoti] = useState(false);
   const [senders, setSenders] = useState({});
   const [receivers, setReceivers] = useState({});
@@ -63,7 +65,7 @@ function Nav({ toggleSettings }) {
   }, []);
 
   return (
-    <nav className={grow ? "Nav Grow" : "Nav"}
+    <nav className={(pin || grow) ? "Nav Grow" : "Nav"}
       onMouseEnter={() => {
         hover = true;
         setGrow(true);
@@ -81,6 +83,11 @@ function Nav({ toggleSettings }) {
           onClick={toggleSettings}
         >
           <SettingsIcon />
+        </div>
+        <div className={pin ? "Pin Active" : "Pin"}
+          onClick={() => { setPin((value) => !value); }}
+        >
+          <PinIcon />
         </div>
         <div className="Menu">
           <MenuIcon />

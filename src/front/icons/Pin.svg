@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" className="Icon" width="100%" viewBox="0 0 100 100">
+  <title>Pin</title>
+  <line x1="50" y1="60" x2="50" y2="80" style="stroke-width:4;stroke-linecap:round" />
+  <path d="M25 60 L75 60 Q75 45 60 40 L60 20 L40 20 L40 40 Q25 45 25 60" />
+</svg>

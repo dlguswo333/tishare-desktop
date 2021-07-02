@@ -30,12 +30,24 @@
     .Settings {
       stroke: black;
       fill: black;
+      cursor: pointer;
+      &:hover {
+        stroke: red;
+        fill: red;
+      }
+    }
+    .Pin {
+      stroke: black;
       margin-right: auto;
       cursor: pointer;
       &:hover {
         stroke: red;
         fill: red;
       }
+    }
+    .Active {
+      stroke: #3f2;
+      fill: #3f2;
     }
     .Menu {
       stroke: black;
