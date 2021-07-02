@@ -76,7 +76,7 @@ function Settings({ setShowSettings }) {
             <input type='text'
               readOnly
               className={style.Body}
-              value={tmpRecvDir}
+              value={tmpRecvDir || ''}
               onChange={(e) => { setTmpRecvDir(e.target.value); }}
             />
             <button

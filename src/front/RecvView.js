@@ -43,7 +43,7 @@ function RecvView({ state, ind }) {
       return (
         <>
           <div className={style.Element} title={state.itemName}>
-            {state.itemName}
+            <span>{state.itemName}</span>
           </div>
           <div className={style.Element}>
             <progress value={state.progress} max={100}></progress>

@@ -81,7 +81,8 @@ class Server {
   close() {
     if (this._serverSocket) {
       this._serverSocket.close((err) => {
-        console.error(err);
+        if (err)
+          console.error(err);
       });
       this._serverSocket = null;
     }

@@ -52,6 +52,6 @@ const printSize = (size) => {
     }
     return size.toFixed(2) + ' KB';
   }
-  return size + ' B';
+  return size.toFixed(2) + ' B';
 }
 module.exports = { PORT, CHUNKSIZE, HEADER_END, STATE, OS, VERSION, SCANTIMEOUT, MAX_NUM_JOBS, printSize };

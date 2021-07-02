@@ -3,7 +3,7 @@
   position: absolute;
   right: calc(100% - #{v.$navWidth});
   top: 0;
-  min-width: v.$navGrowWidth;
+  width: v.$navGrowWidth;
   height: 100vh;
   backdrop-filter: blur(2px);
   background-color: #eff5;

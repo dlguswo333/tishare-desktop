@@ -34,10 +34,12 @@
       align-items: center;
       justify-content: center;
       width: 90%;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      margin-bottom: 5px;
+      margin-bottom: 3px;
+      span {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+      }
     }
     input[type="text"] {
       border-radius: 8px;
