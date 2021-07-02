@@ -144,12 +144,12 @@ class Receiver {
               this_socket.end();
               return;
           }
-        case STATE.RECV:
+        case STATE.RECVING:
         case STATE.SENDER_STOP:
           switch (this._recvHeader.class) {
             case 'ok':
               if (this._state === STATE.SENDER_STOP)
-                this._state = STATE.RECV;
+                this._state = STATE.RECVING;
               if (recvBuf.length === this._recvHeader.size) {
                 // One whole chunk received.
                 // Write chunk on disk.
@@ -181,7 +181,7 @@ class Receiver {
               break;
             case 'new':
               if (this._state === STATE.SENDER_STOP)
-                this._state = STATE.RECV;
+                this._state = STATE.RECVING;
               this._itemName = path.join(this._recvHeader.dir, this._recvHeader.name);
               if (this._recvHeader.type === 'directory') {
                 this._haveParsedHeader = false;
@@ -321,7 +321,7 @@ class Receiver {
    * Return the current state
    */
   getState() {
-    if (this._state === STATE.RECV) {
+    if (this._state === STATE.RECVING) {
       return {
         state: this._state,
         speed: this.getSpeed(),
@@ -365,7 +365,7 @@ class Receiver {
    * @returns {boolean}
    */
   stop() {
-    if (this._state === STATE.RECV)
+    if (this._state === STATE.RECVING)
       return (this._stopFlag = true);
     return false;
   }
@@ -375,7 +375,7 @@ class Receiver {
    */
   resume() {
     if (this._state === STATE.RECEIVER_STOP) {
-      this._state = STATE.RECV;
+      this._state = STATE.RECVING;
       let header = { class: this._itemFlag };
       this._socket.write(JSON.stringify(header) + HEADER_END, this._onWriteError);
       return true;
@@ -387,7 +387,7 @@ class Receiver {
    * @returns {boolean}
    */
   async end() {
-    if (this._state === STATE.RECV || this._state === STATE.SENDER_STOP || this._state === STATE.RECEIVER_STOP) {
+    if (this._state === STATE.RECVING || this._state === STATE.SENDER_STOP || this._state === STATE.RECEIVER_STOP) {
       if (this._itemHandle) {
         // Delete currently receiving file.
         await this._itemHandle.close();
@@ -412,7 +412,7 @@ class Receiver {
     if (this._state !== STATE.RECV_WAIT || this._socket === null) {
       return false;
     }
-    this._state = STATE.RECV;
+    this._state = STATE.RECVING;
     this._recvPath = downloadPath;
     this._numRecvItem = 0;
     this._speedBytes = 0;
@@ -456,7 +456,7 @@ class Receiver {
       return;
     }
     switch (this._state) {
-      case STATE.RECV:
+      case STATE.RECVING:
         header = { class: this._itemFlag };
         this._socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this._onWriteError);
         break;

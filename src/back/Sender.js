@@ -132,7 +132,7 @@ class Sender {
         case STATE.SEND_WAIT:
           switch (recvHeader.class) {
             case 'ok':
-              this._state = STATE.SEND;
+              this._state = STATE.SENDING;
               // Send header and chunk.
               this._send();
               break;
@@ -148,7 +148,7 @@ class Sender {
               return;
           }
           break;
-        case STATE.SEND:
+        case STATE.SENDING:
           switch (recvHeader.class) {
             case 'ok':
               // Send header and chunk.
@@ -180,7 +180,7 @@ class Sender {
           switch (recvHeader.class) {
             case 'ok':
               // Receiver wants to resume from stop.
-              this._state = STATE.SEND;
+              this._state = STATE.SENDING;
               this._send();
               break;
             case 'end':
@@ -225,7 +225,7 @@ class Sender {
    * @returns {boolean}
    */
   stop() {
-    if (this._state === STATE.SEND)
+    if (this._state === STATE.SENDING)
       return (this._stopFlag = true);
     return false;
   }
@@ -235,7 +235,7 @@ class Sender {
    */
   resume() {
     if (this._state === STATE.SENDER_PAUSE) {
-      this._state = STATE.SEND;
+      this._state = STATE.SENDING;
       this._send();
       return true;
     }
@@ -246,7 +246,7 @@ class Sender {
    * @returns {boolean}
    */
   async end() {
-    if (this._state === STATE.SEND || this._state === STATE.SEND_WAIT || this._state === STATE.SENDER_PAUSE || this._state === STATE.RECVER_PAUSE) {
+    if (this._state === STATE.SENDING || this._state === STATE.SEND_WAIT || this._state === STATE.SENDER_PAUSE || this._state === STATE.RECVER_PAUSE) {
       this._endFlag = true;
       if (this._itemHandle) {
         await this._itemHandle.close();
@@ -323,7 +323,7 @@ class Sender {
         id: this._receiverId
       };
     }
-    if (this._state === STATE.SEND) {
+    if (this._state === STATE.SENDING) {
       let itemName = '';
       try {
         itemName = this._itemArray[this._index].name;

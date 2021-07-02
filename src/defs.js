@@ -9,29 +9,31 @@ const STATE = {
   ERR_IP: "ERR_IP",
 
   // For Server and Client
+  // NOTE Maybe we don't need these at all.
   INITING: "INITING",
   IDLE: "IDLE",
 
   // For Receiver and Sender
-  MY_PAUSE: "MY_PAUSE",
-  OTHER_PAUSE: "OTHER_PAUSE",
+  MY_STOP: "MY_STOP",
   MY_END: "MY_END",
+  OTHER_STOP: "OTHER_STOP",
   OTHER_END: "OTHER_END",
+  COMPLETE: "COMPLETE",
 
-  // For Sender
+  // For Receiver and Sender
   SEND_WAIT: "SEND_WAIT",
   SENDING: "SEND",
   SEND_REJECT: "SEND_REJECT",
-  SEND_COMPLETE: "SEND_COMPLETE",
-  SENDER_PAUSE: "SENDER_PAUSE", //Will be deprecated
-  SENDER_END: "SENDER_END", //Will be deprecated
+  SEND_COMPLETE: "SEND_COMPLETE", // Will be deprecated
+  SENDER_PAUSE: "SENDER_PAUSE", // Will be deprecated
+  SENDER_END: "SENDER_END", // Will be deprecated
 
   // For Receiver
   RECV_WAIT: "RECV_WAIT",
   RECVING: "RECVING",
-  RECV_COMPLETE: "RECV_COMPLETE",
-  RECVER_PAUSE: "RECVER_PAUSE", //Will be deprecated
-  RECVER_END: "RECVER_END" //Will be deprecated
+  RECV_COMPLETE: "RECV_COMPLETE", // Will be deprecated
+  RECVER_PAUSE: "RECVER_PAUSE", // Will be deprecated
+  RECVER_END: "RECVER_END" // Will be deprecated
 };
 const OS = require('os').platform();
 const { version: VERSION } = require('../package.json');

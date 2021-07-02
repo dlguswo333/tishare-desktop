@@ -167,7 +167,6 @@ ipcMain.handle('setServerId', (event, myId) => {
 
 ipcMain.handle('send', (event, items, ip, id) => {
   if (client) {
-    console.log(items, ip, id);
     client.send(items, ip, id);
   }
 })
