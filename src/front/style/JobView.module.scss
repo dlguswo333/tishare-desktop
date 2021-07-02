@@ -28,6 +28,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     .Element {
       display: flex;
       align-items: center;
@@ -36,6 +37,29 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      margin-bottom: 5px;
+    }
+    input[type="text"] {
+      border-radius: 8px;
+      border: 1px solid #333;
+      padding: 5px;
+      margin: 0 5px;
+    }
+    button {
+      padding: 5px 10px;
+      color: white;
+      font-weight: bold;
+      transition: v.$fastTransition;
+      background-color: #47c;
+      cursor: pointer;
+      border: none;
+      border-radius: 20px;
+      &:hover {
+        background-color: #25f;
+      }
+      &:active {
+        background-color: #00f;
+      }
     }
   }
   .Foot {

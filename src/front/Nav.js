@@ -88,11 +88,11 @@ function Nav({ toggleSettings }) {
         </div>
       </div>
       <div className="Body">
-        {/*
+
         <SendView state={{ state: 'SENDING', speed: 1, progress: 50, id: 'opponent', itemName: 'dajfklajlfajdskfj.jpg' }} />
         <RecvView state={{ state: 'WAITING', speed: 1, progress: 100, id: 'opponent', itemName: 'dajfklajlfajdskfj.jpg' }} />
         <RecvView state={{ state: 'RECVING', speed: 1, progress: 100, id: 'opponent', itemName: 'dajfklajlfajdskfj.jpg' }} />
-        */}
+
         {showSenders()}
         {showReceivers()}
       </div>

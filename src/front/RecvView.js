@@ -19,7 +19,25 @@ function RecvView({ state, ind }) {
   const showBody = () => {
     if (state.state === STATE.WAITING)
       return (
-        `${state.id} wants to send you files.`
+        <>
+          <div className={style.Element}>
+            {`${state.id} wants to send you files.`}
+          </div>
+          <div className={style.Element}>
+            {`📁`}
+            <input type='text'
+              readOnly
+              value={recvDir}
+            />
+            <button
+              onClick={async () => {
+                const ret = await window.ipcRenderer.setRecvDir();
+                if (ret)
+                  setRecvDir(ret);
+              }}
+            >Find</button>
+          </div>
+        </>
       )
     if (state.state === STATE.RECVING)
       return (
