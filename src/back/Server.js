@@ -34,10 +34,9 @@ class Server {
   /**
    * Open myself to the network.
    * @param {string} ip
-   * @param {Function} callback
    * @returns {boolean} The result of the execution.
    */
-  open(ip, callback) {
+  open(ip) {
     if (!this.myId) {
       this._state = STATE.ERR_ID;
       return false;
@@ -46,7 +45,7 @@ class Server {
       this._state = STATE.ERR_IP;
       return false;
     }
-    this._initScannee(ip, callback);
+    this._initScannee(ip);
     if (this._serverSocket)
       return true;
     this._serverSocket = net.createServer();
@@ -112,18 +111,10 @@ class Server {
   }
 
   /**
-   * @callback scanCallback
-   * @param {String} deviceIp 
-   * @param {String} deviceVersion Version of SendDone 
-   * @param {String} deviceId 
-   * @param {String} deviceOs 
-   */
-  /**
    * Initialize an udp socket which responds to scans.
    * @param {string} ip 
-   * @param {scanCallback} callback Callback function to call when found a device.
    */
-  _initScannee(ip, callback) {
+  _initScannee(ip) {
     this._scannee = dgram.createSocket('udp4');
     this._scannee.bind(PORT, ip, () => {
       this._scannee.on('message', (msg, rinfo) => {
@@ -133,11 +124,14 @@ class Server {
           if (!(recvHeader.version && recvHeader.id && recvHeader.os))
             throw new Error('header not valid');
         } catch {
-          // Abort it.
+          // Abort if parsing failed or header is not valid.
           return;
         }
 
-        callback(rinfo.address, recvHeader.version, recvHeader.id, recvHeader.os);
+        /**
+         * Below is commented because there is no use to show opponents who scan me if the opponents do not open themselves.
+         */
+        // callback(rinfo.address, recvHeader.version, recvHeader.id, recvHeader.os);
 
         const sendHeader = {
           app: "SendDone",
