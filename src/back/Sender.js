@@ -102,13 +102,12 @@ class Sender {
 
     this._socket = net.createConnection(PORT, receiverIp);
     this._socket.on('connect', async () => {
-      console.log('client socket connected to ' + this._socket.remoteAddress);
+      console.log('Sender: connected to ' + this._socket.remoteAddress);
       let sendRequestHeader = this._createSendRequestHeader(items);
       if (sendRequestHeader === null) {
         this._socket.end();
         return;
       }
-      console.log('Sender: About to send total ' + this._itemArray.length);
       this._socket.write(JSON.stringify(sendRequestHeader) + HEADER_END, 'utf-8', this._onWriteError);
     });
 
@@ -251,10 +250,9 @@ class Sender {
       if (this._itemHandle) {
         await this._itemHandle.close();
       }
-      if (this._state === STATE.SENDER_PAUSE || this._state === STATE.RECVER_PAUSE) {
+      if (this._state === STATE.SENDER_PAUSE || this._state === STATE.RECVER_PAUSE || this._state === STATE.WAITING) {
         // Send end header immediately while stop.
-        let header = { class: 'end' };
-        this._socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this._onWriteError);
+        await this._send();
       }
       return true;
     }

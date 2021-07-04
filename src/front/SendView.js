@@ -64,7 +64,11 @@ function SenderView({ state, ind }) {
   const showFoot = () => {
     if (state.state === STATE.WAITING)
       return (
-        <button className={style.Neg}>CANCEL</button>
+        <button className={style.Neg}
+          onClick={() => {
+            ipcRenderer.endSender(ind);
+          }}
+        >CANCEL</button>
       )
     if (state.state === STATE.SENDING)
       return (
