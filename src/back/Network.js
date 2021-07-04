@@ -1,7 +1,7 @@
 const os = require('os');
 const net = require('net');
 const dgram = require('dgram');
-const { PORT, OS, VERSION, HEADER_END, SCANTIME } = require('../defs');
+const { PORT, OS, VERSION, HEADER_END, SCANTIMEOUT } = require('../defs');
 /**
  * Return an array of dictionary each looks like: { name, ip, netmask }.
  * @returns {Array.<{name:String, ip:String, netmask:String}>} Array of networks.
@@ -69,16 +69,20 @@ function scan(ip, netmask, myId, callback) {
       os: OS
     };
     socket.on('message', (msg, rinfo) => {
-      const recvHeader = JSON.parse(msg.toString('utf-8'));
-      if (callback)
-        callback(rinfo.address, recvHeader.version, recvHeader.id, recvHeader.os);
+      try {
+        const recvHeader = JSON.parse(msg.toString('utf-8'));
+        if (callback)
+          callback(rinfo.address, recvHeader.version, recvHeader.id, recvHeader.os);
+      } catch {
+        return;
+      }
     });
     socket.send(JSON.stringify(header), PORT, broadcastIp);
 
     // Close socket after some time.
     setTimeout(() => {
       socket.close();
-    }, SCANTIME);
+    }, SCANTIMEOUT);
   });
 }
 

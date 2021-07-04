@@ -72,6 +72,8 @@ app.whenReady().then(() => {
 // explicitly with Cmd + Q.
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') {
+    if (server && server.isOpen())
+      server.close();
     app.quit();
   }
 })
