@@ -106,9 +106,9 @@ function Nav({ toggleSettings }) {
       </div>
       <div className="Body">
 
-        <SendView state={{ state: 'SENDING', speed: 483344, progress: 50, id: 'taler', itemName: 'files_that_has_too_long_file_name_and_this_is_going_to_be_trimmed.jpg', totalProgress: '1/2' }} />
+        {/* <SendView state={{ state: 'SENDING', speed: 483344, progress: 50, id: 'taler', itemName: 'files_that_has_too_long_file_name_and_this_is_going_to_be_trimmed.jpg', totalProgress: '1/2' }} />
         <RecvView state={{ state: 'WAITING', speed: 110203, progress: 100, id: 'mason', itemName: 'files_that_has_too_long_file_name.jpg' }} />
-        <RecvView state={{ state: 'RECVING', speed: 11033403, progress: 60, id: 'july', itemName: 'report about theme ui.docx' }} />
+        <RecvView state={{ state: 'RECVING', speed: 11033403, progress: 60, id: 'july', itemName: 'report about theme ui.docx' }} /> */}
 
         {showSenders()}
         {showReceivers()}
