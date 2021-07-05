@@ -14,6 +14,10 @@ class Receiver {
     this._socket = socket;
     /** @type {Buffer} */
     this._recvBuf = Buffer.from([]);
+    /** @type {Array.<Buffer>} */
+    this._recvBufArray = [];
+    /** @type {number} */
+    this._recvBufArrayLen = 0;
     /** @type {boolean} Whether Receiver have parsed header. */
     this._haveParsedHeader = false;
     /**
@@ -96,9 +100,9 @@ class Receiver {
   _init() {
     this._socket.on('data', async (data) => {
       let ret = null;
-      this._recvBuf = Buffer.concat([this._recvBuf, data]);
       if (!this._haveParsedHeader) {
-        // Try to parse header and save into header.
+        // Concatenate and try to parse header and save into header.
+        this._recvBuf = Buffer.concat([this._recvBuf, data]);
         ret = _splitHeader(this._recvBuf);
         if (!ret) {
           // The header is still splitted. Wait for more data by return.
@@ -106,14 +110,20 @@ class Receiver {
         }
         try {
           this._recvHeader = JSON.parse(ret.header);
-          this._haveParsedHeader = true;
-          this._recvBuf = ret.buf;
         } catch (err) {
           this._state = STATE.ERR_NETWORK;
           console.error('Header parsing error. Not JSON format.');
           this._socket.destroy();
           return;
         }
+        this._haveParsedHeader = true;
+        this._recvBufArray = [ret.buf];
+        this._recvBuf = Buffer.from([]);
+        this._recvBufArrayLen = ret.buf.length;
+      }
+      else {
+        this._recvBufArray.push(data);
+        this._recvBufArrayLen += data.length;
       }
 
       // Reaching here means we now have header or already have header.
@@ -154,11 +164,11 @@ class Receiver {
             case 'ok':
               if (this._state === STATE.SENDER_STOP)
                 this._state = STATE.RECVING;
-              if (this._recvBuf.length === this._recvHeader.size) {
+              if (this._recvBufArrayLen === this._recvHeader.size) {
                 // One whole chunk received.
                 // Write chunk on disk.
                 try {
-                  await this._itemHandle.appendFile(this._recvBuf);
+                  await this._itemHandle.appendFile(Buffer.concat(this._recvBufArray));
                 } catch (err) {
                   // Appending to file error.
                   // In this error, there is nothing SendDone can do about it.
@@ -175,9 +185,8 @@ class Receiver {
                     return;
                   }
                 }
-                this._haveParsedHeader = false;
-                this._speedBytes += this._recvBuf.length;
-                this._itemWrittenBytes += this._recvBuf.length;
+                this._speedBytes += this._recvBufArrayLen;
+                this._itemWrittenBytes += this._recvBufArrayLen;
                 this._recvBuf = Buffer.from([]);
                 this._itemFlag = 'ok';
                 this._writeOnSocket();
@@ -422,6 +431,7 @@ class Receiver {
    */
   _writeOnSocket() {
     let header = null;
+    this._haveParsedHeader = false;
     if (this._endFlag) {
       this._endFlag = false;
       this._state = STATE.MY_END;
