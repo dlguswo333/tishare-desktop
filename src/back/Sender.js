@@ -136,7 +136,7 @@ class Sender {
               this._send();
               break;
             case 'no':
-              this._state = STATE.SEND_REJECT;
+              this._state = STATE.OTHER_REJECT;
               this._socket.end();
               return;
             default:
@@ -205,7 +205,7 @@ class Sender {
     });
 
     this._socket.on('close', () => {
-      if (!(this._state === STATE.COMPLETE || this._state === STATE.OTHER_END || this._state === STATE.MY_END))
+      if (!(this._state === STATE.COMPLETE || this._state === STATE.OTHER_REJECT || this._state === STATE.OTHER_END || this._state === STATE.MY_END))
         // Unexpected close event.
         this._state = STATE.ERR_NETWORK;
       this._socket.end();

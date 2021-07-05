@@ -268,7 +268,7 @@ class Receiver {
     });
 
     this._socket.on('close', () => {
-      if (!(this._state === STATE.COMPLETE || this._state === STATE.MY_END || this._state === STATE.OTHER_END))
+      if (!(this._state === STATE.COMPLETE || this._state === STATE.MY_REJECT || this._state === STATE.MY_END || this._state === STATE.OTHER_END))
         // Unexpected close event.
         this._state = STATE.ERR_NETWORK;
       this._socket.end();
@@ -410,10 +410,10 @@ class Receiver {
     if (this._state !== STATE.WAITING || this._socket === null) {
       return false;
     }
-    this._state = STATE.IDLE;
+    this._state = STATE.MY_REJECT;
     const header = { class: 'no' };
     this._socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this._onWriteError);
-    this._socket = null;
+    this._socket.end();
     return true;
   }
 

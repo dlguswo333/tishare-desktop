@@ -18,48 +18,62 @@
     flex-direction: row;
     width: 100%;
     height: v.$navWidth;
-    justify-content: center;
+    justify-content: space-between;
     background-color: #9992;
-    .Icon {
-      width: v.$navWidth;
-      height: v.$navWidth;
+    .Element {
       display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .Settings {
-      stroke: black;
-      fill: black;
-      cursor: pointer;
-      &:hover {
-        stroke: red;
-        fill: red;
+      flex-direction: row;
+      .Icon {
+        width: v.$navWidth;
+        height: v.$navWidth;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
-    }
-    .Pin {
-      stroke: black;
-      margin-right: auto;
-      cursor: pointer;
-      &:hover {
-        stroke: red;
-        fill: red;
+      .Settings {
+        stroke: black;
+        fill: black;
+        cursor: pointer;
+        &:hover {
+          stroke: red;
+          fill: red;
+        }
       }
-    }
-    .Active {
-      stroke: #3f2;
-      fill: #3f2;
-    }
-    .Menu {
-      stroke: black;
-      margin-left: auto;
-      .Circle {
-        position: absolute;
-        top: 2px;
-        right: 2px;
-        width: calc(#{v.$navWidth} / 4);
-        height: calc(#{v.$navWidth} / 4);
-        border-radius: 50%;
-        background-color: crimson;
+      .Pin {
+        stroke: black;
+        margin-right: auto;
+        cursor: pointer;
+        &:hover {
+          stroke: red;
+          fill: red;
+        }
+      }
+      .Active {
+        stroke: #3f2;
+        fill: #3f2;
+      }
+      .Menu {
+        stroke: black;
+        margin-left: auto;
+        .Circle {
+          position: absolute;
+          top: 2px;
+          right: 2px;
+          width: calc(#{v.$navWidth} / 4);
+          height: calc(#{v.$navWidth} / 4);
+          border-radius: 50%;
+          background-color: crimson;
+        }
+      }
+      .NumJobs {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+      }
+      .Full {
+        color: #f13;
       }
     }
   }

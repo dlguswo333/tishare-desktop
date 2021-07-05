@@ -59,6 +59,30 @@ function SenderView({ state, ind }) {
           </div>
         </>
       )
+    if (state.state === STATE.ERR_FILE_SYSTEM)
+      return (
+        <>
+          <div className={style.Element}>
+            File System Error
+          </div>
+        </>
+      )
+    if (state.state === STATE.ERR_NETWORK)
+      return (
+        <>
+          <div className={style.Element}>
+            Network Error
+          </div>
+        </>
+      )
+    if (state.state === STATE.OTHER_REJECT)
+      return (
+        <>
+          <div className={style.Element}>
+            {`${state.id} has rejected.`}
+          </div>
+        </>
+      )
   }
 
   const showFoot = () => {
@@ -103,6 +127,36 @@ function SenderView({ state, ind }) {
             ipcRenderer.deleteSender(ind);
           }}
         >OK</button>
+      )
+    if (state.state === STATE.ERR_FILE_SYSTEM)
+      return (
+        <>
+          <button className={style.Neg}
+            onClick={() => {
+              ipcRenderer.deleteSender(ind);
+            }}
+          >OK</button>
+        </>
+      )
+    if (state.state === STATE.ERR_NETWORK)
+      return (
+        <>
+          <button className={style.Neg}
+            onClick={() => {
+              ipcRenderer.deleteSender(ind);
+            }}
+          >OK</button>
+        </>
+      )
+    if (state.state === STATE.OTHER_REJECT)
+      return (
+        <>
+          <button className={style.Neg}
+            onClick={() => {
+              ipcRenderer.deleteSender(ind);
+            }}
+          >OK</button>
+        </>
       )
   }
 

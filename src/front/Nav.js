@@ -4,7 +4,9 @@ import RecvView from './RecvView';
 import { ReactComponent as MenuIcon } from './icons/Menu.svg';
 import { ReactComponent as SettingsIcon } from './icons/Settings.svg';
 import { ReactComponent as PinIcon } from './icons/Pin.svg';
-// import { MAX_NUM_JOBS } from '../defs';
+import { ReactComponent as SendArrow } from './icons/SendArrow.svg';
+import { ReactComponent as RecvArrow } from './icons/RecvArrow.svg';
+import { MAX_NUM_JOBS } from '../defs';
 import './style/Nav.scss';
 const ipcRenderer = window.ipcRenderer;
 
@@ -60,7 +62,7 @@ function Nav({ toggleSettings }) {
         setReceivers(ret);
       else
         setReceivers({});
-    }, 900);
+    }, 800);
     return () => { clearInterval(timer); };
   }, []);
 
@@ -79,19 +81,27 @@ function Nav({ toggleSettings }) {
       }}
     >
       <div className="Head">
-        <div className="Settings"
-          onClick={toggleSettings}
-        >
-          <SettingsIcon />
+        <div className='Element'>
+          <div className="Settings"
+            onClick={toggleSettings}
+          >
+            <SettingsIcon />
+          </div>
+          <div className={pin ? "Pin Active" : "Pin"}
+            onClick={() => { setPin((value) => !value); }}
+          >
+            <PinIcon />
+          </div>
         </div>
-        <div className={pin ? "Pin Active" : "Pin"}
-          onClick={() => { setPin((value) => !value); }}
-        >
-          <PinIcon />
+        <div className='Element'>
+          <div className={Object.keys(senders).length === MAX_NUM_JOBS ? 'NumJobs Full' : 'NumJobs'}><SendArrow />{`${Object.keys(senders).length}/${MAX_NUM_JOBS}`}</div>
+          <div className={Object.keys(receivers).length === MAX_NUM_JOBS ? 'NumJobs Full' : 'NumJobs'}><RecvArrow />{`${Object.keys(receivers).length}/${MAX_NUM_JOBS}`}</div>
         </div>
-        <div className="Menu">
-          <MenuIcon />
-          {noti && <div className="Circle" />}
+        <div className='Element'>
+          <div className="Menu">
+            <MenuIcon />
+            {noti && <div className="Circle" />}
+          </div>
         </div>
       </div>
       <div className="Body">

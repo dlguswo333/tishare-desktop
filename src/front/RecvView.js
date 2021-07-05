@@ -94,6 +94,14 @@ function RecvView({ state, ind }) {
           </div>
         </>
       )
+    if (state.state === STATE.MY_REJECT)
+      return (
+        <>
+          <div className={style.Element}>
+            Successfully Rejected.
+          </div>
+        </>
+      )
   }
 
   const showFoot = () => {
@@ -157,6 +165,16 @@ function RecvView({ state, ind }) {
         </>
       )
     if (state.state === STATE.ERR_NETWORK)
+      return (
+        <>
+          <button className={style.Neg}
+            onClick={() => {
+              ipcRenderer.deleteRecver(ind);
+            }}
+          >OK</button>
+        </>
+      )
+    if (state.state === STATE.MY_REJECT)
       return (
         <>
           <button className={style.Neg}

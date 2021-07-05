@@ -20,10 +20,11 @@ const STATE = {
   OTHER_STOP: "OTHER_STOP",
   OTHER_END: "OTHER_END",
   COMPLETE: "COMPLETE",
+  MY_REJECT: "MY_REJECT",
+  OTHER_REJECT: "OTHER_REJECT",
 
   // For Receiver and Sender
   SENDING: "SENDING",
-  SEND_REJECT: "SEND_REJECT",
   SENDER_PAUSE: "SENDER_PAUSE", // Will be deprecated
 
   // For Receiver
