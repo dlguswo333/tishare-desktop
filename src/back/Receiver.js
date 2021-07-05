@@ -81,15 +81,20 @@ class Receiver {
      */
     this._speedBytes = 0;
     /**
+     * The number of previous bytes after the previous speed measure. 
+     * @type {number}
+     */
+    this._prevSpeedBytes = 0;
+    /**
      * Previous speed measure time in millisecond.
      * @type {number} 
      */
     this._prevSpeedTime = null;
     /**
-     * Previous measured speed.
+     * More previous speed measure time in millisecond.
      * @type {number} 
      */
-    this._prevSpeed = 0;
+    this._prevPrevSpeedTime = null;
     this._init();
   }
 
@@ -298,17 +303,23 @@ class Receiver {
 
   /**
    * Return the # of bytes per second.
-   * If the # of bytes or the interval is 0, return previous measured speed.
+   * If the # of bytes or the interval is 0, calculate speed based on previous measure.
    * @returns {number}
    */
   getSpeed() {
     const now = Date.now();
-    if (now === this._prevSpeedTime || this._speedBytes === 0)
-      return this._prevSpeed;
-    this._prevSpeed = this._speedBytes / ((now - this._prevSpeedTime) / 1000);
+    let ret = 0;
+    if (now === this._prevSpeedTime || this._speedBytes === 0) {
+      if (this._prevPrevSpeedTime === 0)
+        return 0;
+      return this._prevSpeedBytes / (now - this._prevPrevSpeedTime);
+    }
+    ret = this._speedBytes / ((now - this._prevSpeedTime) / 1000);
+    this._prevSpeedBytes = this._speedBytes;
     this._speedBytes = 0;
+    this._prevPrevSpeedTime = this._prevSpeedTime;
     this._prevSpeedTime = now;
-    return this._prevSpeed;
+    return ret;
   }
   /**
    * Return the current item progress out of 100.
