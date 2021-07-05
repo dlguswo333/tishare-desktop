@@ -40,6 +40,12 @@
         overflow: hidden;
         white-space: nowrap;
       }
+      .Left {
+        margin-right: auto;
+      }
+      .Right {
+        margin-left: auto;
+      }
     }
     input[type="text"] {
       border-radius: 8px;

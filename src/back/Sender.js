@@ -1,6 +1,5 @@
 const net = require('net');
 const fs = require('fs').promises;
-const { Stats } = require('fs');
 const { PORT, STATE, HEADER_END, VERSION, CHUNKSIZE } = require('../defs');
 const { _splitHeader } = require('./Network');
 
@@ -10,7 +9,6 @@ const { _splitHeader } = require('./Network');
 
 class Sender {
   /**
-   * 
    * @param {string} myId 
    */
   constructor(myId) {

@@ -47,10 +47,10 @@ function RecvView({ state, ind }) {
           </div>
           <div className={style.Element}>
             <progress value={state.progress} max={100}></progress>
-            {`${printSize(state.speed)}/S`}
           </div>
           <div className={style.Element}>
-            {state.totalProgress}
+            <span className={style.Left}>{state.totalProgress}</span>
+            <span className={style.Right}>{`${printSize(state.speed)}/S`}</span>
           </div>
         </>
       )
