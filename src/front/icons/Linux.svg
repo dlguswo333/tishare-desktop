@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" className="Icon" width="100%" viewBox="0 0 100 100">
+    <path d="M20 82 C15 27 85 27 80 82 L75 82 L50 81 L25 82 Z" style="fill:#000" />
+    <path d="M30 80 C25 55 50 55 45 80 Z" style="fill:#fff" />
+    <path d="M70 80 C75 55 50 55 55 80 Z" style="fill:#fff" />
+    <path d="M35 80 C31 66 44 66 40 80 Z" style="fill:#000" />
+    <path d="M65 80 C69 66 56 66 60 80 Z" style="fill:#000" />
+    <path d="M25 82 C50 70 50 70 75 82 Z" style="fill:#f8bf11" />
+</svg>
