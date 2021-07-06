@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" className="Icon" width="100%" viewBox="0 0 100 100">
+    <path d="M20 30 v20 h20 v-24 Z" style="fill:#48f" />
+    <path d="M20 71 v-20 h20 v24 Z" style="fill:#48f" />
+    <path d="M41 26 v24 h30 v-30 Z" style="fill:#48f" />
+    <path d="M41 75 v-24 h30 v30 Z" style="fill:#48f" />
+</svg>

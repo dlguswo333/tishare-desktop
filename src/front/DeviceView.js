@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ThemeButton from './ThemeButton';
+import { ReactComponent as WindowsIcon } from './icons/Windows.svg';
+import { ReactComponent as AndroidIcon } from './icons/Android.svg';
 import './style/DeviceView.scss';
 const ipcRenderer = window.ipcRenderer;
 
@@ -17,6 +19,20 @@ function DeviceView({ items, myIp, myNetmask, myId }) {
   const [selectedIp, setSelectedIp] = useState(null);
   const [noDeviceWarn, setNoDeviceWarn] = useState(false);
 
+  /** @param {string} _os */
+  const showOs = (_os) => {
+    const os = String(_os).toLowerCase();
+    if (os.includes('win'))
+      return (
+        <WindowsIcon />
+      )
+    if (os.includes('and'))
+      return (
+        <AndroidIcon />
+      )
+    return os;
+  }
+
   const showDevices = () => {
     const ret = [];
     for (let ip in devices) {
@@ -28,7 +44,7 @@ function DeviceView({ items, myIp, myNetmask, myId }) {
           }}
         >
           <div className='DeviceOs'>
-            {device.os}
+            {showOs(device.os)}
           </div>
           <div className='DeviceProperty'>
             <div className='DeviceId'>
