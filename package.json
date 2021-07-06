@@ -26,7 +26,8 @@
   "build": {
     "files": [
       "build/**/*",
-      "src/*"
+      "src/back/**",
+      "src/defs.js"
     ],
     "win": {
       "target": "nsis"

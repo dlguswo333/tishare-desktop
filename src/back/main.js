@@ -41,7 +41,7 @@ function createMainWindow() {
     mainWindow.removeMenu();
     // When in production, run react build first.
     // The main electron window will load the react built packs like below.
-    mainWindow.loadFile(path.join(__dirname, '../build/index.html')).catch(() => {
+    mainWindow.loadFile(path.join(__dirname, '../../build/index.html')).catch(() => {
       console.log('Loading index.html failed');
     });
   }
