@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ThemeButton from './ThemeButton';
 import { ReactComponent as WindowsIcon } from './icons/Windows.svg';
 import { ReactComponent as AndroidIcon } from './icons/Android.svg';
+import { ReactComponent as LinuxIcon } from './icons/Linux.svg';
 import './style/DeviceView.scss';
 const ipcRenderer = window.ipcRenderer;
 
@@ -29,6 +30,10 @@ function DeviceView({ items, myIp, myNetmask, myId }) {
     if (os.includes('and'))
       return (
         <AndroidIcon />
+      )
+    if (os.includes('linux'))
+      return (
+        <LinuxIcon />
       )
     return os;
   }
