@@ -62,5 +62,8 @@ contextBridge.exposeInMainWorld('ipcRenderer',
     rejectRecv: (ind) => {
       ipcRenderer.invoke('rejectRecv', ind);
     },
+    showMessage: (message) => {
+      ipcRenderer.invoke('showMessage', message);
+    }
   }
 )

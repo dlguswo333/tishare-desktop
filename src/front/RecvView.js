@@ -115,6 +115,11 @@ function RecvView({ state, ind }) {
           >REJECT</button>
           <button className={style.Pos}
             onClick={() => {
+              if (!recvDir) {
+                // Prevent receiving if recvDir is empty.
+                ipcRenderer.showMessage('Set your receive directory.');
+                return;
+              }
               ipcRenderer.acceptRecv(ind, recvDir);
             }}
           >ACCEPT</button>

@@ -247,5 +247,5 @@ ipcMain.handle('setRecvDir', () => {
 })
 
 ipcMain.handle('showMessage', (event, message) => {
-  dialog.showMessageBoxSync(mainWindow, { title: 'SendDone-Desktop', message: message });
+  dialog.showMessageBox(mainWindow, { title: 'tiShare', message: message });
 })
