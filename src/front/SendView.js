@@ -75,7 +75,7 @@ function SenderView({ state, ind }) {
           </div>
         </>
       )
-    if (state.state === STATE.OTHER_REJECT)
+    if (state.state === STATE.SEND_REJECTED)
       return (
         <>
           <div className={style.Element}>
@@ -148,7 +148,7 @@ function SenderView({ state, ind }) {
           >OK</button>
         </>
       )
-    if (state.state === STATE.OTHER_REJECT)
+    if (state.state === STATE.SEND_REJECTED)
       return (
         <>
           <button className={style.Neg}
