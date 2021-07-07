@@ -1,7 +1,7 @@
 const net = require('net');
 const fs = require('fs').promises;
-const { PORT, STATE, HEADER_END, VERSION, CHUNKSIZE } = require('../defs');
-const { _splitHeader } = require('./Network');
+const { PORT, STATE, VERSION, CHUNKSIZE } = require('../defs');
+const { HEADER_END, splitHeader } = require('./Common');
 
 /**
  * @typedef {{dir:string, path:string, type:string, size:number, items:Object.<string, any>}} item
@@ -9,14 +9,11 @@ const { _splitHeader } = require('./Network');
 
 class Sender {
   /**
-   * @param {string} myId 
+   * @param {net.Socket} socket
+   * @param {Array.<{path:string, dir:string, name:string, type:string, size:number}>} itemArray
    */
-  constructor(myId) {
+  constructor(socket, itemArray) {
     this._state = STATE.IDLE;
-    if (!myId) {
-      this._state = STATE.ERR_ID;
-      return;
-    }
     /** @type {string} my ID. */
     this._myId = myId;
     /** @type {string} _receiver ID. */
@@ -29,15 +26,13 @@ class Sender {
      * @type {boolean}
      */
     this._endFlag = false;
-    /**
-     * @type {net.Socket}
-     */
-    this._socket = null;
+    /** @type {net.Socket} */
+    this._socket = socket;
     /**
      * Normalized item array.
      * @type {Array.<{path:string, dir:string, name:string, type:string, size:number}>}
      */
-    this._itemArray = null;
+    this._itemArray = itemArray;
     /**
      * Size of sent bytes of the current item.
      * @type {number}
@@ -91,33 +86,20 @@ class Sender {
   async send(items, receiverIp, receiverId) {
     this._state = STATE.WAITING;
     this._receiverId = receiverId;
-    this._itemArray = [];
     this._index = 0;
     this._speedBytes = 0;
 
-    await this._createItemArray(items);
     if (this.getTotalNumItems() === 0) {
       // Nothing to send and consider it send complete.
       this._state = STATE.COMPLETE;
       return;
     }
 
-    this._socket = net.createConnection(PORT, receiverIp);
-    this._socket.on('connect', async () => {
-      console.log('Sender: connected to ' + this._socket.remoteAddress);
-      let sendRequestHeader = this._createSendRequestHeader(items);
-      if (sendRequestHeader === null) {
-        this._socket.end();
-        return;
-      }
-      this._socket.write(JSON.stringify(sendRequestHeader) + HEADER_END, 'utf-8', this._onWriteError);
-    });
-
     this._socket.on('data', async (data) => {
       // Receiver always sends header only.
       let recvHeader = null;
       this._recvBuf = Buffer.concat([this._recvBuf, data]);
-      const ret = _splitHeader(this._recvBuf);
+      const ret = splitHeader(this._recvBuf);
       if (!ret) {
         // Has not received header yet. just exit the function here for more data by return.
         return;
@@ -320,7 +302,7 @@ class Sender {
   }
 
   /**
-   * Return the current state
+   * Return the current state.
    */
   getState() {
     if (this._state === STATE.SEND_REQUEST) {
@@ -446,85 +428,6 @@ class Sender {
   }
 
   /**
-   * Create and return send request header.
-   * Return null on Any Error.
-   * @param {{}} items
-   * @returns {{app:string, version: string, class: string, items:Object.<string, item>}}
-   */
-  _createSendRequestHeader(items) {
-    let header = { app: 'SendDone', version: VERSION, class: 'send-request', id: this._myId, itemArray: this._itemArray };
-    return header;
-  }
-
-  /**
-   * Deep copy items Object and return the result.
-   * When calling the function, let dst value undefined.
-   * @param {Object.<string, item>} items
-   * @param {boolean} noPath
-   */
-  _deepCopyItems(dst, items, noPath) {
-    let retFlag = false;
-    if (dst === undefined) {
-      retFlag = true;
-      dst = {};
-    }
-    for (let itemName in items) {
-      dst[itemName] = {};
-      for (let key in items[itemName]) {
-        if (key === 'items') {
-          // Deep copy it.
-          this._deepCopyItems(dst[itemName], items[itemName], noPath);
-        }
-        else if (key !== 'path' || !noPath)
-          dst[itemName][key] = items[itemName][key];
-      }
-    }
-    if (retFlag)
-      return dst;
-  }
-
-  /**
-   * Normalize tree structure items into serialized item array.
-   * Before calling the function, be sure that this._itemArray is an empty array.
-   * @param {Object.<string, item>} items
-   */
-  async _createItemArray(items) {
-    for (let itemName in items) {
-      let itemStat = await fs.stat(items[itemName].path);
-      if (itemStat.isDirectory()) {
-        this._itemArray.push(this._createDirectoryHeader(items[itemName].path, items[itemName].name, items[itemName].dir));
-        await this._createItemArray(items[itemName].items);
-      }
-      else {
-        this._itemArray.push(this._createFileHeader(items[itemName].path, items[itemName].name, items[itemName].dir, itemStat.size));
-      }
-    }
-  }
-
-  /**
-   * @param {string} path Path of the item.
-   * @param {string} name Name of the item.
-   * @param {string} dir Directory of the item.
-   * @param {number} size Size of the item.
-   * @returns {{name:string, type: string, size: number}} 
-   */
-  _createFileHeader(path, name, dir, size) {
-    const header = { path: path, name: name, dir: dir.split('\\').join('/'), type: 'file', size: size }
-    return header;
-  }
-
-  /**
-   * @param {string} path Path of the item.
-   * @param {string} name name of the item.
-   * @param {string} dir Directory of the item.
-   * @returns {{name:string, type: string}} 
-   */
-  _createDirectoryHeader(path, name, dir) {
-    const header = { path: path, name: name, dir: dir.split('\\').join('/'), type: 'directory' }
-    return header;
-  }
-
-  /**
    * Reset the item related variable and go to next item.
    */
   _goToNextItem() {
@@ -542,9 +445,9 @@ class Sender {
   }
 
   /**
-     * Handle on corrupted data from receiver.
-     * NOTE that it does not set message.
-     */
+   * Handle on corrupted data from receiver.
+   * NOTE that it does not set message.
+   */
   _handleNetworkErr = () => {
     this._state = STATE.ERR_NETWORK;
     this._socket.end();
@@ -552,4 +455,4 @@ class Sender {
 }
 
 
-module.exports = { Sender };
+module.exports = Sender;

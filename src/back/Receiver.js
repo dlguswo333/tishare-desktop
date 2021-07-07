@@ -1,8 +1,8 @@
 const fs = require('fs').promises;
 const net = require('net');
 const path = require('path');
-const { _splitHeader } = require('./Network');
-const { VERSION, HEADER_END, OS, STATE } = require('../defs');
+const { HEADER_END, splitHeader } = require('./Common');
+const { VERSION, OS, STATE } = require('../defs');
 
 class Receiver {
   /**
@@ -108,7 +108,7 @@ class Receiver {
       if (!this._haveParsedHeader) {
         // Concatenate and try to parse header and save into header.
         this._recvBuf = Buffer.concat([this._recvBuf, data]);
-        ret = _splitHeader(this._recvBuf);
+        ret = splitHeader(this._recvBuf);
         if (!ret) {
           // The header is still splitted. Wait for more data by return.
           return;

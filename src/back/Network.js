@@ -1,7 +1,6 @@
 const os = require('os');
-const net = require('net');
 const dgram = require('dgram');
-const { PORT, OS, VERSION, HEADER_END, SCANTIMEOUT } = require('../defs');
+const { PORT, OS, VERSION, SCANTIMEOUT } = require('../defs');
 /**
  * Return an array of dictionary each looks like: { name, ip, netmask }.
  * @returns {Array.<{name:String, ip:String, netmask:String}>} Array of networks.
@@ -22,21 +21,6 @@ function getNetworks() {
     }
   }
   return array;
-}
-
-/**
- * split and separate a header from buf and return the header as string and sliced buf.
- * Return undefined if cannot find HEADER_END.
- * @param {Buffer} buf 
- * @returns {{header:String, buf:Buffer}|undefined}
- */
-function _splitHeader(buf) {
-  const endInd = buf.indexOf(HEADER_END, 0, 'utf-8');
-  if (endInd >= 0) {
-    const header = buf.toString('utf8', 0, endInd);
-    return { header: header, buf: buf.slice(endInd + 2) };
-  };
-  return undefined;
 }
 
 /**
@@ -128,4 +112,4 @@ function _IpBroadcastIp(ip, netmask) {
   return _IpNumberToString((_IpStringToNumber(ip) | (2 ** 32 - 1 - _IpStringToNumber(netmask))) >>> 0);
 }
 
-module.exports = { getNetworks, scan, _splitHeader, _IpBroadcastIp };
+module.exports = { getNetworks, scan, _IpBroadcastIp };
