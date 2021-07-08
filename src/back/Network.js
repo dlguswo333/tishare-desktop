@@ -26,7 +26,7 @@ function getNetworks() {
 /**
  * @callback scanCallback
  * @param {String} deviceIp 
- * @param {String} deviceVersion Version of SendDone 
+ * @param {String} deviceVersion Version of tiShare 
  * @param {String} deviceId 
  * @param {String} deviceOs 
  */
@@ -46,7 +46,7 @@ function scan(ip, netmask, myId, callback) {
   socket.bind(ip, () => {
     socket.setBroadcast(true);
     const header = {
-      app: "SendDone",
+      app: "tiShare",
       version: VERSION,
       class: "scan",
       id: myId,

@@ -1,7 +1,10 @@
 const dgram = require('dgram');
 const net = require('net');
+const Requestee = require('./Requestee');
+const Sender = require('./Sender');
 const Receiver = require('./Receiver');
 const { PORT, OS, VERSION, STATE, MAX_NUM_JOBS } = require('../defs');
+const { splitHeader, HEADER_END } = require('./Common');
 
 class Server {
   constructor() {
@@ -12,7 +15,7 @@ class Server {
     this._scannee = null;
     /** @type {net.Server} */
     this._serverSocket = null;
-    /** @type {Object.<number, Receiver>} */
+    /** @type {Object.<number, (Receiver|Requestee)>} */
     this.jobs = {};
     /** @type {number} */
     this._nextInd = 1;
@@ -50,22 +53,65 @@ class Server {
       return true;
     this._serverSocket = net.createServer();
     this._serverSocket.on('connection', (socket) => {
-      // TODO At this moment, server does only receiving, and client does only sending.
-      // Let server and client do both receiving and sending.
-      // But is it really necessary?
-
       if (Object.keys(this.jobs).length >= MAX_NUM_JOBS || this._state.startsWith('ERR')) {
         // Do not accept more than limit or Server is in error state.
         socket.destroy();
         return;
       }
-      const receiver = new Receiver(socket);
-      this.jobs[this._nextInd++] = receiver;
+      const ind = this._getNextInd();
+      let _recvBuf = Buffer.from([]);
+      socket.on('data', (data) => {
+        let recvHeader = null;
+        _recvBuf = Buffer.concat([_recvBuf, data]);
+        const ret = splitHeader(_recvBuf);
+        if (!ret) {
+          if (_recvBuf.length > MAX_HEADER_LEN) {
+            // Abort this suspicious connection.
+            this._handleNetworkErr(ind);
+          }
+          // Has not received header yet. just exit the function here for more data by return.
+          return;
+        }
+        try {
+          recvHeader = JSON.parse(ret.header);
+        } catch (err) {
+          // HEADER_END is met but is not JSON format.
+          // Abort and ignore this suspicious connection.
+          this._handleNetworkErr(ind);
+          return;
+        }
+        switch (recvHeader.class) {
+          case 'send-request':
+            if (!this._validateRequestHeader(recvHeader)) {
+              // Abort and ignore this suspicious connection.
+              this._handleNetworkErr(ind);
+              return;
+            }
+            this.jobs[ind] = new Requestee(STATE.RQE_RECV_REQUEST, socket, recvHeader.id);
+            break;
+          case 'recv-request':
+            if (!this._validateRequestHeader(recvHeader)) {
+              // Abort and ignore this suspicious connection.
+              this._handleNetworkErr(ind);
+              return;
+            }
+            this.jobs[ind] = new Requestee(STATE.RQE_SEND_REQUEST, socket, recvHeader.id);
+            break;
+          case 'end':
+            if (this.jobs[ind])
+              this.jobs[ind].setState(STATE.RQE_CANCEL);
+            socket.end();
+          default:
+            // Abort and ignore this suspicious connection.
+            this._handleNetworkErr(ind);
+        }
+      });
     });
 
     this._serverSocket.on('error', (err) => {
       console.error(err.message);
       this._state = STATE.ERR_NETWORK;
+      this.close();
     });
 
     this._serverSocket.listen(PORT, ip);
@@ -99,8 +145,8 @@ class Server {
   getState(ind) {
     if (ind === undefined) {
       let ret = {};
-      for (const receiver in this.jobs) {
-        ret[receiver] = this.jobs[receiver].getState();
+      for (const job in this.jobs) {
+        ret[job] = this.jobs[job].getState();
       }
       return ret;
     }
@@ -128,13 +174,8 @@ class Server {
           return;
         }
 
-        /**
-         * Below is commented because there is no use to show opponents who scan me if the opponents do not open themselves.
-         */
-        // callback(rinfo.address, recvHeader.version, recvHeader.id, recvHeader.os);
-
         const sendHeader = {
-          app: "SendDone",
+          app: "tiShare",
           version: VERSION,
           class: "scan",
           id: this.myId,
@@ -160,23 +201,58 @@ class Server {
     }
   }
 
+  _getNextInd() {
+    return (this._nextInd)++;
+  }
+
+  _validateRequestHeader(header) {
+    if (!header)
+      return false;
+    if (header.app !== 'tiShare')
+      return false;
+    if (header.version !== VERSION)
+      return false;
+    if (!header.id)
+      return false;
+    if (!(header.class === 'send-request' || header.class === 'recv-request'))
+      return false;
+    return true;
+  }
+
   /**
-   * Accept receiving.
+   * Accept send request.
    * @param {number} ind 
+   * @param {string} recvDir 
    */
-  acceptRecv(ind, recvDir) {
+  acceptSendRequest(ind, recvDir) {
     if (this.jobs[ind]) {
-      this.jobs[ind].acceptRecv(recvDir);
+      const receiver = new Receiver(this.jobs[ind]._socket, this.jobs[ind]._opponentId, recvDir);
+      this.jobs[ind] = receiver;
+      receiver._writeOnSocket();
     }
   }
 
   /**
-   * Reject receiving.
+   * Accept receive request.
+   * @param {number} ind 
+   * @param {import('./Common').item} items 
+   */
+  acceptRecvRequest(ind, items) {
+    if (this.jobs[ind]) {
+      const socket = this.jobs[ind]._socket;
+      const sender = new Sender(this.jobs[ind]._socket, this.jobs[ind]._opponentId, items);
+      this.jobs[ind] = sender;
+      socket.write(JSON.stringify({ class: 'ok' }), 'utf-8');
+    }
+  }
+
+  /**
+   * Reject send request.
    * @param {number} ind 
    */
-  rejectRecv(ind) {
+  rejectRequest(ind) {
     if (this.jobs[ind]) {
-      this.jobs[ind].rejectRecv();
+      this.jobs[ind].reject();
     }
   }
 
@@ -186,7 +262,7 @@ class Server {
    * @param {number} ind
    * @returns {boolean} Whether the execution has been successful.
    */
-  endRecver(ind) {
+  endJob(ind) {
     if (this.jobs[ind]) {
       return this.jobs[ind].end();
     }
@@ -197,12 +273,21 @@ class Server {
    * @param {number} ind 
    * @returns {boolean} Whether the execution has been successful.
    */
-  deleteRecver(ind) {
+  deleteJob(ind) {
     if (this.jobs[ind]) {
       delete this.jobs[ind];
       return true;
     }
     return false;
+  }
+
+  /**
+   * Handle network error on Requestee.
+   */
+  _handleNetworkErr(ind) {
+    if (this.jobs[ind]) {
+      this.jobs[ind]._socket.destroy();
+    }
   }
 }
 

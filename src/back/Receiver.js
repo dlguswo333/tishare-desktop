@@ -1,17 +1,22 @@
 const fs = require('fs').promises;
-const net = require('net');
 const path = require('path');
 const { HEADER_END, splitHeader } = require('./Common');
 const { VERSION, OS, STATE } = require('../defs');
 
 class Receiver {
   /**
-   * @param {net.Socket} socket 
+   * @param {import('net').Socket} socket 
+   * @param {string!} senderId 
+   * @param {string!} recvDir 
    */
-  constructor(socket) {
-    this._state = STATE.IDLE;
-    /** @type {net.Socket} */
+  constructor(socket, senderId, recvDir) {
+    this._state = STATE.RECVING;
+    /** @type {import('net').Socket} */
     this._socket = socket;
+    /** @type {string} */
+    this._senderId = senderId;
+    /** @type {String} */
+    this._recvPath = recvDir;
     /** @type {Buffer} */
     this._recvBuf = Buffer.from([]);
     /** @type {Array.<Buffer>} */
@@ -25,14 +30,12 @@ class Receiver {
      * @type {{app: string, version:string, class:string, id:string, itemArray:Array.<>}}
      */
     this._sendRequestHeader = null;
-    /** @type {string} */
-    this._senderId = null;
     /** @type {Object} */
     this._recvHeader = null;
     /**
      * @type {'ok'|'next'}
      */
-    this._itemFlag = '';
+    this._itemFlag = 'ok';
     /**
      * @type {boolean}
      */
@@ -46,12 +49,6 @@ class Receiver {
     * @type {fs.FileHandle}
     */
     this._itemHandle = null;
-    /**
-     * Array of items. Each item is composed of name, dir, type, and size.
-     * Size can be omitted if directory.
-     * @type {Array.<{name:String, dir:String, type:String, size:number}>}
-     */
-    this._itemArray = null;
     /**
      * Name of the current item excluding download path.
      * @type {String}
@@ -72,9 +69,10 @@ class Receiver {
      */
     this._numRecvItem = 0;
     /**
-     * @type {String}
+     * Number of total items.
+     * @type {number}
      */
-    this._recvPath = null;
+    this._numTotalItems = 0;
     /**
      * The number of bytes after the previous speed measure. 
      * @type {number}
@@ -100,9 +98,13 @@ class Receiver {
 
   /**
    * Initialize Receiver by adding event listeners.
-   * Call it after contructor.
+   * Call it inside contructor.
    */
   _init() {
+    this._socket.removeAllListeners('data');
+    this._socket.removeAllListeners('close');
+    this._socket.removeAllListeners('error');
+
     this._socket.on('data', async (data) => {
       let ret = null;
       if (!this._haveParsedHeader) {
@@ -133,36 +135,6 @@ class Receiver {
 
       // Reaching here means we now have header or already have header.
       switch (this._state) {
-        case STATE.IDLE:
-          switch (this._recvHeader.class) {
-            case 'send-request':
-              this._sendRequestHeader = this._recvHeader;
-              if (!this._validateSendRequestHeader(this._sendRequestHeader)) {
-                console.error('Header error. Not valid.');
-                this._socket.end();
-              }
-              this._senderId = this._sendRequestHeader.id;
-              this._itemArray = this._recvHeader.itemArray;
-              this._state = STATE.WAITING;
-              this._haveParsedHeader = false;
-              break;
-            default:
-              // What the hell?
-              this._socket.end();
-              return;
-          }
-          break;
-        case STATE.WAITING:
-          switch (this._recvHeader.class) {
-            case 'end':
-              this._state = STATE.OTHER_END;
-              this._socket.end();
-              return;
-            default:
-              // What the hell?
-              this._socket.end();
-              return;
-          }
         case STATE.RECVING:
         case STATE.SENDER_STOP:
           switch (this._recvHeader.class) {
@@ -176,7 +148,7 @@ class Receiver {
                   await this._itemHandle.appendFile(Buffer.concat(this._recvBufArray));
                 } catch (err) {
                   // Appending to file error.
-                  // In this error, there is nothing SendDone can do about it.
+                  // In this error, there is nothing tiShare can do about it.
                   // Better delete what has been written so far,
                   // mark it failed, and go to next item.
                   // TODO mark the item failed.
@@ -282,7 +254,7 @@ class Receiver {
     });
 
     this._socket.on('close', () => {
-      if (!(this._state === STATE.COMPLETE || this._state === STATE.MY_REJECT || this._state === STATE.MY_END || this._state === STATE.OTHER_END))
+      if (!(this._state === STATE.RECV_COMPLETE || this._state === STATE.MY_REJECT || this._state === STATE.MY_END || this._state === STATE.OTHER_END))
         // Unexpected close event.
         this._state = STATE.ERR_NETWORK;
       this._socket.end();
@@ -292,13 +264,6 @@ class Receiver {
       console.error(err.message);
       this._state = STATE.ERR_NETWORK;
     })
-  }
-
-  /**
-   * @returns {Array<{name:String, type:String, size:number}>}
-   */
-  getitemArray() {
-    return this._itemArray;
   }
 
   /**
@@ -334,7 +299,7 @@ class Receiver {
    * Return a string representing the total progress.
    */
   getTotalProgress() {
-    return this._numRecvItem + '/' + this._itemArray.length;
+    return this._numRecvItem + '/' + this._numTotalItems;
   }
 
   /**
@@ -405,40 +370,7 @@ class Receiver {
   }
 
   /**
-   * This shall be called when the user clicks receive accept button.
-   * The module is going to change current state and be ready to receive.
-   * @returns {boolean} Return the result of the function.
-   */
-  acceptRecv(recvPath) {
-    if (this._state !== STATE.WAITING || this._socket === null) {
-      return false;
-    }
-    this._state = STATE.RECVING;
-    this._recvPath = recvPath;
-    this._numRecvItem = 0;
-    this._speedBytes = 0;
-    this._itemFlag = 'ok';
-    const header = { class: this._itemFlag };
-    this._socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this._onWriteError);
-    return true;
-  }
-  /**
-   * This shall be called when the user clicks receive reject button.
-   * @returns {boolean} Return the result of the function.
-   */
-  rejectRecv() {
-    if (this._state !== STATE.WAITING || this._socket === null) {
-      return false;
-    }
-    this._state = STATE.MY_REJECT;
-    const header = { class: 'no' };
-    this._socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this._onWriteError);
-    this._socket.end();
-    return true;
-  }
-
-  /**
-   * Special method for writing to recvSocket while receiving.
+   * Special method for writing to socket while receiving.
    */
   _writeOnSocket() {
     let header = null;
@@ -470,24 +402,6 @@ class Receiver {
   }
 
   /**
-   * Validate header what sender sent and return false if invalid, or return true.
-   * @param {{app:String, version: String, class: String, array: Array.<{}>}} header 
-   */
-  _validateSendRequestHeader(header) {
-    if (!header)
-      return false;
-    if (header.app !== 'SendDone')
-      return false;
-    if (header.version !== VERSION)
-      return false;
-    if (!header.id)
-      return false;
-    if (!header.itemArray)
-      return false;
-    return true;
-  }
-
-  /**
    * @param {Error} err 
    */
   _onWriteError = (err) => {
@@ -500,6 +414,5 @@ class Receiver {
     }
   }
 }
-
 
 module.exports = Receiver;

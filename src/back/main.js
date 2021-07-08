@@ -223,15 +223,15 @@ ipcMain.handle('deleteRecver', (_, ind) => {
   return false;
 })
 
-ipcMain.handle('acceptRecv', (_, ind, recvDir) => {
+ipcMain.handle('acceptSend', (_, ind, recvDir) => {
   if (server) {
-    server.acceptRecv(ind, (recvDir ? recvDir : app.getPath('downloads')));
+    server.acceptSend(ind, (recvDir ? recvDir : app.getPath('downloads')));
   }
 })
 
-ipcMain.handle('rejectRecv', (_, ind) => {
+ipcMain.handle('rejectSend', (_, ind) => {
   if (server) {
-    server.rejectRecv(ind);
+    server.rejectSend(ind);
   }
 })
 

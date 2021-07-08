@@ -110,7 +110,7 @@ function RecvView({ state, ind }) {
         <>
           <button className={style.Neg}
             onClick={() => {
-              ipcRenderer.rejectRecv(ind);
+              ipcRenderer.rejectSend(ind);
             }}
           >REJECT</button>
           <button className={style.Pos}
@@ -120,7 +120,7 @@ function RecvView({ state, ind }) {
                 ipcRenderer.showMessage('Set your receive directory.');
                 return;
               }
-              ipcRenderer.acceptRecv(ind, recvDir);
+              ipcRenderer.acceptSend(ind, recvDir);
             }}
           >ACCEPT</button>
         </>
