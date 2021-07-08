@@ -175,13 +175,13 @@ ipcMain.handle('setMyId', (event, myId) => {
   return false;
 })
 
-ipcMain.handle('sendRequest', (event, items, ip, id) => {
+ipcMain.handle('sendRequest', (_, items, ip, id) => {
   if (client) {
     client.sendRequest(items, ip, id);
   }
 })
 
-ipcMain.handle('recvRequest', (event, items, ip, id) => {
+ipcMain.handle('recvRequest', (_, ip, id) => {
   if (client) {
     client.recvRequest(ip, id);
   }

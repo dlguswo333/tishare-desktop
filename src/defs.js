@@ -17,7 +17,7 @@ const STATE = {
   RQR_RECV_REQUEST: "RQR_RECV_REQUEST",
   RQR_SEND_REJECT: "RQR_SEND_REJECT",
   RQR_RECV_REJECT: "RQR_RECV_REJECT",
-  RQR_MY_CANCEL: "RQR_MY_CANCEL",
+  RQR_CANCEL: "RQR_CANCEL",
 
   // For Requestee
   RQE_SEND_REQUEST: "RQE_SEND_REQUEST",
@@ -27,12 +27,11 @@ const STATE = {
   RQE_CANCEL: "RQE_CANCEL",
 
   // For Receiver and Sender
-  WAITING: "WAITING", // Deprecated it.
-  MY_STOP: "MY_STOP",
+  WAITING: "WAITING", // Will be deprecated
+  MY_STOP: "MY_STOP", // Not used
   MY_END: "MY_END",
-  OTHER_STOP: "OTHER_STOP",
+  OTHER_STOP: "OTHER_STOP", // Not used
   OTHER_END: "OTHER_END",
-  MY_REJECT: "MY_REJECT",
 
   // For Sender
   SENDING: "SENDING",

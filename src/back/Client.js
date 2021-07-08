@@ -1,4 +1,4 @@
-const { PORT, OS, STATE, MAX_NUM_JOBS } = require('../defs');
+const { PORT, VERSION, STATE, MAX_NUM_JOBS } = require('../defs');
 const { HEADER_END, splitHeader, MAX_HEADER_LEN, createItemArray } = require('./Common');
 const net = require('net');
 const Sender = require('./Sender');
@@ -8,7 +8,7 @@ const Receiver = require('./Receiver');
 class Client {
   constructor() {
     /** @type {string} */
-    this.myId = '';
+    this._myId = '';
     /** @type {Object.<number, (Sender|Receiver|Requester)>} */
     this.jobs = {};
     /** @type {number} */
@@ -22,7 +22,7 @@ class Client {
    */
   setMyId(id) {
     if (id) {
-      this.myId = id;
+      this._myId = id;
       return true;
     }
     return false;
@@ -64,9 +64,9 @@ class Client {
     this.jobs[ind] = new Requester(STATE.RQR_SEND_REQUEST, socket, receiverId);
 
     socket.once('connect', async () => {
-      console.log('sendRequest: connected to ' + this._socket.remoteAddress);
+      console.log('sendRequest: connected to ' + socket.remoteAddress);
       const requestHeader = this._createSendRequestHeader();
-      socket.write(JSON.stringify(requestHeader) + HEADER_END, 'utf-8', this._onWriteError);
+      socket.write(JSON.stringify(requestHeader) + HEADER_END, 'utf-8', (err) => { if (err) this._handleNetworkErr(ind); });
     });
 
     socket.on('data', async (data) => {
@@ -139,9 +139,9 @@ class Client {
     this.jobs[ind] = new Requester(STATE.RQR_RECV_REQUEST, socket, senderId);
 
     socket.once('connect', async () => {
-      console.log('recvRequest: connected to ' + this._socket.remoteAddress);
+      console.log('recvRequest: connected to ' + socket.remoteAddress);
       const requestHeader = this._createRecvRequestHeader();
-      socket.write(JSON.stringify(requestHeader) + HEADER_END, 'utf-8', this._onWriteError);
+      socket.write(JSON.stringify(requestHeader) + HEADER_END, 'utf-8', (err) => { if (err) this._handleNetworkErr(ind); });
     });
 
     socket.on('data', async (data) => {
@@ -231,14 +231,6 @@ class Client {
     return (this._nextInd)++;
   }
 
-  _onWriteError = (err) => {
-    if (err) {
-      console.error('Sender: Error Occurred during writing to Socket.');
-      console.error(err);
-      this._socket.destroy();
-      this._state = STATE.ERR_NETWORK;
-    }
-  }
   /**
    * Handle network error on Requester.
    */

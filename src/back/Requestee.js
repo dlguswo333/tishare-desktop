@@ -18,7 +18,7 @@ class Requestee {
    */
   reject() {
     if (this._state === STATE.RQE_SEND_REQUEST || this._state === STATE.RQE_RECV_REQUEST) {
-      this._socket.write(JSON.stringify({ class: 'no' } + HEADER_END, 'utf-8', this._onWriteError));
+      this._socket.write(JSON.stringify({ class: 'no' }) + HEADER_END, 'utf-8', this._onWriteError);
     }
   }
 

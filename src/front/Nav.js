@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import SendView from './SendView';
-import RecvView from './RecvView';
+import ClientJobView from './ClientJobView';
+import ServerJobView from './ServerJobView';
 import { ReactComponent as MenuIcon } from './icons/Menu.svg';
 import { ReactComponent as SettingsIcon } from './icons/Settings.svg';
 import { ReactComponent as PinIcon } from './icons/Pin.svg';
@@ -14,30 +14,31 @@ let hover = false;
 /**
  * @param {object} props 
  * @param {Function} props.toggleSettings 
+ * @param {object} props.items 
  * @returns 
  */
-function Nav({ toggleSettings }) {
+function Nav({ toggleSettings, items }) {
   const [grow, setGrow] = useState(false);
   const [pin, setPin] = useState(false);
   const [noti, setNoti] = useState(false);
   const [senders, setSenders] = useState({});
   const [receivers, setReceivers] = useState({});
 
-  const showSenders = () => {
+  const showClientJobs = () => {
     let ret = [];
     for (const key in senders) {
       ret.push(
-        <SendView state={senders[key]} ind={key} key={key} />
+        <ClientJobView state={senders[key]} ind={key} key={key} />
       )
     }
     return ret;
   }
 
-  const showReceivers = () => {
+  const showServerJobs = () => {
     let ret = [];
     for (const key in receivers) {
       ret.push(
-        <RecvView state={receivers[key]} ind={key} key={key} />
+        <ServerJobView state={receivers[key]} ind={key} items={items} key={key} />
       )
     }
     return ret;
@@ -110,8 +111,8 @@ function Nav({ toggleSettings }) {
         <RecvView state={{ state: 'WAITING', speed: 110203, progress: 100, id: 'mason', itemName: 'files_that_has_too_long_file_name.jpg' }} />
         <RecvView state={{ state: 'RECVING', speed: 11033403, progress: 60, id: 'july', itemName: 'report about theme ui.docx', totalProgress: '1/2' }} /> */}
 
-        {showSenders()}
-        {showReceivers()}
+        {showClientJobs()}
+        {showServerJobs()}
       </div>
     </nav>
   )
