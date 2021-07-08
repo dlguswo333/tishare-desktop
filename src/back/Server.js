@@ -257,8 +257,7 @@ class Server {
   }
 
   /**
-   * End receiving.
-   * Call this while the state is 'WAITING', 'RECVING'.
+   * End a Job.
    * @param {number} ind
    * @returns {boolean} Whether the execution has been successful.
    */
@@ -269,7 +268,8 @@ class Server {
     return false;
   }
   /**
-   * Delete a Receiver from jobs.
+   * Delete a Job from jobs.
+   * This function must be preceded by endJob.
    * @param {number} ind 
    * @returns {boolean} Whether the execution has been successful.
    */

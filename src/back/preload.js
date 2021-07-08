@@ -20,9 +20,6 @@ contextBridge.exposeInMainWorld('ipcRenderer',
     setMyId: async (myId) => {
       return (await ipcRenderer.invoke('setMyId', myId));
     },
-    setRecvDir: async () => {
-      return (await ipcRenderer.invoke('setRecvDir'));
-    },
     isServerOpen: async () => {
       return (await ipcRenderer.invoke('isServerOpen'));
     },
@@ -35,8 +32,11 @@ contextBridge.exposeInMainWorld('ipcRenderer',
     removeScanCallback: () => {
       ipcRenderer.removeAllListeners('scannedDevice');
     },
-    send: (items, receiverIp, receiverId) => {
-      ipcRenderer.invoke('send', items, receiverIp, receiverId);
+    sendRequest: (items, receiverIp, receiverId) => {
+      ipcRenderer.invoke('sendRequest', items, receiverIp, receiverId);
+    },
+    recvRequest: (senderIp, senderId) => {
+      ipcRenderer.invoke('recvRequest', senderIp, senderId);
     },
     getServerState: async () => {
       return (await ipcRenderer.invoke('getServerState'));
@@ -44,23 +44,29 @@ contextBridge.exposeInMainWorld('ipcRenderer',
     getClientState: async () => {
       return (await ipcRenderer.invoke('getClientState'));
     },
-    endSender: (ind) => {
-      ipcRenderer.invoke('endSender', ind);
+    endServerJob: (ind) => {
+      ipcRenderer.invoke('endServerJob', ind);
     },
-    deleteSender: (ind) => {
-      ipcRenderer.invoke('deleteSender', ind);
+    endClientJob: (ind) => {
+      ipcRenderer.invoke('endClientJob', ind);
     },
-    endRecver: (ind) => {
-      ipcRenderer.invoke('endRecver', ind);
+    deleteServerJob: (ind) => {
+      ipcRenderer.invoke('deleteServerJob', ind);
     },
-    deleteRecver: (ind) => {
-      ipcRenderer.invoke('deleteRecver', ind);
+    deleteClientJob: (ind) => {
+      ipcRenderer.invoke('deleteClientJob', ind);
     },
-    acceptSend: (ind, recvDir) => {
-      ipcRenderer.invoke('acceptSend', ind, recvDir);
+    acceptSendRequest: (ind, recvDir) => {
+      ipcRenderer.invoke('acceptSendRequest', ind, recvDir);
     },
-    rejectSend: (ind) => {
-      ipcRenderer.invoke('rejectSend', ind);
+    acceptRecvRequest: (ind, items) => {
+      ipcRenderer.invoke('acceptRecvRequest', ind, items);
+    },
+    rejectRequest: (ind) => {
+      ipcRenderer.invoke('rejectRequest', ind);
+    },
+    setRecvDir: async () => {
+      return (await ipcRenderer.invoke('setRecvDir'));
     },
     showMessage: (message) => {
       ipcRenderer.invoke('showMessage', message);
