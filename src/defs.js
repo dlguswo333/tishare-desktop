@@ -1,6 +1,5 @@
 const PORT = 9238;
 const CHUNKSIZE = 2097152;
-const HEADER_END = '\n\n';
 const STATE = {
   // For Server, Client, Sender and Receiver
   ERR_FILE_SYSTEM: "ERR_FILE_SYSTEM",
@@ -69,4 +68,4 @@ const printSize = (size) => {
   }
   return size.toFixed(2) + ' B';
 }
-module.exports = { PORT, CHUNKSIZE, HEADER_END, STATE, OS, VERSION, SCANTIMEOUT, MAX_NUM_JOBS, printSize };
+module.exports = { PORT, CHUNKSIZE, STATE, OS, VERSION, SCANTIMEOUT, MAX_NUM_JOBS, printSize };

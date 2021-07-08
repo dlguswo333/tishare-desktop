@@ -90,7 +90,7 @@ Sender connects to receiver and sends the following header first.
 }
 ```
 The above `json` data is stringified and followed by `\n\n`, which notifies the end of the header, as stated [above](#basic-idea).<br>
-There is no following data after `\n\n`. Sender sends the header and goes to `SEND_REQUEST` state, waiting for receiver to accept or reject.<br>
+There is no following data after `\n\n`. Sender sends the header and goes to `RQR_SEND_REQUEST` state, waiting for receiver to accept or reject.<br>
 The following describes the header in sender's perspective.
 <br>
 

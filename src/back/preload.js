@@ -56,11 +56,11 @@ contextBridge.exposeInMainWorld('ipcRenderer',
     deleteRecver: (ind) => {
       ipcRenderer.invoke('deleteRecver', ind);
     },
-    acceptRecv: (ind, recvDir) => {
-      ipcRenderer.invoke('acceptRecv', ind, recvDir);
+    acceptSend: (ind, recvDir) => {
+      ipcRenderer.invoke('acceptSend', ind, recvDir);
     },
-    rejectRecv: (ind) => {
-      ipcRenderer.invoke('rejectRecv', ind);
+    rejectSend: (ind) => {
+      ipcRenderer.invoke('rejectSend', ind);
     },
     showMessage: (message) => {
       ipcRenderer.invoke('showMessage', message);
