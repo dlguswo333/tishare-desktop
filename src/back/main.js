@@ -175,9 +175,15 @@ ipcMain.handle('setMyId', (event, myId) => {
   return false;
 })
 
-ipcMain.handle('send', (event, items, ip, id) => {
+ipcMain.handle('sendRequest', (event, items, ip, id) => {
   if (client) {
-    client.send(items, ip, id);
+    client.sendRequest(items, ip, id);
+  }
+})
+
+ipcMain.handle('recvRequest', (event, items, ip, id) => {
+  if (client) {
+    client.recvRequest(ip, id);
   }
 })
 
@@ -195,46 +201,48 @@ ipcMain.handle('getClientState', () => {
   return undefined;
 })
 
-ipcMain.handle('endSender', (_, ind) => {
+ipcMain.handle('endServerJob', (_, ind) => {
+  if (server) {
+    return server.endJob(ind);
+  }
+  return false;
+})
+
+ipcMain.handle('endClientJob', (_, ind) => {
   if (client) {
-    return client.endSender(ind);
+    return client.endJob(ind);
   }
   return false;
 })
 
-ipcMain.handle('deleteSender', (_, ind) => {
+ipcMain.handle('deleteServerJob', (_, ind) => {
+  if (server) {
+    return server.deleteJob(ind);
+  }
+  return false;
+})
+
+ipcMain.handle('deleteClientJob', (_, ind) => {
   if (client) {
-    return client.deleteSender(ind);
+    return client.deleteJob(ind);
   }
   return false;
 })
 
-ipcMain.handle('endRecver', (_, ind) => {
-  if (server) {
-    return server.endRecver(ind);
-  }
-  return false;
+ipcMain.handle('acceptSendRequest', (_, ind, recvDir) => {
+  if (server)
+    server.acceptSendRequest(ind, recvDir);
 })
 
-ipcMain.handle('deleteRecver', (_, ind) => {
-  if (server) {
-    return server.deleteRecver(ind);
-  }
-  return false;
+ipcMain.handle('acceptRecvRequest', (_, ind, items) => {
+  if (server)
+    server.acceptRecvRequest(ind, items);
 })
 
-ipcMain.handle('acceptSend', (_, ind, recvDir) => {
-  if (server) {
-    server.acceptSend(ind, (recvDir ? recvDir : app.getPath('downloads')));
-  }
+ipcMain.handle('rejectRequest', (_, ind) => {
+  if (server)
+    server.rejectRequest(ind);
 })
-
-ipcMain.handle('rejectSend', (_, ind) => {
-  if (server) {
-    server.rejectSend(ind);
-  }
-})
-
 
 ipcMain.handle('setRecvDir', () => {
   let ret = dialog.showOpenDialogSync(mainWindow, {
