@@ -181,7 +181,7 @@ function App() {
           </div>
         </div>
       </div>
-      <Nav toggleSettings={toggleSettings} />
+      <Nav toggleSettings={toggleSettings} items={items} />
       {showSettings && <Settings setShowSettings={setShowSettings} />}
     </div>
   );

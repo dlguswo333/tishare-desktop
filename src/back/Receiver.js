@@ -223,7 +223,7 @@ class Receiver {
                 // Close previous item handle.
                 await this._itemHandle.close();
               }
-              this._state = STATE.COMPLETE;
+              this._state = STATE.RECV_COMPLETE;
               this._socket.end();
               break;
             case 'stop':
@@ -232,7 +232,7 @@ class Receiver {
               break;
             case 'end':
               this._state = STATE.OTHER_END;
-              this._socket = null;
+              this._socket.end();
               break;
           }
           break;
@@ -240,7 +240,7 @@ class Receiver {
           switch (this._recvHeader.class) {
             case 'end':
               this._state = STATE.OTHER_END;
-              this._socket = null;
+              this._socket.end();
               break;
             // Ignore any other classes.
           }
@@ -254,7 +254,7 @@ class Receiver {
     });
 
     this._socket.on('close', () => {
-      if (!(this._state === STATE.RECV_COMPLETE || this._state === STATE.MY_REJECT || this._state === STATE.MY_END || this._state === STATE.OTHER_END))
+      if (!(this._state === STATE.RECV_COMPLETE || this._state === STATE.MY_END || this._state === STATE.OTHER_END))
         // Unexpected close event.
         this._state = STATE.ERR_NETWORK;
       this._socket.end();

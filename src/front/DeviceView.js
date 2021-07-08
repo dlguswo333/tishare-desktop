@@ -71,13 +71,22 @@ function DeviceView({ items, myIp, myNetmask, myId }) {
     ipcRenderer.scan(myIp, myNetmask, myId);
   }
 
-  const send = () => {
+  const sendRequest = () => {
     if (!selectedIp) {
       setNoDeviceWarn(true);
       return;
     }
     setNoDeviceWarn(false);
-    ipcRenderer.send(items, selectedIp, devices[selectedIp].id);
+    ipcRenderer.sendRequest(items, selectedIp, devices[selectedIp].id);
+  }
+
+  const recvRequest = () => {
+    if (!selectedIp) {
+      setNoDeviceWarn(true);
+      return;
+    }
+    setNoDeviceWarn(false);
+    ipcRenderer.recvRequest(selectedIp, devices[selectedIp].id);
   }
 
   useEffect(() => {
@@ -100,7 +109,8 @@ function DeviceView({ items, myIp, myNetmask, myId }) {
       <div className='DeviceViewHead'>
         <div className='Buttons'>
           <ThemeButton onClick={scan} value='Scan' />
-          <ThemeButton onClick={send} value='Send' />
+          <ThemeButton onClick={sendRequest} value='Send' />
+          <ThemeButton onClick={recvRequest} value='Receive' />
         </div>
       </div>
       <div className='DeviceViewBody'>

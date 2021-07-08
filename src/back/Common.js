@@ -45,7 +45,7 @@ function _createItemArray(items, ret) {
       _createItemArray(items[itemName].items, ret);
     }
     else {
-      ret.push(_createFileHeader(items[itemName].path, items[itemName].name, items[itemName].dir, itemStat.size));
+      ret.push(_createFileHeader(items[itemName].path, items[itemName].name, items[itemName].dir, items[itemName].size));
     }
   }
 }

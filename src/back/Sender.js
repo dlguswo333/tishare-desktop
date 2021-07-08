@@ -107,12 +107,12 @@ class Sender {
    * @returns {boolean}
    */
   async end() {
-    if (this._state === STATE.SENDING || this._state === STATE.WAITING || this._state === STATE.SENDER_PAUSE || this._state === STATE.RECVER_PAUSE) {
+    if (this._state === STATE.SENDING || this._state === STATE.SENDER_PAUSE || this._state === STATE.RECVER_PAUSE) {
       this._endFlag = true;
       if (this._itemHandle) {
         await this._itemHandle.close();
       }
-      if (this._state === STATE.SENDER_PAUSE || this._state === STATE.RECVER_PAUSE || this._state === STATE.WAITING) {
+      if (this._state === STATE.SENDER_PAUSE || this._state === STATE.RECVER_PAUSE) {
         // Send end header immediately while stop.
         await this._send();
       }
@@ -158,7 +158,7 @@ class Sender {
               break
             case 'end':
               this._state = STATE.OTHER_END;
-              this._socket.end();
+              this._socket.end(() => { this._socket = null; });
               break
             case 'next':
               if (this._itemHandle) {
@@ -184,6 +184,7 @@ class Sender {
               break;
             case 'end':
               this._state = STATE.OTHER_END;
+              this._socket.end();
             default:
               // What the hell?
               break;
@@ -193,6 +194,7 @@ class Sender {
           switch (recvHeader.class) {
             case 'end':
               this._state = STATE.OTHER_END;
+              this._socket.end();
               break;
             // Ignore any other classes.
           }

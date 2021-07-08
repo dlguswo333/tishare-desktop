@@ -18,8 +18,8 @@ class Requester {
    */
   end() {
     if (this._state === STATE.RQR_SEND_REQUEST || this._state === STATE.RQR_RECV_REQUEST) {
-      // End socket.
-      this._socket.write(JSON.stringify({ class: 'end' } + HEADER_END, 'utf-8', this._onWriteError));
+      this._state = STATE.RQR_CANCEL;
+      this._socket.write(JSON.stringify({ class: 'end' }) + HEADER_END, 'utf-8', this._onWriteError);
     }
   }
 
