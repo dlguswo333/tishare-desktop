@@ -1,23 +1,9 @@
-/**
- * Header must not and cannot exceed this length.
- * @type {number}
- */
+/** Header must not and cannot exceed this length. @type {number} */
 const MAX_HEADER_LEN = 10000;
 const HEADER_END = '\n\n';
 /**
  * @typedef {{dir:string, path:string, type:string, size:number, items:Object.<string, item>}} item
  */
-
-/**
- * Normalize tree structure items into serialized item array.
- * Before calling the function, be sure that this._itemArray is an empty array.
- * @param {Object.<string, item>} items
- */
-function createItemArray(items) {
-  let ret = [];
-  _createItemArray(items, ret);
-  return ret;
-}
 
 /**
  * split and separate a header from buf and return the header as string and sliced buf.
@@ -32,6 +18,17 @@ function splitHeader(buf) {
     return { header: header, buf: buf.slice(endInd + 2) };
   };
   return undefined;
+}
+
+/**
+ * Normalize tree structure items into serialized item array.
+ * Before calling the function, be sure that this._itemArray is an empty array.
+ * @param {Object.<string, item>} items
+ */
+function createItemArray(items) {
+  let ret = [];
+  _createItemArray(items, ret);
+  return ret;
 }
 
 /**
@@ -71,33 +68,6 @@ function _createFileHeader(path, name, dir, size) {
 function _createDirectoryHeader(path, name, dir) {
   const header = { path: path, name: name, dir: dir.split('\\').join('/'), type: 'directory' }
   return header;
-}
-
-/**
- * Deep copy items Object and return the result.
- * When calling the function, let dst value undefined.
- * @param {Object.<string, item>} items
- * @param {boolean} noPath
- */
-function _deepCopyItems(dst, items, noPath) {
-  let retFlag = false;
-  if (dst === undefined) {
-    retFlag = true;
-    dst = {};
-  }
-  for (let itemName in items) {
-    dst[itemName] = {};
-    for (let key in items[itemName]) {
-      if (key === 'items') {
-        // Deep copy it.
-        this._deepCopyItems(dst[itemName], items[itemName], noPath);
-      }
-      else if (key !== 'path' || !noPath)
-        dst[itemName][key] = items[itemName][key];
-    }
-  }
-  if (retFlag)
-    return dst;
 }
 
 module.exports = { MAX_HEADER_LEN, HEADER_END, createItemArray, splitHeader };
