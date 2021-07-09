@@ -246,7 +246,7 @@ class Receiver {
         default:
           // What the hell?
           // Unhandled Receiver state case.
-          this._socket.end();
+          this._socket.destroy();
           break;
       }
     });
@@ -255,7 +255,6 @@ class Receiver {
       if (!(this._state === STATE.RECV_COMPLETE || this._state === STATE.MY_END || this._state === STATE.OTHER_END))
         // Unexpected close event.
         this._state = STATE.ERR_NETWORK;
-      this._socket.end();
     });
 
     this._socket.on('error', (err) => {

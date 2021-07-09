@@ -137,7 +137,7 @@ class Sender {
               break
             case 'end':
               this._state = STATE.OTHER_END;
-              this._socket.end(() => { this._socket = null; });
+              this._socket.end();
               break
             case 'next':
               if (this._itemHandle) {
@@ -186,10 +186,9 @@ class Sender {
     });
 
     this._socket.on('close', () => {
-      if (!(this._state === STATE.SEND_COMPLETE || this._state === STATE.OTHER_REJECT || this._state === STATE.OTHER_END || this._state === STATE.MY_END))
+      if (!(this._state === STATE.SEND_COMPLETE || this._state === STATE.OTHER_END || this._state === STATE.MY_END))
         // Unexpected close event.
         this._state = STATE.ERR_NETWORK;
-      this._socket.end();
     });
 
     this._socket.on('error', (err) => {
@@ -407,7 +406,7 @@ class Sender {
    */
   _handleNetworkErr = () => {
     this._state = STATE.ERR_NETWORK;
-    this._socket.end();
+    this._socket.destroy();
   }
 }
 

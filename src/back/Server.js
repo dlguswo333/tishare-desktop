@@ -102,6 +102,7 @@ class Server {
             if (this.jobs[ind])
               this.jobs[ind].setState(STATE.RQE_CANCEL);
             socket.end();
+            break;
           default:
             // Abort and ignore this suspicious connection.
             this._handleNetworkErr(ind);

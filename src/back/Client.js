@@ -107,10 +107,8 @@ class Client {
 
     socket.on('close', (err) => {
       if (err || this.jobs[ind].getState().state !== STATE.RQR_SEND_REJECT) {
-        socket.destroy();
         this._handleNetworkErr(ind);
       }
-      socket.end();
     });
 
     socket.on('error', (err) => {
@@ -194,10 +192,8 @@ class Client {
 
     socket.on('close', (err) => {
       if (err || this.jobs[ind].getState().state !== STATE.RQR_RECV_REJECT) {
-        socket.destroy();
         this._handleNetworkErr(ind);
       }
-      socket.end();
     });
 
     socket.on('error', (err) => {
