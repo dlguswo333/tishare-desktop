@@ -1,5 +1,8 @@
 {
   "name": "tishare-desktop",
+  "author": {
+    "name": "dlguswo333"
+  },
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -24,6 +27,7 @@
     "builder": "npm run build && electron-builder"
   },
   "build": {
+    "productName": "tiShare",
     "files": [
       "build/**/*",
       "src/back/**",
@@ -31,6 +35,9 @@
     ],
     "win": {
       "target": "nsis"
+    },
+    "directories": {
+      "buildResources": "public"
     },
     "nsis": {
       "oneClick": false

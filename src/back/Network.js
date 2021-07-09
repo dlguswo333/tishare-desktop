@@ -53,10 +53,10 @@ function scan(ip, netmask, myId, callback) {
       os: OS
     };
     socket.on('message', (msg, rinfo) => {
-      // if (rinfo.address === ip) {
-      //   // Ignore myself.
-      //   return;
-      // }
+      if (rinfo.address === ip) {
+        // Ignore myself.
+        return;
+      }
       try {
         const recvHeader = JSON.parse(msg.toString('utf-8'));
         if (callback)
