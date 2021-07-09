@@ -80,13 +80,13 @@ function DeviceView({ items, myIp, myNetmask, myId }) {
     ipcRenderer.sendRequest(items, selectedIp, devices[selectedIp].id);
   }
 
-  const recvRequest = () => {
+  const preRecvRequest = () => {
     if (!selectedIp) {
       setNoDeviceWarn(true);
       return;
     }
     setNoDeviceWarn(false);
-    ipcRenderer.recvRequest(selectedIp, devices[selectedIp].id);
+    ipcRenderer.preRecvRequest(selectedIp, devices[selectedIp].id);
   }
 
   useEffect(() => {
@@ -110,7 +110,7 @@ function DeviceView({ items, myIp, myNetmask, myId }) {
         <div className='Buttons'>
           <ThemeButton onClick={scan} value='Scan' />
           <ThemeButton onClick={sendRequest} value='Send' />
-          <ThemeButton onClick={recvRequest} value='Receive' />
+          <ThemeButton onClick={preRecvRequest} value='Receive' />
         </div>
       </div>
       <div className='DeviceViewBody'>

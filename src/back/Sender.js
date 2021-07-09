@@ -82,27 +82,6 @@ class Sender {
   }
 
   /**
-   * Stop sending for a moment.
-   * @returns {boolean}
-   */
-  stop() {
-    if (this._state === STATE.SENDING)
-      return (this._stopFlag = true);
-    return false;
-  }
-  /**
-   * Resume from stop.
-   * @returns {boolean}
-   */
-  resume() {
-    if (this._state === STATE.SENDER_PAUSE) {
-      this._state = STATE.SENDING;
-      this._send();
-      return true;
-    }
-    return false;
-  }
-  /**
    * End sending.
    * @returns {boolean}
    */

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { STATE, printSize } from '../defs';
 import style from './style/JobView.module.scss';
 const ipcRenderer = window.ipcRenderer;
@@ -14,6 +14,8 @@ const ipcRenderer = window.ipcRenderer;
  * @param {number} props.ind
  */
 function ClientJobView({ state, ind }) {
+  const [recvDir, setRecvDir] = useState(localStorage.getItem('recvDir'));
+
   const showHead = () => {
     switch (state.state) {
       case STATE.RQR_SEND_REQUEST:
@@ -24,6 +26,8 @@ function ClientJobView({ state, ind }) {
         return `Request Rejected`
       case STATE.RQR_CANCEL:
         return `Request Cancelled`
+      case STATE.RQR_PRE_RECV_REQUEST:
+        return `Select Receive Path`
       case STATE.MY_END:
       case STATE.OTHER_END:
         return `Process Cancelled`
@@ -50,7 +54,7 @@ function ClientJobView({ state, ind }) {
         return (
           <>
             <div className={style.Element}>
-              {`Waiting for ${state.id}...`}
+              {`Waiting for ${state.id} to accept...`}
             </div>
           </>
         )
@@ -67,7 +71,26 @@ function ClientJobView({ state, ind }) {
         return (
           <>
             <div className={style.Element}>
-              {`You cancelled the request to ${state.id}`}
+              {`You cancelled your request to ${state.id}.`}
+            </div>
+          </>
+        )
+      case STATE.RQR_PRE_RECV_REQUEST:
+        return (
+          <>
+            <div className={style.Element}>
+              {`📁`}
+              <input type='text'
+                readOnly
+                value={recvDir}
+              />
+              <button
+                onClick={async () => {
+                  const ret = await ipcRenderer.setRecvDir();
+                  if (ret)
+                    setRecvDir(ret);
+                }}
+              >Find</button>
             </div>
           </>
         )
@@ -174,6 +197,26 @@ function ClientJobView({ state, ind }) {
             >OK</button>
           </>
         )
+      case STATE.RQR_PRE_RECV_REQUEST:
+        return (
+          <>
+            <button className={style.Neg}
+              onClick={() => {
+                ipcRenderer.endClientJob(ind);
+              }}
+            >CANCEL</button>
+            <button className={style.Pos}
+              onClick={() => {
+                if (!recvDir) {
+                  // Prevent receiving if recvDir is empty.
+                  ipcRenderer.showMessage('Set your receive directory.');
+                  return;
+                }
+                ipcRenderer.recvRequest(ind, recvDir);
+              }}
+            >OK</button>
+          </>
+        )
       case STATE.MY_END:
       case STATE.OTHER_END:
         return (
@@ -193,11 +236,20 @@ function ClientJobView({ state, ind }) {
               onClick={() => {
                 ipcRenderer.endClientJob(ind);
               }}
-            >OK</button>
+            >CANCEL</button>
           </>
         )
       case STATE.SEND_COMPLETE:
       case STATE.RECV_COMPLETE:
+        return (
+          <>
+            <button className={style.Pos}
+              onClick={() => {
+                ipcRenderer.deleteClientJob(ind);
+              }}
+            >OK</button>
+          </>
+        )
       case STATE.ERR_NETWORK:
       case STATE.ERR_FILE_SYSTEM:
         return (

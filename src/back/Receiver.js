@@ -1,15 +1,16 @@
 const fs = require('fs').promises;
 const path = require('path');
 const { HEADER_END, splitHeader } = require('./Common');
-const { VERSION, OS, STATE } = require('../defs');
+const { STATE } = require('../defs');
 
 class Receiver {
   /**
    * @param {import('net').Socket} socket 
    * @param {string!} senderId 
    * @param {string!} recvDir 
+   * @param {number!} numItems 
    */
-  constructor(socket, senderId, recvDir) {
+  constructor(socket, senderId, recvDir, numItems) {
     this._state = STATE.RECVING;
     /** @type {import('net').Socket} */
     this._socket = socket;
@@ -17,6 +18,8 @@ class Receiver {
     this._senderId = senderId;
     /** @type {String} */
     this._recvPath = recvDir;
+    /** @type {number} */
+    this._numItems = numItems;
     /** @type {Buffer} */
     this._recvBuf = Buffer.from([]);
     /** @type {Array.<Buffer>} */
@@ -68,11 +71,6 @@ class Receiver {
      * @type {number} 
      */
     this._numRecvItem = 0;
-    /**
-     * Number of total items.
-     * @type {number}
-     */
-    this._numTotalItems = 0;
     /**
      * The number of bytes after the previous speed measure. 
      * @type {number}
@@ -299,7 +297,7 @@ class Receiver {
    * Return a string representing the total progress.
    */
   getTotalProgress() {
-    return this._numRecvItem + '/' + this._numTotalItems;
+    return this._numRecvItem + '/' + this._numItems;
   }
 
   /**
@@ -326,28 +324,6 @@ class Receiver {
     return { state: this._state, id: this._senderId };
   }
 
-  /**
-   * Stop receiving for a moment.
-   * @returns {boolean}
-   */
-  stop() {
-    if (this._state === STATE.RECVING)
-      return (this._stopFlag = true);
-    return false;
-  }
-  /**
-   * Retume from stop.
-   * @returns {boolean}
-   */
-  resume() {
-    if (this._state === STATE.RECEIVER_STOP) {
-      this._state = STATE.RECVING;
-      let header = { class: this._itemFlag };
-      this._socket.write(JSON.stringify(header) + HEADER_END, this._onWriteError);
-      return true;
-    }
-    return false;
-  }
   /**
    * End receiving.
    * @returns {boolean}

@@ -4,7 +4,7 @@ const { HEADER_END } = require('./Common');
 class Requester {
   /**
    * @param {string} state
-   * @param {import('net').Socket} socket
+   * @param {import('net').Socket|string} socket it will be used for saving sender IP.
    * @param {string} opponentId
    */
   constructor(state, socket, opponentId) {
@@ -17,6 +17,11 @@ class Requester {
    * Cancel Request.
    */
   end() {
+    if (this._state === STATE.RQR_PRE_RECV_REQUEST) {
+      // Because it is before making socket connection (the request is local yet.)
+      // Just mark it cancel and do nothing else.
+      this._state = STATE.RQR_CANCEL;
+    }
     if (this._state === STATE.RQR_SEND_REQUEST || this._state === STATE.RQR_RECV_REQUEST) {
       this._state = STATE.RQR_CANCEL;
       this._socket.write(JSON.stringify({ class: 'end' }) + HEADER_END, 'utf-8', this._onWriteError);

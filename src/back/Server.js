@@ -4,7 +4,7 @@ const Requestee = require('./Requestee');
 const Sender = require('./Sender');
 const Receiver = require('./Receiver');
 const { PORT, OS, VERSION, STATE, MAX_NUM_JOBS } = require('../defs');
-const { splitHeader, MAX_HEADER_LEN } = require('./Common');
+const { splitHeader, MAX_HEADER_LEN, createItemArray, HEADER_END } = require('./Common');
 
 class Server {
   constructor() {
@@ -88,7 +88,7 @@ class Server {
               this._handleNetworkErr(ind);
               return;
             }
-            this.jobs[ind] = new Requestee(STATE.RQE_SEND_REQUEST, socket, recvHeader.id);
+            this.jobs[ind] = new Requestee(STATE.RQE_SEND_REQUEST, socket, recvHeader);
             break;
           case 'recv-request':
             if (!this._validateRequestHeader(recvHeader)) {
@@ -96,7 +96,7 @@ class Server {
               this._handleNetworkErr(ind);
               return;
             }
-            this.jobs[ind] = new Requestee(STATE.RQE_RECV_REQUEST, socket, recvHeader.id);
+            this.jobs[ind] = new Requestee(STATE.RQE_RECV_REQUEST, socket, recvHeader);
             break;
           case 'end':
             if (this.jobs[ind])
@@ -227,7 +227,7 @@ class Server {
    */
   acceptSendRequest(ind, recvDir) {
     if (this.jobs[ind]) {
-      const receiver = new Receiver(this.jobs[ind]._socket, this.jobs[ind]._opponentId, recvDir);
+      const receiver = new Receiver(this.jobs[ind]._socket, this.jobs[ind].getId(), recvDir, this.jobs[ind].getNumItems());
       this.jobs[ind] = receiver;
       receiver._writeOnSocket();
     }
@@ -241,9 +241,10 @@ class Server {
   acceptRecvRequest(ind, items) {
     if (this.jobs[ind]) {
       const socket = this.jobs[ind]._socket;
-      const sender = new Sender(this.jobs[ind]._socket, this.jobs[ind]._opponentId, items);
+      const itemArray = createItemArray(items);
+      const sender = new Sender(this.jobs[ind]._socket, this.jobs[ind].getId(), itemArray);
       this.jobs[ind] = sender;
-      socket.write(JSON.stringify({ class: 'ok' }), 'utf-8');
+      socket.write(JSON.stringify({ class: 'ok', numItems: itemArray.length }) + HEADER_END, 'utf-8');
     }
   }
 

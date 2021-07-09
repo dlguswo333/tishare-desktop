@@ -5,19 +5,24 @@ class Requestee {
   /**
    * @param {string} state
    * @param {import('net').Socket} socket
-   * @param {string} opponentId
+   * @param {string} requestHeader
    */
-  constructor(state, socket, opponentId) {
+  constructor(state, socket, requestHeader) {
     this._state = state;
     this._socket = socket;
-    this._opponentId = opponentId;
+    this._requestHeader = requestHeader;
   }
 
   /**
    * Reject Request.
    */
   reject() {
-    if (this._state === STATE.RQE_SEND_REQUEST || this._state === STATE.RQE_RECV_REQUEST) {
+    if (this._state === STATE.RQE_SEND_REQUEST) {
+      this.setState(STATE.RQE_SEND_REJECT);
+      this._socket.write(JSON.stringify({ class: 'no' }) + HEADER_END, 'utf-8', this._onWriteError);
+    }
+    if (this._state === STATE.RQE_RECV_REQUEST) {
+      this.setState(STATE.RQE_RECV_REJECT);
       this._socket.write(JSON.stringify({ class: 'no' }) + HEADER_END, 'utf-8', this._onWriteError);
     }
   }
@@ -30,13 +35,21 @@ class Requestee {
     this._state = state;
   }
 
+  getId() {
+    return this._requestHeader.id;
+  }
+
+  getNumItems() {
+    return (this._requestHeader.numItems ? this._requestHeader.numItems : 0);
+  }
+
   /**
    * Return the current state.
    */
   getState() {
     return {
       state: this._state,
-      id: this._opponentId
+      id: this._requestHeader.id
     };
   }
 

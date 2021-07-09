@@ -35,8 +35,11 @@ contextBridge.exposeInMainWorld('ipcRenderer',
     sendRequest: (items, receiverIp, receiverId) => {
       ipcRenderer.invoke('sendRequest', items, receiverIp, receiverId);
     },
-    recvRequest: (senderIp, senderId) => {
-      ipcRenderer.invoke('recvRequest', senderIp, senderId);
+    preRecvRequest: (senderIp, senderId) => {
+      ipcRenderer.invoke('preRecvRequest', senderIp, senderId);
+    },
+    recvRequest: (ind, recvDir) => {
+      ipcRenderer.invoke('recvRequest', ind, recvDir);
     },
     getServerState: async () => {
       return (await ipcRenderer.invoke('getServerState'));

@@ -246,6 +246,15 @@ function ServerJobView({ state, ind, items }) {
         )
       case STATE.SEND_COMPLETE:
       case STATE.RECV_COMPLETE:
+        return (
+          <>
+            <button className={style.Pos}
+              onClick={() => {
+                ipcRenderer.deleteServerJob(ind);
+              }}
+            >OK</button>
+          </>
+        )
       case STATE.ERR_NETWORK:
       case STATE.ERR_FILE_SYSTEM:
         return (

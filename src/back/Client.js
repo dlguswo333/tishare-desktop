@@ -58,6 +58,7 @@ class Client {
       return false;
     /** @type {Buffer} */
     let _recvBuf = Buffer.from([]);
+    const itemArray = createItemArray(items);
     const ind = this._getNextInd();
     const socket = net.createConnection(PORT, receiverIp);
 
@@ -65,7 +66,7 @@ class Client {
 
     socket.once('connect', async () => {
       console.log('sendRequest: connected to ' + socket.remoteAddress);
-      const requestHeader = this._createSendRequestHeader();
+      const requestHeader = this._createSendRequestHeader(itemArray.length);
       socket.write(JSON.stringify(requestHeader) + HEADER_END, 'utf-8', (err) => { if (err) this._handleNetworkErr(ind); });
     });
 
@@ -92,7 +93,7 @@ class Client {
       switch (recvHeader.class) {
         case 'ok':
           // Transform Requester into Sender.
-          this.jobs[ind] = new Sender(socket, receiverId, createItemArray(items));
+          this.jobs[ind] = new Sender(socket, receiverId, itemArray);
           this.jobs[ind].send();
           break;
         case 'no':
@@ -123,17 +124,28 @@ class Client {
   }
 
   /**
-   * request to receive from opponent Server.
-   * @param {string} senderIp 
-   * @param {string} senderId 
+   * Prepare to request to receive from the opponent.
+   * @param {number} ind 
    * @returns {boolean} Index value of the Sender or false.
    */
-  recvRequest(senderIp, senderId) {
+  preRecvRequest(senderIp, senderId) {
     if (Object.keys(this.jobs).length >= MAX_NUM_JOBS)
       return false;
+    const ind = this._getNextInd();
+    this.jobs[ind] = new Requester(STATE.RQR_PRE_RECV_REQUEST, senderIp, senderId);
+  }
+
+  /**
+   * Send Receive request to receive from the opponent.
+   * @param {number} ind 
+   * @param {string} recvDir 
+   * @returns {boolean} Index value of the Sender or false.
+   */
+  recvRequest(ind, recvDir) {
     /** @type {Buffer} */
     let _recvBuf = Buffer.from([]);
-    const ind = this._getNextInd();
+    const senderIp = this.jobs[ind]._socket;
+    const senderId = this.jobs[ind]._opponentId;
     const socket = net.createConnection(PORT, senderIp);
 
     this.jobs[ind] = new Requester(STATE.RQR_RECV_REQUEST, socket, senderId);
@@ -167,7 +179,7 @@ class Client {
       switch (recvHeader.class) {
         case 'ok':
           // Transform Requester into Sender.
-          this.jobs[ind] = new Receiver(socket);
+          this.jobs[ind] = new Receiver(socket, senderId, recvDir, recvHeader.numItems);
           // Send ok header explictly to notify it is ready to receive.
           this.jobs[ind]._writeOnSocket();
           break;
@@ -183,10 +195,11 @@ class Client {
 
   /**
    * Create and return send request header.
+   * @param {number} _numItems
    * @returns {{app:string, version: string, class: string, id: string}}
    */
-  _createSendRequestHeader() {
-    let header = { app: 'tiShare', version: VERSION, class: 'send-request', id: this._myId };
+  _createSendRequestHeader(_numItems) {
+    let header = { app: 'tiShare', version: VERSION, class: 'send-request', id: this._myId, numItems: _numItems };
     return header;
   }
 

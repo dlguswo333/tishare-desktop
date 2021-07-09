@@ -181,9 +181,15 @@ ipcMain.handle('sendRequest', (_, items, ip, id) => {
   }
 })
 
-ipcMain.handle('recvRequest', (_, ip, id) => {
+ipcMain.handle('preRecvRequest', (_, ip, id) => {
   if (client) {
-    client.recvRequest(ip, id);
+    client.preRecvRequest(ip, id);
+  }
+})
+
+ipcMain.handle('recvRequest', (_, ind, recvDir) => {
+  if (client) {
+    client.recvRequest(ind, recvDir);
   }
 })
 
