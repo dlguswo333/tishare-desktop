@@ -106,7 +106,7 @@ class Client {
     });
 
     socket.on('close', (err) => {
-      if (err || this.jobs[ind].getState() !== STATE.RQR_SEND_REJECT) {
+      if (err || this.jobs[ind].getState().state !== STATE.RQR_SEND_REJECT) {
         socket.destroy();
         this._handleNetworkErr(ind);
       }
@@ -189,6 +189,21 @@ class Client {
           break;
         default:
           this._handleNetworkErr(ind);
+      }
+    });
+
+    socket.on('close', (err) => {
+      if (err || this.jobs[ind].getState().state !== STATE.RQR_RECV_REJECT) {
+        socket.destroy();
+        this._handleNetworkErr(ind);
+      }
+      socket.end();
+    });
+
+    socket.on('error', (err) => {
+      if (err) {
+        socket.destroy();
+        this._handleNetworkErr(ind);
       }
     });
   }
