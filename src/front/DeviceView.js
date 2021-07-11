@@ -94,7 +94,10 @@ function DeviceView({ items, myIp, myNetmask, myId }) {
       let tmp = {};
       tmp[deviceIp] = { ip: deviceIp, version: deviceVersion, id: deviceId, os: deviceOs };
       /**
-       * Passing a function inside setState,
+       * NOTE
+       * Here I Pass an arrow function inside setState.
+       * The parameter is the most recent state value.
+       * By passing the most recent state value to the function,
        * updating 'devices' using scan callback works as expected,
        * and unnecessary adding and removing callback is deleted.
        * Refer to the link: https://ko.reactjs.org/docs/hooks-faq.html#what-can-i-do-if-my-effect-dependencies-change-too-often
@@ -116,7 +119,7 @@ function DeviceView({ items, myIp, myNetmask, myId }) {
       <div className='DeviceViewBody'>
         <div className='Head'>
           Devices
-          {noDeviceWarn && <span>Select Device to send.</span>}
+          {noDeviceWarn && <span>Select a device first.</span>}
         </div>
         {showDevices()}
       </div>
