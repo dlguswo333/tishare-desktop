@@ -3,7 +3,7 @@
   "author": {
     "name": "dlguswo333"
   },
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "dependencies": {
     "electron-is-dev": "^2.0.0",
