@@ -11,10 +11,10 @@ function getNetworks() {
   for (const network in interfaces) {
     const one = interfaces[network];
     for (const ip of one) {
-      // Only ipv4 and external ip
+      // Only IPv4 and external IP which falls into the local IP address range.
       if (ip['family'] === 'IPv4' && !ip['internal']) {
-        // LAN ip addresses start with 192, 10, or 172.
-        if (ip['address'].startsWith('192') || ip['address'].startsWith('10') || ip['address'].startsWith('172')) {
+        const ipAsNum = _IpStringToNumber(ip['address'])
+        if ((167772160 <= ipAsNum <= 184549375) || (2886729728 <= ipAsNum <= 2887778303) || (3232235520 <= ipAsNum <= 3232301055)) {
           array.push({ name: network, ip: ip['address'], netmask: ip['netmask'] });
         }
       }
@@ -77,7 +77,7 @@ function scan(ip, netmask, myId, callback) {
 /**
  * Return number representation of IPv4.
  * @param {String} ip String representation of IPv4.
- * @returns {number}
+ * @returns {number} Number representation of IPv4.
  */
 function _IpStringToNumber(ip) {
   let tmp = ip.split('.');
@@ -92,7 +92,7 @@ function _IpStringToNumber(ip) {
 /**
  * Return number representation of IPv4.
  * @param {number} ip Number representation of IPv4.
- * @returns {String}
+ * @returns {String} String representation of IPv4.
  */
 function _IpNumberToString(ip) {
   let ret = '';

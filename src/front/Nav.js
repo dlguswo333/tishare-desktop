@@ -52,13 +52,11 @@ function Nav({ toggleSettings, items }) {
   useEffect(() => {
     const timer = setInterval(async () => {
       let ret = await ipcRenderer.getClientState();
-      // console.log(ret);
       if (ret)
         setSenders(ret);
       else
         setSenders({});
       ret = await ipcRenderer.getServerState();
-      // console.log(ret);
       if (ret)
         setReceivers(ret);
       else
