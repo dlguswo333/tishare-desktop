@@ -53,7 +53,7 @@ class Server {
       return true;
     this._serverSocket = net.createServer();
     this._serverSocket.on('connection', (socket) => {
-      if (Object.keys(this.jobs).length >= MAX_NUM_JOBS || this._state.startsWith('ERR')) {
+      if (this._serverSocket.connections >= MAX_NUM_JOBS || this._state.startsWith('ERR')) {
         // Do not accept more than limit or Server is in error state.
         socket.destroy();
         return;
@@ -212,8 +212,8 @@ class Server {
       return false;
     if (header.app !== 'tiShare')
       return false;
-    if (header.version !== VERSION)
-      return false;
+    // if (header.version !== VERSION)
+    // return false;
     if (!header.id)
       return false;
     if (!(header.class === 'send-request' || header.class === 'recv-request'))
