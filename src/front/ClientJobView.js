@@ -20,28 +20,58 @@ function ClientJobView({ state, ind }) {
     switch (state.state) {
       case STATE.RQR_SEND_REQUEST:
       case STATE.RQR_RECV_REQUEST:
-        return `Waiting`
+        return <>
+          <span className={style.Title}>Waiting</span>
+          <span className={style.Id}>{state.id}</span>
+        </>
       case STATE.RQR_SEND_REJECT:
       case STATE.RQR_RECV_REJECT:
-        return `Request Rejected`
+        return <>
+          <span className={style.Title}>Request Rejected</span>
+          <span className={style.Id}>{state.id}</span>
+        </>
       case STATE.RQR_CANCEL:
-        return `Request Cancelled`
+        return <>
+          <span className={style.Title}>Request Cancelled</span>
+          <span className={style.Id}>{state.id}</span>
+        </>
       case STATE.RQR_PRE_RECV_REQUEST:
-        return `Select Receive Path`
+        return <>
+          <span className={style.Title}>Select Receive Path</span>
+          <span className={style.Id}>{state.id}</span>
+        </>
       case STATE.MY_END:
       case STATE.OTHER_END:
-        return `Process Cancelled`
+        return <>
+          <span className={style.Title}>Process Cancelled</span>
+          <span className={style.Id}>{state.id}</span>
+        </>
       case STATE.SENDING:
-        return `Sending To ${state.id}`
+        return <>
+          <span className={style.Title}>Sending</span>
+          <span className={style.Id}>{state.id}</span>
+        </>
       case STATE.RECVING:
-        return `Receiving From ${state.id}`
+        return <>
+          <span className={style.Title}>Receiving</span>
+          <span className={style.Id}>{state.id}</span>
+        </>
       case STATE.SEND_COMPLETE:
-        return `Send Complete`
+        return <>
+          <span className={style.Title}>Send Complete</span>
+          <span className={style.Id}>{state.id}</span>
+        </>
       case STATE.RECV_COMPLETE:
-        return `Receive Complete`
+        return <>
+          <span className={style.Title}>Receive Complete</span>
+          <span className={style.Id}>{state.id}</span>
+        </>
       case STATE.ERR_NETWORK:
       case STATE.ERR_FILE_SYSTEM:
-        return `Error`
+        return <>
+          <span className={style.Title}>Error</span>
+          <span className={style.Id}>{state.id}</span>
+        </>
       default:
         return null
     }
@@ -146,7 +176,7 @@ function ClientJobView({ state, ind }) {
         return (
           <>
             <div className={style.Element}>
-              Network Error
+              File System Error detected.
             </div>
           </>
         )
@@ -154,7 +184,7 @@ function ClientJobView({ state, ind }) {
         return (
           <>
             <div className={style.Element}>
-              Network Error
+              Network Error detected.
             </div>
           </>
         )

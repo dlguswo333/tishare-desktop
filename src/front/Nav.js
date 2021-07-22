@@ -6,7 +6,7 @@ import { ReactComponent as SettingsIcon } from './icons/Settings.svg';
 import { ReactComponent as PinIcon } from './icons/Pin.svg';
 import { ReactComponent as SendArrow } from './icons/SendArrow.svg';
 import { ReactComponent as RecvArrow } from './icons/RecvArrow.svg';
-import { MAX_NUM_JOBS } from '../defs';
+import { STATE, MAX_NUM_JOBS } from '../defs';
 import './style/Nav.scss';
 const ipcRenderer = window.ipcRenderer;
 
@@ -105,9 +105,9 @@ function Nav({ toggleSettings, items }) {
       </div>
       <div className="Body">
 
-        {/* <SendView state={{ state: 'SENDING', speed: 483344, progress: 50, id: 'taler', itemName: 'files_that_has_too_long_file_name_and_this_is_going_to_be_trimmed.jpg', totalProgress: '1/2' }} />
-        <RecvView state={{ state: 'WAITING', speed: 110203, progress: 100, id: 'mason', itemName: 'files_that_has_too_long_file_name.jpg' }} />
-        <RecvView state={{ state: 'RECVING', speed: 11033403, progress: 60, id: 'july', itemName: 'report about theme ui.docx', totalProgress: '1/2' }} /> */}
+        {/* <ServerJobView state={{ state: STATE.RQE_RECV_REQUEST, speed: 483344, progress: 50, id: 'july', itemName: 'files_that_has_too_long_file_name_and_this_is_going_to_be_trimmed.jpg', totalProgress: '1/2' }} />
+        <ClientJobView state={{ state: STATE.RQR_RECV_REQUEST, speed: 110203, progress: 100, id: 'mason', itemName: 'files_that_has_too_long_file_name.jpg' }} />
+        <ClientJobView state={{ state: STATE.SENDING, speed: 11033403, progress: 60, id: 'july', itemName: 'report about theme ui.docx', totalProgress: '1/2' }} /> */}
 
         {showClientJobs()}
         {showServerJobs()}

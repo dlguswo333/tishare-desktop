@@ -20,27 +20,58 @@ function ServerJobView({ state, ind, items }) {
   const showHead = () => {
     switch (state.state) {
       case STATE.RQE_SEND_REQUEST:
+        return <>
+          <span className={style.Title}>Send Request</span>
+          <span className={style.Id}>{state.id}</span>
+        </>
       case STATE.RQE_RECV_REQUEST:
-        return `New Request`
+        return <>
+          <span className={style.Title}>Receive Request</span>
+          <span className={style.Id}>{state.id}</span>
+        </>
       case STATE.RQE_SEND_REJECT:
       case STATE.RQE_RECV_REJECT:
-        return `Request Rejected`
+        return <>
+          <span className={style.Title}>Request Rejected</span>
+          <span className={style.Id}>{state.id}</span>
+        </>
       case STATE.RQE_CANCEL:
-        return `Request Cancelled`
+        return <>
+          <span className={style.Title}>Request Cancelled</span>
+          <span className={style.Id}>{state.id}</span>
+        </>
       case STATE.MY_END:
       case STATE.OTHER_END:
-        return `Share Cancelled`
+        return <>
+          <span className={style.Title}>Process Cancelled</span>
+          <span className={style.Id}>{state.id}</span>
+        </>
       case STATE.SENDING:
-        return `Sending To ${state.id}`
+        return <>
+          <span className={style.Title}>Sending</span>
+          <span className={style.Id}>{state.id}</span>
+        </>
       case STATE.RECVING:
-        return `Receiving From ${state.id}`
+        return <>
+          <span className={style.Title}>Receiving</span>
+          <span className={style.Id}>{state.id}</span>
+        </>
       case STATE.SEND_COMPLETE:
-        return `Send Complete`
+        return <>
+          <span className={style.Title}>Send Complete</span>
+          <span className={style.Id}>{state.id}</span>
+        </>
       case STATE.RECV_COMPLETE:
-        return `Receive Complete`
+        return <>
+          <span className={style.Title}>Receive Complete</span>
+          <span className={style.Id}>{state.id}</span>
+        </>
       case STATE.ERR_NETWORK:
       case STATE.ERR_FILE_SYSTEM:
-        return `Error`
+        return <>
+          <span className={style.Title}>Error</span>
+          <span className={style.Id}>{state.id}</span>
+        </>
       default:
         return null
     }

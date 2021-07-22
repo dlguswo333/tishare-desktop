@@ -14,7 +14,6 @@
     display: flex;
     flex-direction: row;
     align-self: center;
-    align-items: center;
     justify-content: center;
     padding: 5px;
     font-size: 1.04rem;
@@ -22,6 +21,25 @@
     overflow: hidden;
     width: 95%;
     border-bottom: 1px solid #999;
+    .Title {
+      display: inline-flex;
+      color: #000;
+      align-items: center;
+      justify-content: center;
+      margin-right: auto;
+    }
+    .Id {
+      display: inline-flex;
+      color: #fff;
+      background-color: #25f;
+      font-size: 0.96rem;
+      font-weight: normal;
+      border-radius: 4px;
+      padding: 1px 4px;
+      align-items: center;
+      justify-content: center;
+      margin-left: auto;
+    }
   }
   .Body {
     flex: 1;
