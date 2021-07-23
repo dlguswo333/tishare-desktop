@@ -42,10 +42,6 @@ class Receiver {
     /**
      * @type {boolean}
      */
-    this._stopFlag = false;
-    /**
-     * @type {boolean}
-     */
     this._endFlag = false;
     /**
     * File handle for receiving.
@@ -134,11 +130,8 @@ class Receiver {
       // Reaching here means we now have header or already have header.
       switch (this._state) {
         case STATE.RECVING:
-        case STATE.SENDER_STOP:
           switch (this._recvHeader.class) {
             case 'ok':
-              if (this._state === STATE.SENDER_STOP)
-                this._state = STATE.RECVING;
               if (this._recvBufArrayLen === this._recvHeader.size) {
                 // One whole chunk received.
                 // Write chunk on disk.
@@ -168,8 +161,6 @@ class Receiver {
               }
               break;
             case 'new':
-              if (this._state === STATE.SENDER_STOP)
-                this._state = STATE.RECVING;
               this._itemName = path.join(this._recvHeader.dir, this._recvHeader.name);
               if (this._recvHeader.type === 'directory') {
                 this._haveParsedHeader = false;
@@ -224,23 +215,15 @@ class Receiver {
               this._state = STATE.RECV_COMPLETE;
               this._socket.end();
               break;
-            case 'stop':
-              this._state = STATE.SENDER_STOP;
-              this._haveParsedHeader = false;
-              break;
             case 'end':
               this._state = STATE.OTHER_END;
+              if (this._itemHandle) {
+                // Close previous item handle.
+                await this._itemHandle.close();
+                await fs.rm(path.join(this._recvPath, this._itemName), { force: true });
+              }
               this._socket.end();
               break;
-          }
-          break;
-        case STATE.RECEIVER_STOP:
-          switch (this._recvHeader.class) {
-            case 'end':
-              this._state = STATE.OTHER_END;
-              this._socket.end();
-              break;
-            // Ignore any other classes.
           }
           break;
         default:
@@ -328,17 +311,13 @@ class Receiver {
    * @returns {boolean}
    */
   async end() {
-    if (this._state === STATE.RECVING || this._state === STATE.SENDER_STOP || this._state === STATE.RECEIVER_STOP) {
+    if (this._state === STATE.RECVING) {
       if (this._itemHandle) {
         // Delete currently receiving file.
         await this._itemHandle.close();
         await fs.rm(path.join(this._recvPath, this._itemName), { force: true });
       }
       this._endFlag = true;
-      if (this._state === STATE.SENDER_STOP || this._state === STATE.RECEIVER_STOP) {
-        // Send end header immediately while stop.
-        this._writeOnSocket();
-      }
       return true;
     }
     return false;
@@ -354,13 +333,6 @@ class Receiver {
       this._endFlag = false;
       this._state = STATE.MY_END;
       header = { class: 'end' };
-      this._socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this._onWriteError);
-      return;
-    }
-    if (this._stopFlag) {
-      this._stopFlag = false;
-      this._state = STATE.RECEIVER_STOP;
-      header = { class: 'stop' };
       this._socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this._onWriteError);
       return;
     }
