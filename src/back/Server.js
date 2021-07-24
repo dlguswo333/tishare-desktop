@@ -15,7 +15,7 @@ class Server {
     this._scannee = null;
     /** @type {net.Server} */
     this._serverSocket = null;
-    /** @type {Object.<number, (Receiver|Requestee)>} */
+    /** @type {Object.<number, (Sender|Receiver|Requestee)>} */
     this.jobs = {};
     /** @type {number} */
     this._nextInd = 1;

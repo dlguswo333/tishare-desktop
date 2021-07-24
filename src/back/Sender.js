@@ -9,8 +9,8 @@ const { HEADER_END, splitHeader } = require('./Common');
 class Sender {
   /**
    * @param {import('net').Socket} socket
-   * @param {Array.<{path:string, dir:string, name:string, type:string, size:number}>} itemArray
    * @param {string!} receiverId
+   * @param {Array.<{path:string, dir:string, name:string, type:string, size:number}>} itemArray
    */
   constructor(socket, receiverId, itemArray) {
     this._state = STATE.SENDING;
@@ -280,6 +280,7 @@ class Sender {
         speed: this.getSpeed(),
         progress: this.getItemProgress(),
         totalProgress: this.getTotalProgress(),
+        id: this._receiverId,
         itemName: itemName
       };
     }
