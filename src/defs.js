@@ -28,20 +28,14 @@ const STATE = {
   RQE_CANCEL: "RQE_CANCEL",
 
   // For Receiver and Sender
-  WAITING: "WAITING", // Will be deprecated
-  MY_STOP: "MY_STOP", // Not used
-  MY_END: "MY_END",
-  OTHER_STOP: "OTHER_STOP", // Not used
   OTHER_END: "OTHER_END",
 
   // For Sender
   SENDING: "SENDING",
-  SENDER_PAUSE: "SENDER_PAUSE", // Will be deprecated
   SEND_COMPLETE: "SEND_COMPLETE",
 
   // For Receiver
   RECVING: "RECVING",
-  RECVER_PAUSE: "RECVER_PAUSE", // Will be deprecated
   RECV_COMPLETE: "RECV_COMPLETE",
 };
 const OS = require('os').platform();

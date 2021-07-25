@@ -40,7 +40,6 @@ function ClientJobView({ state, ind }) {
           <span className={style.Title}>Select Receive Path</span>
           <span className={style.Id}>{state.id}</span>
         </>
-      case STATE.MY_END:
       case STATE.OTHER_END:
         return <>
           <span className={style.Title}>Process Cancelled</span>
@@ -121,14 +120,6 @@ function ClientJobView({ state, ind }) {
                     setRecvDir(ret);
                 }}
               >Find</button>
-            </div>
-          </>
-        )
-      case STATE.MY_END:
-        return (
-          <>
-            <div className={style.Element}>
-              {`You cancelled the process with ${state.id}.`}
             </div>
           </>
         )
@@ -247,7 +238,6 @@ function ClientJobView({ state, ind }) {
             >OK</button>
           </>
         )
-      case STATE.MY_END:
       case STATE.OTHER_END:
         return (
           <>

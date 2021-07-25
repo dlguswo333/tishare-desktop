@@ -40,7 +40,6 @@ function ServerJobView({ state, ind, items }) {
           <span className={style.Title}>Request Cancelled</span>
           <span className={style.Id}>{state.id}</span>
         </>
-      case STATE.MY_END:
       case STATE.OTHER_END:
         return <>
           <span className={style.Title}>Process Cancelled</span>
@@ -123,14 +122,6 @@ function ServerJobView({ state, ind, items }) {
           <>
             <div className={style.Element}>
               {`${state.id} cancelled the request.`}
-            </div>
-          </>
-        )
-      case STATE.MY_END:
-        return (
-          <>
-            <div className={style.Element}>
-              {`You cancelled the process with ${state.id}.`}
             </div>
           </>
         )
@@ -253,7 +244,6 @@ function ServerJobView({ state, ind, items }) {
             >OK</button>
           </>
         )
-      case STATE.MY_END:
       case STATE.OTHER_END:
         return (
           <>

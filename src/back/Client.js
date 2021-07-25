@@ -224,8 +224,7 @@ class Client {
   }
 
   /**
-   * End sending.
-   * Call this while the state is 'WAITING', 'SENDING'.
+   * End a job with the ind.
    * @param {number} ind 
    * @returns {boolean} Whether the execution has been successful.
    */

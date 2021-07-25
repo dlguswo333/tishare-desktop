@@ -6,7 +6,7 @@ import { ReactComponent as SettingsIcon } from './icons/Settings.svg';
 import { ReactComponent as PinIcon } from './icons/Pin.svg';
 import { ReactComponent as SendArrow } from './icons/SendArrow.svg';
 import { ReactComponent as RecvArrow } from './icons/RecvArrow.svg';
-import { STATE, MAX_NUM_JOBS } from '../defs';
+import { MAX_NUM_JOBS } from '../defs';
 import './style/Nav.scss';
 const ipcRenderer = window.ipcRenderer;
 

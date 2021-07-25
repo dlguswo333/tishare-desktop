@@ -43,6 +43,8 @@ class Receiver {
      * @type {boolean}
      */
     this._endFlag = false;
+    /** @type {boolean} */
+    this._haveWrittenEndHeader = false;
     /**
     * File handle for receiving.
     * @type {fs.FileHandle}
@@ -100,6 +102,13 @@ class Receiver {
     this._socket.removeAllListeners('error');
 
     this._socket.on('data', async (data) => {
+      if (this._haveWrittenEndHeader) {
+        // Have written end header but received data.
+        // Consider it as an error.
+        this._state = STATE.ERR_NETWORK;
+        this._socket.destroy();
+        return;
+      }
       let ret = null;
       if (!this._haveParsedHeader) {
         // Concatenate and try to parse header and save into header.
@@ -235,7 +244,7 @@ class Receiver {
     });
 
     this._socket.on('close', () => {
-      if (!(this._state === STATE.RECV_COMPLETE || this._state === STATE.MY_END || this._state === STATE.OTHER_END))
+      if (!(this._state === STATE.RECV_COMPLETE || this._haveWrittenEndHeader))
         // Unexpected close event.
         this._state = STATE.ERR_NETWORK;
     });
@@ -296,13 +305,6 @@ class Receiver {
         itemName: this._itemName,
       };
     }
-    if (this._state === STATE.WAITING) {
-      return {
-        state: this._state,
-        id: this._senderId,
-        // itemArray: this._sendRequestHeader.itemArray
-      }
-    }
     return { state: this._state, id: this._senderId };
   }
 
@@ -330,8 +332,7 @@ class Receiver {
     let header = null;
     this._haveParsedHeader = false;
     if (this._endFlag) {
-      this._endFlag = false;
-      this._state = STATE.MY_END;
+      this._haveWrittenEndHeader = true;
       header = { class: 'end' };
       this._socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this._onWriteError);
       return;
@@ -339,10 +340,6 @@ class Receiver {
     switch (this._state) {
       case STATE.RECVING:
         header = { class: this._itemFlag };
-        this._socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this._onWriteError);
-        break;
-      case STATE.MY_END:
-        header = { class: 'end' };
         this._socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this._onWriteError);
         break;
     }
