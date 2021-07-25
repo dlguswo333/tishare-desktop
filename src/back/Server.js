@@ -52,8 +52,8 @@ class Server {
     if (this._serverSocket)
       return true;
     this._serverSocket = net.createServer();
-    this._serverSocket.on('connection', (socket) => {
-      if (this._serverSocket.connections >= MAX_NUM_JOBS || this._state.startsWith('ERR')) {
+    this._serverSocket.on('connection', async (socket) => {
+      if ((await this._getNumConnections()) > MAX_NUM_JOBS || this._state.startsWith('ERR')) {
         // Do not accept more than limit or Server is in error state.
         socket.destroy();
         return;
@@ -138,6 +138,17 @@ class Server {
       this._scannee = null;
     }
     return true;
+  }
+
+  _getNumConnections() {
+    return new Promise((resolve, reject) => {
+      this._serverSocket.getConnections((err, cnt) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(cnt);
+      })
+    })
   }
 
   /**
