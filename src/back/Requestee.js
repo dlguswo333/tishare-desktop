@@ -11,6 +11,12 @@ class Requestee {
     this._state = state;
     this._socket = socket;
     this._requestHeader = requestHeader;
+    this._haveRejectedFlag = false;
+    this._socket.on('close', (err) => {
+      if (err || !(this._state == STATE.RQE_CANCEL || this._haveRejectedFlag)) {
+        this.setState(STATE.ERR_NETWORK);
+      }
+    })
   }
 
   /**
