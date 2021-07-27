@@ -106,7 +106,8 @@ class Client {
     });
 
     socket.on('close', (err) => {
-      if (err || this.jobs[ind].getState().state !== STATE.RQR_SEND_REJECT) {
+      const state = this.jobs[ind].getState().state
+      if (err || (state !== STATE.RQR_SEND_REJECT && state !== STATE.RQR_CANCEL)) {
         this._handleNetworkErr(ind);
       }
     });
@@ -191,7 +192,8 @@ class Client {
     });
 
     socket.on('close', (err) => {
-      if (err || this.jobs[ind].getState().state !== STATE.RQR_RECV_REJECT) {
+      const state = this.jobs[ind].getState().state
+      if (err || (state !== STATE.RQR_RECV_REJECT && state !== STATE.RQR_CANCEL)) {
         this._handleNetworkErr(ind);
       }
     });
