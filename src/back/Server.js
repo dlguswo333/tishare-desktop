@@ -4,6 +4,7 @@ const Requestee = require('./Requestee');
 const Sender = require('./Sender');
 const Receiver = require('./Receiver');
 const { PORT, OS, VERSION, STATE, MAX_NUM_JOBS } = require('../defs');
+const { _getBroadcastIp } = require('./Network');
 const { splitHeader, MAX_HEADER_LEN, createItemArray, HEADER_END } = require('./Common');
 
 class Server {
@@ -37,9 +38,10 @@ class Server {
   /**
    * Open myself to the network.
    * @param {string} ip
+   * @param {string} netmask
    * @returns {boolean} The result of the execution.
    */
-  open(ip) {
+  open(ip, netmask) {
     if (!this.myId) {
       this._state = STATE.ERR_ID;
       return false;
@@ -48,7 +50,7 @@ class Server {
       this._state = STATE.ERR_IP;
       return false;
     }
-    this._initScannee(ip);
+    this._initScannee(ip, _getBroadcastIp(ip, netmask));
     if (this._serverSocket)
       return true;
     this._serverSocket = net.createServer();
@@ -172,10 +174,12 @@ class Server {
   /**
    * Initialize an udp socket which responds to scans.
    * @param {string} ip 
+   * @param {string} broadcastIp
    */
-  _initScannee(ip) {
+  _initScannee(ip, broadcastIp) {
     this._scannee = dgram.createSocket('udp4');
-    this._scannee.bind(PORT, ip, () => {
+    // If OS is linux, bind to broadcast IP address.
+    this._scannee.bind(PORT, (OS == 'linux' ? broadcastIp : ip), () => {
       this._scannee.on('message', (msg, rinfo) => {
         let recvHeader = null;
         try {

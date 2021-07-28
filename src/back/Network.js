@@ -13,7 +13,7 @@ function getNetworks() {
     for (const ip of one) {
       // Only IPv4 and external IP which falls into the local IP address range.
       if (ip['family'] === 'IPv4' && !ip['internal']) {
-        const ipAsNum = _IpStringToNumber(ip['address'])
+        const ipAsNum = _ipStringToNumber(ip['address'])
         if ((167772160 <= ipAsNum <= 184549375) || (2886729728 <= ipAsNum <= 2887778303) || (3232235520 <= ipAsNum <= 3232301055)) {
           array.push({ name: network, ip: ip['address'], netmask: ip['netmask'] });
         }
@@ -38,7 +38,7 @@ function getNetworks() {
  * @param {scanCallback} callback Callback function to call when found a device.
  */
 function scan(ip, netmask, myId, callback) {
-  const broadcastIp = _IpBroadcastIp(ip, netmask);
+  const broadcastIp = _getBroadcastIp(ip, netmask);
   const socket = dgram.createSocket('udp4');
 
   // Bind socket.
@@ -79,7 +79,7 @@ function scan(ip, netmask, myId, callback) {
  * @param {String} ip String representation of IPv4.
  * @returns {number} Number representation of IPv4.
  */
-function _IpStringToNumber(ip) {
+function _ipStringToNumber(ip) {
   let tmp = ip.split('.');
   let ret = 0;
   for (let i = 0; i < 4; ++i) {
@@ -94,7 +94,7 @@ function _IpStringToNumber(ip) {
  * @param {number} ip Number representation of IPv4.
  * @returns {String} String representation of IPv4.
  */
-function _IpNumberToString(ip) {
+function _ipNumberToString(ip) {
   let ret = '';
   for (let i = 0; i < 4; ++i) {
     let tmp = 255 & ip;
@@ -112,8 +112,8 @@ function _IpNumberToString(ip) {
  * @param {String} netmask 
  * @returns {String}
  */
-function _IpBroadcastIp(ip, netmask) {
-  return _IpNumberToString((_IpStringToNumber(ip) | (2 ** 32 - 1 - _IpStringToNumber(netmask))) >>> 0);
+function _getBroadcastIp(ip, netmask) {
+  return _ipNumberToString((_ipStringToNumber(ip) | (2 ** 32 - 1 - _ipStringToNumber(netmask))) >>> 0);
 }
 
-module.exports = { getNetworks, scan, _IpBroadcastIp };
+module.exports = { getNetworks, scan, _getBroadcastIp };

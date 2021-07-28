@@ -141,11 +141,11 @@ ipcMain.handle('getNetworks', () => {
   return network.getNetworks();
 })
 
-ipcMain.handle('openServer', (event, myIp) => {
+ipcMain.handle('openServer', (event, myIp, netmask) => {
   if (server.isOpen()) {
     return true;
   }
-  return server.open(myIp);
+  return server.open(myIp, netmask);
 })
 
 ipcMain.handle('closeServer', () => {

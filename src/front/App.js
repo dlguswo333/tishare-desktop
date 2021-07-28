@@ -71,7 +71,7 @@ function App() {
   });
 
   const openServer = async () => {
-    const ret = await ipcRenderer.openServer(myIp);
+    const ret = await ipcRenderer.openServer(myIp, myNetmask);
     if (!ret)
       console.error('tried to open server but returned false');
   }

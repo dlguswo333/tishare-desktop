@@ -11,8 +11,8 @@ contextBridge.exposeInMainWorld('ipcRenderer',
     getNetworks: async () => {
       return (await ipcRenderer.invoke('getNetworks'));
     },
-    openServer: async (myIp) => {
-      return (await ipcRenderer.invoke('openServer', myIp));
+    openServer: async (myIp, myNetmask) => {
+      return (await ipcRenderer.invoke('openServer', myIp, myNetmask));
     },
     closeServer: async () => {
       return (await ipcRenderer.invoke('closeServer'));
