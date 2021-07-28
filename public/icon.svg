@@ -1,5 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1024" height="1024" viewBox="0 0 1024 1024">
-  <path d="M62 900 a40 40 90 0 1 -40 -40 v-640 h500 l60 220 Z" style="fill:#da0;stroke:black;stroke-width:10" />
-  <rect x="62" y="300" width="900" height="600" style="fill:#f0d210;stroke:black;stroke-width:10" />
-  <text x="280" y="760" font-size="400" font-family="cascadia code">ti</text>
-</svg>
