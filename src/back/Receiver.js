@@ -317,6 +317,7 @@ class Receiver {
       if (this._itemHandle) {
         // Delete currently receiving file.
         await this._itemHandle.close();
+        this._itemHandle = null;
         await fs.rm(path.join(this._recvPath, this._itemName), { force: true });
       }
       this._endFlag = true;

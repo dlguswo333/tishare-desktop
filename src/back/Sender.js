@@ -166,12 +166,12 @@ class Sender {
       }
     })
 
-    this._socket.on('close', () => {
+    this._socket.on('close', async () => {
       if (this._itemHandle) {
         await this._itemHandle.close();
         this._itemHandle = null;
       }
-      if (!(this._state === STATE.RECV_COMPLETE || this._state === STATE.OTHER_END || this._haveWrittenEndHeader))
+      if (!(this._state === STATE.SEND_COMPLETE || this._state === STATE.OTHER_END || this._haveWrittenEndHeader))
         // Unexpected close event.
         this._state = STATE.ERR_NETWORK;
     })

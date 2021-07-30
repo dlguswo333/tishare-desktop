@@ -60,6 +60,7 @@ class Server {
         socket.destroy();
         return;
       }
+      // TODO Set timeout for better malicious socket handling.
       const ind = this._getNextInd();
       let _recvBuf = Buffer.from([]);
       socket.on('data', (data) => {
@@ -110,6 +111,15 @@ class Server {
             this._handleNetworkErr(ind);
         }
       });
+      socket.on('close', () => {
+        if (this.jobs[ind]) {
+          if (this.jobs[ind].getState().state === STATE.RQE_CANCEL || this.jobs[ind].getRejectFlag())
+            this.deleteJob(ind);
+          else
+            this.jobs[ind].setState(STATE.RQE_CANCEL);
+        }
+        // If this socket was not registered, do nothing.
+      })
     });
 
     this._serverSocket.on('error', (err) => {

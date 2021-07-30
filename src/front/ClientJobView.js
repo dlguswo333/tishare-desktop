@@ -30,11 +30,6 @@ function ClientJobView({ state, ind }) {
           <span className={style.Title}>Request Rejected</span>
           <span className={style.Id}>{state.id}</span>
         </>
-      case STATE.RQR_CANCEL:
-        return <>
-          <span className={style.Title}>Request Cancelled</span>
-          <span className={style.Id}>{state.id}</span>
-        </>
       case STATE.RQR_PRE_RECV_REQUEST:
         return <>
           <span className={style.Title}>Select Receive Path</span>
@@ -93,14 +88,6 @@ function ClientJobView({ state, ind }) {
           <>
             <div className={style.Element}>
               {`${state.id} rejected your request.`}
-            </div>
-          </>
-        )
-      case STATE.RQR_CANCEL:
-        return (
-          <>
-            <div className={style.Element}>
-              {`You cancelled your request to ${state.id}.`}
             </div>
           </>
         )
@@ -202,16 +189,6 @@ function ClientJobView({ state, ind }) {
         return (
           <>
             <button className={style.Neg}
-              onClick={() => {
-                ipcRenderer.deleteClientJob(ind);
-              }}
-            >OK</button>
-          </>
-        )
-      case STATE.RQR_CANCEL:
-        return (
-          <>
-            <button className={style.Pos}
               onClick={() => {
                 ipcRenderer.deleteClientJob(ind);
               }}

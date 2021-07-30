@@ -12,11 +12,6 @@ class Requestee {
     this._socket = socket;
     this._requestHeader = requestHeader;
     this._haveRejectedFlag = false;
-    this._socket.on('close', (err) => {
-      if (err || !(this._state == STATE.RQE_CANCEL || this._haveRejectedFlag)) {
-        this.setState(STATE.ERR_NETWORK);
-      }
-    })
   }
 
   /**
@@ -25,13 +20,19 @@ class Requestee {
   reject() {
     this._haveRejectedFlag = true;
     if (this._state === STATE.RQE_SEND_REQUEST) {
-      this.setState(STATE.RQE_SEND_REJECT);
       this._socket.write(JSON.stringify({ class: 'no' }) + HEADER_END, 'utf-8', this._onWriteError);
     }
     if (this._state === STATE.RQE_RECV_REQUEST) {
-      this.setState(STATE.RQE_RECV_REJECT);
       this._socket.write(JSON.stringify({ class: 'no' }) + HEADER_END, 'utf-8', this._onWriteError);
     }
+  }
+
+  /**
+   * Return the reject flag.
+   * @returns {boolean}
+   */
+  getRejectFlag() {
+    return this._haveRejectedFlag;
   }
 
   /**

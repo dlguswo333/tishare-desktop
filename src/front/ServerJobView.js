@@ -29,12 +29,6 @@ function ServerJobView({ state, ind, items }) {
           <span className={style.Title}>Receive Request</span>
           <span className={style.Id}>{state.id}</span>
         </>
-      case STATE.RQE_SEND_REJECT:
-      case STATE.RQE_RECV_REJECT:
-        return <>
-          <span className={style.Title}>Request Rejected</span>
-          <span className={style.Id}>{state.id}</span>
-        </>
       case STATE.RQE_CANCEL:
         return <>
           <span className={style.Title}>Request Cancelled</span>
@@ -105,15 +99,6 @@ function ServerJobView({ state, ind, items }) {
           <>
             <div className={style.Element}>
               {`${state.id} wants to receive files.`}
-            </div>
-          </>
-        )
-      case STATE.RQE_SEND_REJECT:
-      case STATE.RQE_RECV_REJECT:
-        return (
-          <>
-            <div className={style.Element}>
-              {`You cancelled the request from ${state.id}.`}
             </div>
           </>
         )
@@ -221,17 +206,6 @@ function ServerJobView({ state, ind, items }) {
                 ipcRenderer.acceptRecvRequest(ind, items);
               }}
             >ACCEPT</button>
-          </>
-        )
-      case STATE.RQE_SEND_REJECT:
-      case STATE.RQE_RECV_REJECT:
-        return (
-          <>
-            <button className={style.Pos}
-              onClick={() => {
-                ipcRenderer.deleteServerJob(ind);
-              }}
-            >OK</button>
           </>
         )
       case STATE.RQE_CANCEL:

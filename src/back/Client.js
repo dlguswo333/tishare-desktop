@@ -105,10 +105,13 @@ class Client {
       }
     });
 
-    socket.on('close', (err) => {
+    socket.on('close', () => {
       const state = this.jobs[ind].getState().state
-      if (err || (state !== STATE.RQR_SEND_REJECT && state !== STATE.RQR_CANCEL)) {
+      if (state !== STATE.RQR_SEND_REJECT && !this.jobs[ind].getHaveWrittenEndFlag()) {
         this._handleNetworkErr(ind);
+      }
+      else {
+        this.deleteJob(ind);
       }
     });
 
@@ -189,21 +192,24 @@ class Client {
         default:
           this._handleNetworkErr(ind);
       }
-    });
+    })
 
-    socket.on('close', (err) => {
+    socket.on('close', () => {
       const state = this.jobs[ind].getState().state
-      if (err || (state !== STATE.RQR_RECV_REJECT && state !== STATE.RQR_CANCEL)) {
+      if (!(state === STATE.RQR_RECV_REJECT || this.jobs[ind].getHaveWrittenEndFlag())) {
         this._handleNetworkErr(ind);
       }
-    });
+      else if (this.jobs[ind].getHaveWrittenEndFlag()) {
+        this.deleteJob(ind);
+      }
+    })
 
     socket.on('error', (err) => {
       if (err) {
         socket.destroy();
         this._handleNetworkErr(ind);
       }
-    });
+    })
   }
 
   /**
@@ -232,7 +238,10 @@ class Client {
    */
   endJob(ind) {
     if (this.jobs[ind]) {
-      this.jobs[ind].end();
+      if (this.jobs[ind].getState().state === STATE.RQR_PRE_RECV_REQUEST)
+        this.deleteJob(ind);
+      else
+        this.jobs[ind].end();
       return true;
     }
     return false;
