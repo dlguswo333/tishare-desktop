@@ -68,7 +68,8 @@ function Nav({ toggleSettings, items }) {
     ipcRenderer.onNumJobs((_, numJobs) => {
       setNumJobs(numJobs);
     })
-  })
+    return () => { ipcRenderer.removeNumJobsCallback(); };
+  }, []);
 
   return (
     <nav className={(pin || grow) ? "Nav Grow" : "Nav"}

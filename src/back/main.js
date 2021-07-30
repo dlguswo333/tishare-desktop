@@ -95,7 +95,7 @@ ipcMain.handle('openFile', async () => {
     return ret;
   for (item of tmp) {
     try {
-      let size = (await fs.stat(item)).size;
+      const size = (await fs.stat(item)).size;
       ret[path.basename(item)] = { path: item, name: path.basename(item), dir: '.', type: 'file', size: size };
     } catch (err) {
       // Maybe No permission or file system error. Skip it.
@@ -105,31 +105,6 @@ ipcMain.handle('openFile', async () => {
 })
 
 ipcMain.handle('openDirectory', async () => {
-  // TODO Instead adding nestly items to items, just record the number of items and send all the items.
-  /**
-   * Sub item will be added to the parameter item Object recursively.
-   * @param {{ path: string, name:string, dir: string }} item 
-   */
-  async function addSubItems(item) {
-    try {
-      let itemStat = await fs.stat(item.path);
-      if (itemStat.isDirectory()) {
-        item.type = 'directory';
-        item.items = {};
-        for (let subItem of (await fs.readdir(item.path))) {
-          item.items[subItem] = { path: path.join(item.path, subItem), name: subItem, dir: path.join(item.dir, item.name) };
-          await addSubItems(item.items[subItem]);
-        }
-      }
-      else {
-        item.type = 'file';
-        item.size = (await fs.stat(item.path)).size;
-      }
-    } catch (err) {
-      // Maybe No permission or file system error. Skip it.
-    }
-    return;
-  }
   let tmp = dialog.showOpenDialogSync(mainWindow, {
     title: "Open Directory(s)",
     properties: ["openDirectory", "multiSelections"]
@@ -138,8 +113,8 @@ ipcMain.handle('openDirectory', async () => {
   if (!tmp)
     return ret;
   for (let item of tmp) {
-    ret[path.basename(item)] = { path: item, name: path.basename(item), dir: '.', type: 'directory', items: {} };
-    await addSubItems(ret[path.basename(item)]);
+    const size = (await fs.readdir(item)).length;
+    ret[path.basename(item)] = { path: item, name: path.basename(item), dir: '.', type: 'directory', size: size };
   }
   return ret;
 })

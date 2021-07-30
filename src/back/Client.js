@@ -57,12 +57,12 @@ class Client {
    * @param {string} receiverId 
    * @returns {boolean} Index value of the Sender or false.
    */
-  sendRequest(items, receiverIp, receiverId) {
+  async sendRequest(items, receiverIp, receiverId) {
     if (Object.keys(this.jobs).length >= MAX_NUM_JOBS)
       return false;
     /** @type {Buffer} */
     let _recvBuf = Buffer.from([]);
-    const itemArray = createItemArray(items);
+    const itemArray = await createItemArray(items);
     const ind = this._getNextInd();
     const socket = net.createConnection(PORT, receiverIp);
 

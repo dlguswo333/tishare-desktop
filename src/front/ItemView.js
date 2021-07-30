@@ -27,7 +27,7 @@ function ItemView({ items, openFile, openDirectory, deleteChecked }) {
               {(item.type === 'directory' ? '📁 ' : '📄 ') + itemName}
             </div>
             <div className='ItemProperty'>
-              {(item.type === 'directory' ? Object.keys(item.items).length + ' items' : printSize(item.size))}
+              {(item.type === 'directory' ? item.size + ' items' : printSize(item.size))}
             </div>
           </div>
           <div className='ItemCheck'>

@@ -76,6 +76,9 @@ contextBridge.exposeInMainWorld('ipcRenderer',
     },
     onNumJobs: (callback) => {
       ipcRenderer.on('numJobs', callback);
+    },
+    removeNumJobsCallback: () => {
+      ipcRenderer.removeAllListeners('numJobs');
     }
   }
 )

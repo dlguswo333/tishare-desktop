@@ -266,10 +266,10 @@ class Server {
    * @param {number} ind 
    * @param {import('./Common').item} items 
    */
-  acceptRecvRequest(ind, items) {
+  async acceptRecvRequest(ind, items) {
     if (this.jobs[ind]) {
       const socket = this.jobs[ind]._socket;
-      const itemArray = createItemArray(items);
+      const itemArray = await createItemArray(items);
       const sender = new Sender(this.jobs[ind]._socket, this.jobs[ind].getId(), itemArray);
       this.jobs[ind] = sender;
       socket.write(JSON.stringify({ class: 'ok', numItems: itemArray.length }) + HEADER_END, 'utf-8');
