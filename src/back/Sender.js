@@ -90,10 +90,6 @@ class Sender {
   async end() {
     if (this._state === STATE.SENDING) {
       this._endFlag = true;
-      if (this._itemHandle) {
-        await this._itemHandle.close();
-        this._itemHandle = null;
-      }
       return true;
     }
     return false;
@@ -168,19 +164,20 @@ class Sender {
           this._socket.destroy();
           return;
       }
-    });
+    })
 
     this._socket.on('close', () => {
-      if (!(this._state === STATE.SEND_COMPLETE || this._haveWrittenEndHeader))
+      if (this._itemHandle) {
+        await this._itemHandle.close();
+        this._itemHandle = null;
+      }
+      if (!(this._state === STATE.RECV_COMPLETE || this._state === STATE.OTHER_END || this._haveWrittenEndHeader))
         // Unexpected close event.
         this._state = STATE.ERR_NETWORK;
-    });
+    })
 
     this._socket.on('error', (err) => {
-      if (err.code === 'ETIMEDOUT') {
-        console.error('Sender: failed to connect due to timeout');
-      }
-      this._state = STATE.ERR_NETWORK;
+      console.error(err.message);
     })
   }
 

@@ -33,6 +33,7 @@ function createMainWindow() {
     console.log('Running in development');
     // When in development, run react start first.
     // The main electron window will load the react webpage like below.
+    mainWindow.setIcon(path.join(__dirname, '../../public/icon.ico'))
     mainWindow.loadURL('http://localhost:3000');
     mainWindow.maximize();
   }
