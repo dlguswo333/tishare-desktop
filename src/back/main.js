@@ -6,11 +6,16 @@ const network = require('./Network');
 const isDev = require('electron-is-dev');
 const Server = require('./Server');
 const Client = require('./Client');
+const Indexer = require('./Indexer');
 
 /** @type {BrowserWindow} */
 var mainWindow = null;
-const server = new Server();
-const client = new Client();
+
+const indexer = new Indexer((numJobs) => {
+  mainWindow?.webContents.send('numJobs', numJobs);
+});
+const server = new Server(indexer);
+const client = new Client(indexer);
 
 function createMainWindow() {
   // Create the browser window.
@@ -100,6 +105,7 @@ ipcMain.handle('openFile', async () => {
 })
 
 ipcMain.handle('openDirectory', async () => {
+  // TODO Instead adding nestly items to items, just record the number of items and send all the items.
   /**
    * Sub item will be added to the parameter item Object recursively.
    * @param {{ path: string, name:string, dir: string }} item 

@@ -90,7 +90,7 @@ function DeviceView({ items, myIp, myNetmask, myId }) {
   }
 
   useEffect(() => {
-    ipcRenderer.scanCallback((event, deviceIp, deviceVersion, deviceId, deviceOs) => {
+    ipcRenderer.scanCallback((_, deviceIp, deviceVersion, deviceId, deviceOs) => {
       let tmp = {};
       tmp[deviceIp] = { ip: deviceIp, version: deviceVersion, id: deviceId, os: deviceOs };
       /**

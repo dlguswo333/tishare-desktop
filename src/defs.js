@@ -38,7 +38,7 @@ const STATE = {
 const OS = require('os').platform();
 const { version: VERSION } = require('../package.json');
 const SCANTIMEOUT = 3000;
-const MAX_NUM_JOBS = 2;
+const MAX_NUM_JOBS = 4;
 /**
  * Print file size in pretty.
  * @param {number} size 

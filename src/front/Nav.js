@@ -4,8 +4,6 @@ import ServerJobView from './ServerJobView';
 import { ReactComponent as MenuIcon } from './icons/Menu.svg';
 import { ReactComponent as SettingsIcon } from './icons/Settings.svg';
 import { ReactComponent as PinIcon } from './icons/Pin.svg';
-import { ReactComponent as SendArrow } from './icons/SendArrow.svg';
-import { ReactComponent as RecvArrow } from './icons/RecvArrow.svg';
 import { MAX_NUM_JOBS } from '../defs';
 import './style/Nav.scss';
 const ipcRenderer = window.ipcRenderer;
@@ -23,6 +21,7 @@ function Nav({ toggleSettings, items }) {
   const [noti, setNoti] = useState(false);
   const [senders, setSenders] = useState({});
   const [receivers, setReceivers] = useState({});
+  const [numJobs, setNumJobs] = useState(0);
 
   const showClientJobs = () => {
     let ret = [];
@@ -65,6 +64,12 @@ function Nav({ toggleSettings, items }) {
     return () => { clearInterval(timer); };
   }, []);
 
+  useEffect(() => {
+    ipcRenderer.onNumJobs((_, numJobs) => {
+      setNumJobs(numJobs);
+    })
+  })
+
   return (
     <nav className={(pin || grow) ? "Nav Grow" : "Nav"}
       onMouseEnter={() => {
@@ -93,8 +98,7 @@ function Nav({ toggleSettings, items }) {
           </div>
         </div>
         <div className='Element'>
-          <div className={Object.keys(senders).length === MAX_NUM_JOBS ? 'NumJobs Full' : 'NumJobs'}><SendArrow />{`${Object.keys(senders).length}/${MAX_NUM_JOBS}`}</div>
-          <div className={Object.keys(receivers).length === MAX_NUM_JOBS ? 'NumJobs Full' : 'NumJobs'}><RecvArrow />{`${Object.keys(receivers).length}/${MAX_NUM_JOBS}`}</div>
+          <div className={numJobs === MAX_NUM_JOBS ? 'NumJobs Full' : 'NumJobs'}>{`${numJobs}/${MAX_NUM_JOBS}`}</div>
         </div>
         <div className='Element'>
           <div className="Menu">

@@ -8,7 +8,11 @@ const { _getBroadcastIp } = require('./Network');
 const { splitHeader, MAX_HEADER_LEN, createItemArray, HEADER_END } = require('./Common');
 
 class Server {
-  constructor() {
+  /**
+   * @param {import('./Indexer')} indexer
+   */
+  constructor(indexer) {
+    this._indexer = indexer;
     this._state = STATE.IDLE;
     /** @type {string} */
     this.myId = '';
@@ -18,8 +22,6 @@ class Server {
     this._serverSocket = null;
     /** @type {Object.<number, (Sender|Receiver|Requestee)>} */
     this.jobs = {};
-    /** @type {number} */
-    this._nextInd = 1;
   }
 
   /**
@@ -229,7 +231,7 @@ class Server {
   }
 
   _getNextInd() {
-    return (this._nextInd)++;
+    return this._indexer.getInd();
   }
 
   _validateRequestHeader(header) {
@@ -304,6 +306,7 @@ class Server {
   deleteJob(ind) {
     if (this.jobs[ind]) {
       delete this.jobs[ind];
+      this._indexer.returnInd(ind);
       return true;
     }
     return false;

@@ -6,7 +6,11 @@ const Requester = require('./Requester');
 const Receiver = require('./Receiver');
 
 class Client {
-  constructor() {
+  /**
+   * @param {import('./Indexer')} indexer
+   */
+  constructor(indexer) {
+    this._indexer = indexer;
     /** @type {string} */
     this._myId = '';
     /** @type {Object.<number, (Sender|Receiver|Requester)>} */
@@ -256,13 +260,14 @@ class Client {
   deleteJob(ind) {
     if (this.jobs[ind]) {
       delete this.jobs[ind];
+      this._indexer.returnInd(ind);
       return true;
     }
     return false;
   }
 
   _getNextInd() {
-    return (this._nextInd)++;
+    return this._indexer.getInd();
   }
 
   /**

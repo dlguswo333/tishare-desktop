@@ -73,6 +73,9 @@ contextBridge.exposeInMainWorld('ipcRenderer',
     },
     showMessage: (message) => {
       ipcRenderer.invoke('showMessage', message);
+    },
+    onNumJobs: (callback) => {
+      ipcRenderer.on('numJobs', callback);
     }
   }
 )
