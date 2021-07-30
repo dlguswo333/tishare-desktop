@@ -57,13 +57,13 @@ class Server {
       return true;
     this._serverSocket = net.createServer();
     this._serverSocket.on('connection', async (socket) => {
-      if ((await this._getNumConnections()) > MAX_NUM_JOBS || this._state.startsWith('ERR')) {
+      const ind = this._getNextInd();
+      if (ind < 0 || this._state.startsWith('ERR')) {
         // Do not accept more than limit or Server is in error state.
         socket.destroy();
         return;
       }
       // TODO Set timeout for better malicious socket handling.
-      const ind = this._getNextInd();
       let _recvBuf = Buffer.from([]);
       socket.on('data', (data) => {
         let recvHeader = null;
@@ -158,17 +158,6 @@ class Server {
     return true;
   }
 
-  _getNumConnections() {
-    return new Promise((resolve, reject) => {
-      this._serverSocket.getConnections((err, cnt) => {
-        if (err) {
-          reject(err);
-        }
-        resolve(cnt);
-      })
-    })
-  }
-
   /**
    * Return State of Receivers or a Receiver with the index.
    * @param {number} ind 
@@ -259,7 +248,7 @@ class Server {
    */
   acceptSendRequest(ind, recvDir) {
     if (this.jobs[ind]) {
-      const receiver = new Receiver(this.jobs[ind]._socket, this.jobs[ind].getId(), recvDir, this.jobs[ind].getNumItems());
+      const receiver = new Receiver(this.jobs[ind]._socket, this.jobs[ind].getId(), recvDir, this.jobs[ind].getNumItems(), () => { this.deleteJob(ind); });
       this.jobs[ind] = receiver;
       receiver._writeOnSocket();
     }
@@ -274,7 +263,7 @@ class Server {
     if (this.jobs[ind]) {
       const socket = this.jobs[ind]._socket;
       const itemArray = await createItemArray(items);
-      const sender = new Sender(this.jobs[ind]._socket, this.jobs[ind].getId(), itemArray);
+      const sender = new Sender(this.jobs[ind]._socket, this.jobs[ind].getId(), itemArray, () => { this.deleteJob(ind); });
       this.jobs[ind] = sender;
       socket.write(JSON.stringify({ class: 'ok', numItems: itemArray.length }) + HEADER_END, 'utf-8');
     }

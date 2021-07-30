@@ -58,12 +58,12 @@ class Client {
    * @returns {boolean} Index value of the Sender or false.
    */
   async sendRequest(items, receiverIp, receiverId) {
-    if (Object.keys(this.jobs).length >= MAX_NUM_JOBS)
+    const ind = this._getNextInd();
+    if (ind < 0)
       return false;
     /** @type {Buffer} */
     let _recvBuf = Buffer.from([]);
     const itemArray = await createItemArray(items);
-    const ind = this._getNextInd();
     const socket = net.createConnection(PORT, receiverIp);
 
     this.jobs[ind] = new Requester(STATE.RQR_SEND_REQUEST, socket, receiverId);
@@ -97,7 +97,7 @@ class Client {
       switch (recvHeader.class) {
         case 'ok':
           // Transform Requester into Sender.
-          this.jobs[ind] = new Sender(socket, receiverId, itemArray);
+          this.jobs[ind] = new Sender(socket, receiverId, itemArray, () => { this.deleteJob(ind); });
           this.jobs[ind].send();
           break;
         case 'no':
@@ -137,9 +137,9 @@ class Client {
    * @returns {boolean} Index value of the Sender or false.
    */
   preRecvRequest(senderIp, senderId) {
-    if (Object.keys(this.jobs).length >= MAX_NUM_JOBS)
-      return false;
     const ind = this._getNextInd();
+    if (ind < 0)
+      return false;
     this.jobs[ind] = new Requester(STATE.RQR_PRE_RECV_REQUEST, senderIp, senderId);
   }
 
@@ -187,7 +187,7 @@ class Client {
       switch (recvHeader.class) {
         case 'ok':
           // Transform Requester into Sender.
-          this.jobs[ind] = new Receiver(socket, senderId, recvDir, recvHeader.numItems);
+          this.jobs[ind] = new Receiver(socket, senderId, recvDir, recvHeader.numItems, () => { this.deleteJob(ind) });
           // Send ok header explictly to notify it is ready to receive.
           this.jobs[ind]._writeOnSocket();
           break;

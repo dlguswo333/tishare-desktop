@@ -9,8 +9,9 @@ class Receiver {
    * @param {string!} senderId 
    * @param {string!} recvDir 
    * @param {number!} numItems 
+   * @param {Function} deleteCallback
    */
-  constructor(socket, senderId, recvDir, numItems) {
+  constructor(socket, senderId, recvDir, numItems, deleteCallback) {
     this._state = STATE.RECVING;
     /** @type {import('net').Socket} */
     this._socket = socket;
@@ -20,6 +21,8 @@ class Receiver {
     this._recvPath = recvDir;
     /** @type {number} */
     this._numItems = numItems;
+    /** @type {Function} */
+    this._deleteCallback = deleteCallback;
     /** @type {Buffer} */
     this._recvBuf = Buffer.from([]);
     /** @type {Array.<Buffer>} */
@@ -248,6 +251,8 @@ class Receiver {
       if (!(this._state === STATE.RECV_COMPLETE || this._state === STATE.OTHER_END || this._haveWrittenEndHeader))
         // Unexpected close event.
         this._state = STATE.ERR_NETWORK;
+      else if (this._haveWrittenEndHeader)
+        this._deleteCallback();
     })
 
     this._socket.on('error', (err) => {

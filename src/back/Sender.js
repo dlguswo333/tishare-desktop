@@ -11,8 +11,9 @@ class Sender {
    * @param {import('net').Socket} socket
    * @param {string!} receiverId
    * @param {Array.<{path:string, dir:string, name:string, type:string, size:number}>} itemArray
+   * @param {Function} deleteCallback
    */
-  constructor(socket, receiverId, itemArray) {
+  constructor(socket, receiverId, itemArray, deleteCallback) {
     this._state = STATE.SENDING;
     /** @type {import('net').Socket} */
     this._socket = socket;
@@ -23,6 +24,8 @@ class Sender {
      * @type {Array.<{path:string, dir:string, name:string, type:string, size:number}>}
      */
     this._itemArray = itemArray;
+    /** @type {Function} */
+    this._deleteCallback = deleteCallback;
     /** @type {boolean} */
     this._stopFlag = false;
     /** @type {boolean} */
@@ -174,6 +177,8 @@ class Sender {
       if (!(this._state === STATE.SEND_COMPLETE || this._state === STATE.OTHER_END || this._haveWrittenEndHeader))
         // Unexpected close event.
         this._state = STATE.ERR_NETWORK;
+      else if (this._haveWrittenEndHeader)
+        this._deleteCallback();
     })
 
     this._socket.on('error', (err) => {
