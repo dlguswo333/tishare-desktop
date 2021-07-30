@@ -110,13 +110,15 @@ class Client {
     });
 
     socket.on('close', () => {
-      const state = this.jobs[ind].getState().state
-      if (state !== STATE.RQR_SEND_REJECT && !this.jobs[ind].getHaveWrittenEndFlag()) {
-        this._handleNetworkErr(ind);
+      if (this.jobs[ind]) {
+        const state = this.jobs[ind].getState().state
+        if (state === STATE.RQR_SEND_REJECT || this.jobs[ind].getHaveWrittenEndFlag()) {
+          if (this.jobs[ind].getHaveWrittenEndFlag())
+            this.deleteJob(ind);
+          return;
+        }
       }
-      else {
-        this.deleteJob(ind);
-      }
+      this._handleNetworkErr(ind);
     });
 
     socket.on('error', (err) => {
