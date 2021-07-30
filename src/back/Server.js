@@ -115,10 +115,14 @@ class Server {
       });
       socket.on('close', () => {
         if (this.jobs[ind]) {
-          if (this.jobs[ind].getState().state === STATE.RQE_CANCEL || this.jobs[ind].getRejectFlag())
-            this.deleteJob(ind);
+          if (this.jobs[ind].getState().state === STATE.RQE_CANCEL || this.jobs[ind].getRejectFlag()) {
+            if (this.jobs[ind].getRejectFlag())
+              this.deleteJob(ind);
+            else
+              this.jobs[ind].setState(STATE.RQE_CANCEL);
+          }
           else
-            this.jobs[ind].setState(STATE.RQE_CANCEL);
+            this._handleNetworkErr(ind);
         }
         // If this socket was not registered, do nothing.
       })
