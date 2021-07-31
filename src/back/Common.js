@@ -4,7 +4,7 @@ const fs = require('fs').promises;
 const MAX_HEADER_LEN = 10000;
 const HEADER_END = '\n\n';
 /**
- * @typedef {{dir:string, path:string, type:string, size:number, items:Object.<string, item>}} item
+ * @typedef {{dir:string, path:string, type:string, size:number}} item
  */
 
 /**
@@ -53,7 +53,7 @@ async function _createItemArray(items, ret) {
       await _createItemArray(tmp, ret);
     }
     else {
-      ret.push(_createFileHeader(item.path, item.name, item.dir, item.size));
+      ret.push(_createFileHeader(item.path, itemName, item.dir, item.size));
     }
   }
 }

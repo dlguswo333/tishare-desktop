@@ -55,13 +55,13 @@ class Client {
    * @param {Object.<string, {dir:string, path:string, type:string, size:number}>} items
    * @param {string} receiverIp 
    * @param {string} receiverId 
-   * @returns {boolean} Index value of the Sender or false.
+   * @returns {Promise.<number|boolean>} Index value of the Sender or false.
    */
   async sendRequest(items, receiverIp, receiverId) {
     const ind = this._getNextInd();
-    if (ind < 0)
+    if (!this._myId || ind < 0)
       return false;
-    /** @type {Buffer} */
+    /** @type {Buffser} */
     let _recvBuf = Buffer.from([]);
     const itemArray = await createItemArray(items);
     const socket = net.createConnection(PORT, receiverIp);
@@ -134,11 +134,11 @@ class Client {
   /**
    * Prepare to request to receive from the opponent.
    * @param {number} ind 
-   * @returns {boolean} Index value of the Sender or false.
+   * @returns {boolean}
    */
   preRecvRequest(senderIp, senderId) {
     const ind = this._getNextInd();
-    if (ind < 0)
+    if (!this._myId || ind < 0)
       return false;
     this.jobs[ind] = new Requester(STATE.RQR_PRE_RECV_REQUEST, senderIp, senderId);
   }
@@ -147,7 +147,7 @@ class Client {
    * Send Receive request to receive from the opponent.
    * @param {number} ind 
    * @param {string} recvDir 
-   * @returns {boolean} Index value of the Sender or false.
+   * @returns {number|boolean} Index value of the Receiver or false.
    */
   recvRequest(ind, recvDir) {
     /** @type {Buffer} */
