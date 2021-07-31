@@ -60,7 +60,7 @@ function Nav({ toggleSettings, items }) {
         setReceivers(ret);
       else
         setReceivers({});
-    }, 800);
+    }, 600);
     return () => { clearInterval(timer); };
   }, []);
 
