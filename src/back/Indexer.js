@@ -28,14 +28,16 @@ class Indexer {
   /**
    * Return a index back to the Indexer.
    * @param {number} ind
+   * @returns {boolean} Whether the function succeeded.
    */
   returnInd(ind) {
     if (this._indexer[ind]) {
       delete this._indexer[ind];
       this._callback(this.getNumJobs());
+      return true;
     }
-    else
-      console.log(`Indexer error: tried to return ind ${ind} that does not exist.`)
+    console.log(`Indexer error: tried to return ind ${ind} that does not exist.`)
+    return false;
   }
 
   /**
