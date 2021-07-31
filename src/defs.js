@@ -1,5 +1,10 @@
 const PORT = 9238;
 const CHUNKSIZE = 2097152;
+const OS = require('os').platform();
+const { version: VERSION } = require('../package.json');
+const SCANTIMEOUT = 3000;
+const SOCKET_TIMEOUT = 5000;
+const MAX_NUM_JOBS = 4;
 const STATE = {
   // For Server, Client, Sender and Receiver
   ERR_FILE_SYSTEM: "ERR_FILE_SYSTEM",
@@ -35,10 +40,7 @@ const STATE = {
   RECVING: "RECVING",
   RECV_COMPLETE: "RECV_COMPLETE",
 };
-const OS = require('os').platform();
-const { version: VERSION } = require('../package.json');
-const SCANTIMEOUT = 3000;
-const MAX_NUM_JOBS = 4;
+
 /**
  * Print file size in pretty.
  * @param {number} size 
@@ -59,4 +61,4 @@ const printSize = (size) => {
   }
   return size.toFixed(2) + ' B';
 }
-module.exports = { PORT, CHUNKSIZE, STATE, OS, VERSION, SCANTIMEOUT, MAX_NUM_JOBS, printSize };
+module.exports = { PORT, CHUNKSIZE, STATE, OS, VERSION, SCANTIMEOUT, SOCKET_TIMEOUT, MAX_NUM_JOBS, printSize };

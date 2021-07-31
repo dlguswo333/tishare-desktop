@@ -63,7 +63,6 @@ class Server {
         socket.destroy();
         return;
       }
-      // TODO Set timeout for better malicious socket handling.
       let _recvBuf = Buffer.from([]);
       socket.on('data', (data) => {
         let recvHeader = null;

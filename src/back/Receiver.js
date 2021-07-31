@@ -1,7 +1,7 @@
 const fs = require('fs').promises;
 const path = require('path');
 const { HEADER_END, splitHeader } = require('./Common');
-const { STATE } = require('../defs');
+const { STATE, SOCKET_TIMEOUT } = require('../defs');
 
 class Receiver {
   /**
@@ -257,6 +257,10 @@ class Receiver {
 
     this._socket.on('error', (err) => {
       console.error(err.message);
+    })
+
+    this._socket.setTimeout(SOCKET_TIMEOUT, () => {
+      this._handleNetworkErr();
     })
   }
 
