@@ -1,13 +1,17 @@
+
 # tiShare-Desktop
-This is a reporitory for tiShare, desktop version.<br>
-tiShare is inspired by my former team project, [sendDone](https://github.com/La-Beaute/SendDone-Desktop).
+<img src="https://raw.githubusercontent.com/dlguswo333/tishare-desktop/main/public/icon.png" width="300px"/>
 <br>
 
-## How to Run Debug
+This is a reporitory for tiShare, desktop version.<br>
+tiShare has been inspired by my former team project, [SendDone](https://github.com/La-Beaute/SendDone-Desktop).
+<br>
+
+## How to Run in Development Mode
 ```bash
 # Run react in localhost.
 npm start
-# Electron will load web page the above.
+# Electron will load the web page above.
 npm run electron
 ```
 
