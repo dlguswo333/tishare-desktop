@@ -6,6 +6,8 @@ import { ReactComponent as SettingsIcon } from './icons/Settings.svg';
 import { ReactComponent as PinIcon } from './icons/Pin.svg';
 import { MAX_NUM_JOBS } from '../defs';
 import './style/Nav.scss';
+// import { STATE } from '../defs'
+
 const ipcRenderer = window.ipcRenderer;
 
 let hover = false;

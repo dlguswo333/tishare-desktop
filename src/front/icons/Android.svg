@@ -1,9 +1,17 @@
 <!-- "The Android robot is reproduced or modified from work created and shared by Google and used according to terms described in the Creative Commons 3.0 Attribution License." -->
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" className="Icon" width="100%" viewBox="0 0 100 100">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" className="Icon" width="100%"
+    viewBox="0 0 100 100">
     <title>Android</title>
-    <path d="M20 65 h60 A 30 30 180 0 0 20 65 Z" style="fill:#3ddc84" />
-    <rect transform="rotate(30 50 65)" x="49" y="20" rx="1" ry="1" width="2" height="25" style="stroke:#3ddc84;fill:#3ddc84" />
-    <rect transform="rotate(-30 50 65)" x="49" y="20" rx="1" ry="1" width="2" height="25" style="stroke:#3ddc84;fill:#3ddc84" />
-    <circle cx="35" cy="53" r="2" fill="#fff" stroke-width="0" />
-    <circle cx="65" cy="53" r="2" fill="#fff" stroke-width="0" />
+    <defs>
+        <mask id="eyes">
+            <circle cx="50" cy="65" r="30" fill="white" />
+            <circle cx="35" cy="53" r="2" fill="black" />
+            <circle cx="65" cy="53" r="2" fill="black" />
+        </mask>
+    </defs>
+    <path d="M20 65 h60 A 30 30 180 0 0 20 65 Z" style="fill:#3ddc84" mask="url(#eyes)" />
+    <rect transform="rotate(30 50 65)" x="49" y="20" rx="1" ry="1" width="2" height="25"
+        style="stroke:#3ddc84;fill:#3ddc84" />
+    <rect transform="rotate(-30 50 65)" x="49" y="20" rx="1" ry="1" width="2" height="25"
+        style="stroke:#3ddc84;fill:#3ddc84" />
 </svg>
