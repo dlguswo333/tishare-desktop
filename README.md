@@ -3,8 +3,15 @@
 <img src="https://raw.githubusercontent.com/dlguswo333/tishare-desktop/main/public/icon.png" width="300px"/>
 <br>
 
+<img src="https://dlguswo333.github.io/tishare-docs/desktop-run.png" width="960px"/>
+<br>
+
 This is a reporitory for tiShare, desktop version.<br>
 tiShare has been inspired by my former team project, [SendDone](https://github.com/La-Beaute/SendDone-Desktop).
+<br>
+
+tiShare aims to help users transfer both files and folders across cross-platform devices.<br>
+Checkout for more [Documentaiton](https://dlguswo333.github.io/tishare-docs) for more information and FAQ.
 <br>
 
 ## How to Run in Development Mode
