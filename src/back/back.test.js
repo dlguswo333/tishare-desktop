@@ -34,6 +34,39 @@ describe('Indexer', () => {
   })
 })
 
+describe('Network', () => {
+  const { _getBroadcastIp, isLocalIp } = require('./Network')
+  describe('Get Broadcast IP', () => {
+    const ip = '192.168.0.1'
+    it('Test 1', () => {
+      const netmask = '255.255.255.0'
+      const expected = '192.168.0.255'
+      assert.strictEqual(_getBroadcastIp(ip, netmask), expected)
+    })
+    it('Test 2', () => {
+      const netmask = '255.255.0.0'
+      const expected = '192.168.255.255'
+      assert.strictEqual(_getBroadcastIp(ip, netmask), expected)
+    })
+    it('Test 3', () => {
+      const netmask = '255.255.255.128'
+      const expected = '192.168.0.127'
+      assert.strictEqual(_getBroadcastIp(ip, netmask), expected)
+    })
+  })
+  describe('Determine is IP local', () => {
+    it('Test 1', () => {
+      assert.strictEqual(isLocalIp('192.168.0.1'), true)
+    })
+    it('Test 2', () => {
+      assert.strictEqual(isLocalIp('11.111.0.1'), false)
+    })
+    it('Test 3', () => {
+      assert.strictEqual(isLocalIp('10.11.101.200'), true)
+    })
+  })
+})
+
 describe('Server and client', () => {
   const indexer = new Indexer(() => { })
   const server = new Server(indexer)

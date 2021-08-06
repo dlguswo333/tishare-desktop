@@ -12,15 +12,25 @@ function getNetworks() {
     const one = interfaces[network];
     for (const ip of one) {
       // Only IPv4 and external IP which falls into the local IP address range.
-      if (ip['family'] === 'IPv4' && !ip['internal']) {
-        const ipAsNum = _ipStringToNumber(ip['address'])
-        if ((167772160 <= ipAsNum && ipAsNum <= 184549375) || (2886729728 <= ipAsNum && ipAsNum <= 2887778303) || (3232235520 <= ipAsNum && ipAsNum <= 3232301055)) {
-          array.push({ name: network, ip: ip['address'], netmask: ip['netmask'] });
-        }
+      if (ip['family'] === 'IPv4' && !ip['internal'] && isLocalIp(ip['address'])) {
+        array.push({ name: network, ip: ip['address'], netmask: ip['netmask'] });
       }
     }
   }
   return array;
+}
+
+/**
+ * Returns boolean value whether a given IP string is local(private) or not. 
+ * @param {string} ip
+ * @returns {boolean}
+ */
+function isLocalIp(ip) {
+  const ipAsNum = _ipStringToNumber(ip)
+  if ((167772160 <= ipAsNum && ipAsNum <= 184549375) || (2886729728 <= ipAsNum && ipAsNum <= 2887778303) || (3232235520 <= ipAsNum && ipAsNum <= 3232301055)) {
+    return true;
+  }
+  return false;
 }
 
 /**
@@ -116,4 +126,4 @@ function _getBroadcastIp(ip, netmask) {
   return _ipNumberToString((_ipStringToNumber(ip) | (2 ** 32 - 1 - _ipStringToNumber(netmask))) >>> 0);
 }
 
-module.exports = { getNetworks, scan, _getBroadcastIp };
+module.exports = { getNetworks, isLocalIp, scan, _getBroadcastIp };
