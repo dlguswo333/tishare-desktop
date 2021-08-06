@@ -14,7 +14,7 @@ function getNetworks() {
       // Only IPv4 and external IP which falls into the local IP address range.
       if (ip['family'] === 'IPv4' && !ip['internal']) {
         const ipAsNum = _ipStringToNumber(ip['address'])
-        if ((167772160 <= ipAsNum <= 184549375) || (2886729728 <= ipAsNum <= 2887778303) || (3232235520 <= ipAsNum <= 3232301055)) {
+        if ((167772160 <= ipAsNum && ipAsNum <= 184549375) || (2886729728 <= ipAsNum && ipAsNum <= 2887778303) || (3232235520 <= ipAsNum && ipAsNum <= 3232301055)) {
           array.push({ name: network, ip: ip['address'], netmask: ip['netmask'] });
         }
       }
