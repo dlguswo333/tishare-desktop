@@ -161,6 +161,7 @@ class Receiver {
                   } finally {
                     this._itemHandle = null;
                     this._itemFlag = 'next';
+                    this._numRecvItem++;
                     this._writeOnSocket();
                     return;
                   }
@@ -206,12 +207,11 @@ class Receiver {
                   // 1. Ignore the file.
                   // 2. Create the file with another name.
                   this._itemHandle = null;
-                  this._haveParsedHeader = false;
                   this._itemFlag = 'next';
+                  this._numRecvItem++;
                   this._writeOnSocket();
                   return;
                 }
-                this._haveParsedHeader = false;
                 this._itemWrittenBytes = 0;
                 this._itemSize = this._recvHeader.size;
                 this._recvBuf = Buffer.from([]);
