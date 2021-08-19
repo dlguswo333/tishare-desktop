@@ -1,4 +1,4 @@
-@use './variables' as v;
+@use './variables' as *;
 .Settings {
   position: fixed;
   top: 50%;
@@ -12,6 +12,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  animation: showUp $slowTransition linear 0s;
   .SettingsHead {
     display: flex;
     align-items: center;
@@ -67,7 +68,7 @@
         padding: 5px 10px;
         color: white;
         font-weight: bold;
-        transition: v.$fastTransition;
+        transition: $fastTransition;
         background-color: #47c;
         cursor: pointer;
         border: none;
@@ -99,5 +100,15 @@
         border-right: 1px solid #999;
       }
     }
+  }
+}
+@keyframes showUp {
+  from {
+    opacity: 0;
+    top: 55%;
+  }
+  to {
+    opacity: 1;
+    top: 50%;
   }
 }
