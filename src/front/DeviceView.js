@@ -125,7 +125,7 @@ function DeviceView({ items, myIp, myNetmask, myId }) {
             opaqueText={scanning}>
             <>
               {scanning && <span className='Overlay'>
-                <Spinner fill={false} width='10' size='20px' colors={['#38f', '#eee']} />
+                <Spinner fill={false} width='10' size='20px' colors={['#5bf', '#eee']} />
               </span>}
               Scan
             </>
