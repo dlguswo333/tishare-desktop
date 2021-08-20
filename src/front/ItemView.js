@@ -103,8 +103,8 @@ function ItemView({ items, openFile, openDirectory, deleteChecked }) {
     <div className='ItemView'>
       <div className='ItemViewHead'>
         <div className='Buttons'>
-          <ThemeButton onClick={openFile} children='+ File' />
-          <ThemeButton onClick={openDirectory} children='+ Directory' />
+          <ThemeButton onClick={openFile}>+ File</ThemeButton>
+          <ThemeButton onClick={openDirectory}>+ Directory</ThemeButton>
           <ThemeButton onClick={() => {
             if (checkAll)
               deleteChecked(undefined);
@@ -112,7 +112,7 @@ function ItemView({ items, openFile, openDirectory, deleteChecked }) {
               deleteChecked(checked);
             setChecked({});
           }
-          } children='- Checked' />
+          }>- Checked</ThemeButton>
         </div>
       </div>
       <div className='ItemViewBody'>
