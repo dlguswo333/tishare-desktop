@@ -3,16 +3,17 @@ import style from './style/ThemeButton.module.scss';
 
 /**
  * @param {Object} props 
- * @param {string} props.value
+ * @param {React.ReactNode} props.children
  * @param {Function} props.onClick
+ * @param {boolean} props.opaqueText
  */
-function ThemeButton({ value, onClick }) {
+function ThemeButton({ children, onClick, opaqueText }) {
   return (
     <button
-      className={style.ThemeButton}
+      className={style.ThemeButton + (opaqueText ? ' ' + style.OpaqueText : '')}
       onClick={onClick}
     >
-      {value}
+      {children}
     </button>
   )
 }

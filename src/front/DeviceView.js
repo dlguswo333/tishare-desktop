@@ -3,6 +3,8 @@ import ThemeButton from './ThemeButton';
 import { ReactComponent as WindowsIcon } from './icons/Windows.svg';
 import { ReactComponent as AndroidIcon } from './icons/Android.svg';
 import { ReactComponent as LinuxIcon } from './icons/Linux.svg';
+import Spinner from '@dlguswo333/react-simple-spinner';
+import { SCANTIMEOUT } from '../defs';
 import './style/DeviceView.scss';
 const ipcRenderer = window.ipcRenderer;
 
@@ -20,6 +22,8 @@ function DeviceView({ items, myIp, myNetmask, myId }) {
   // const [devices, setDevices] = useState({ '10.221.151.210': { ip: '10.221.151.210', id: 'linuxmachine', os: 'linux', version: '0.2.0' }, '10.221.151.200': { ip: '10.221.151.200', id: 'my phone', os: 'android', version: '0.2.0' } });
   const [selectedIp, setSelectedIp] = useState(null);
   const [noDeviceWarn, setNoDeviceWarn] = useState(false);
+  const [scanning, setScanning] = useState(false);
+
 
   /** @param {string} _os */
   const showOs = (_os) => {
@@ -67,6 +71,8 @@ function DeviceView({ items, myIp, myNetmask, myId }) {
   }
 
   const scan = () => {
+    setScanning(true);
+    setTimeout(() => { setScanning(false); }, SCANTIMEOUT);
     setSelectedIp(null);
     setDevices({});
     ipcRenderer.scan(myIp, myNetmask, myId);
@@ -112,9 +118,20 @@ function DeviceView({ items, myIp, myNetmask, myId }) {
     <div className='DeviceView'>
       <div className='DeviceViewHead'>
         <div className='Buttons'>
-          <ThemeButton onClick={scan} value='Scan' />
-          <ThemeButton onClick={sendRequest} value='Send' />
-          <ThemeButton onClick={preRecvRequest} value='Receive' />
+          <ThemeButton
+            onClick={() => {
+              !scanning && scan();
+            }}
+            opaqueText={scanning}>
+            <>
+              {scanning && <span className='Overlay'>
+                <Spinner fill={false} width='10' size='20px' colors={['#5bf', '#eee']} />
+              </span>}
+              Scan
+            </>
+          </ThemeButton>
+          <ThemeButton onClick={sendRequest}>Send</ThemeButton>
+          <ThemeButton onClick={preRecvRequest}>Receive</ThemeButton>
         </div>
       </div>
       <div className='DeviceViewBody'>
