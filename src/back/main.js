@@ -14,8 +14,16 @@ var mainWindow = null;
 const indexer = new Indexer((numJobs) => {
   mainWindow?.webContents.send('numJobs', numJobs);
 });
-const server = new Server(indexer);
-const client = new Client(indexer);
+
+/**
+ * Send state to renderer process.
+ */
+const sendState = (state) => {
+  mainWindow?.webContents.send('state', state);
+}
+
+const server = new Server(indexer, sendState);
+const client = new Client(indexer, sendState);
 
 function createMainWindow() {
   // Create the browser window.

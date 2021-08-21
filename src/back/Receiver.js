@@ -5,13 +5,17 @@ const { STATE, SOCKET_TIMEOUT } = require('../defs');
 
 class Receiver {
   /**
+   * @param {number} ind
    * @param {import('net').Socket} socket 
    * @param {string!} senderId 
    * @param {string!} recvDir 
    * @param {number!} numItems 
    * @param {Function} deleteCallback
+   * @param {Function} sendState
    */
-  constructor(socket, senderId, recvDir, numItems, deleteCallback) {
+  constructor(ind, socket, senderId, recvDir, numItems, deleteCallback, sendState) {
+    /** @type {number} */
+    this._ind = ind;
     this._state = STATE.RECVING;
     /** @type {import('net').Socket} */
     this._socket = socket;
@@ -23,6 +27,8 @@ class Receiver {
     this._numItems = numItems;
     /** @type {Function} */
     this._deleteCallback = deleteCallback;
+    /** @type {Function} */
+    this._sendState = sendState;
     /** @type {Buffer} */
     this._recvBuf = Buffer.from([]);
     /** @type {Array.<Buffer>} */

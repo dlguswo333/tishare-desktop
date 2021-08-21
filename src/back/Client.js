@@ -8,9 +8,13 @@ const Receiver = require('./Receiver');
 class Client {
   /**
    * @param {import('./Indexer')} indexer
+   * @param {Function} sendState
    */
-  constructor(indexer) {
+  constructor(indexer, sendState) {
+    /** @type {import('./Indexer')} */
     this._indexer = indexer;
+    /** @type {Function} */
+    this._sendState = sendState;
     /** @type {string} */
     this._myId = '';
     /** @type {Object.<number, (Sender|Receiver|Requester)>} */

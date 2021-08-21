@@ -10,9 +10,13 @@ const { splitHeader, MAX_HEADER_LEN, createItemArray, HEADER_END } = require('./
 class Server {
   /**
    * @param {import('./Indexer')} indexer
+   * @param {Function} sendState
    */
-  constructor(indexer) {
+  constructor(indexer, sendState) {
+    /** @type {import('./Indexer')} */
     this._indexer = indexer;
+    /** @type {Function} */
+    this._sendState = sendState;
     this._state = STATE.IDLE;
     /** @type {string} */
     this.myId = '';
@@ -183,7 +187,7 @@ class Server {
   _initScannee(ip, broadcastIp) {
     this._scannee = dgram.createSocket('udp4');
     // If OS is linux, bind to broadcast IP address.
-    this._scannee.bind(PORT, (OS == 'linux' ? broadcastIp : ip), () => {
+    this._scannee.bind(PORT, (OS === 'linux' ? broadcastIp : ip), () => {
       this._scannee.on('message', (msg, rinfo) => {
         let recvHeader = null;
         try {
@@ -247,7 +251,7 @@ class Server {
    */
   acceptSendRequest(ind, recvDir) {
     if (this.jobs[ind]) {
-      const receiver = new Receiver(this.jobs[ind]._socket, this.jobs[ind].getId(), recvDir, this.jobs[ind].getNumItems(), () => { this.deleteJob(ind); });
+      const receiver = new Receiver(ind, this.jobs[ind]._socket, this.jobs[ind].getId(), recvDir, this.jobs[ind].getNumItems(), () => { this.deleteJob(ind); }, sendState);
       this.jobs[ind] = receiver;
       receiver._writeOnSocket();
     }
@@ -262,7 +266,7 @@ class Server {
     if (this.jobs[ind]) {
       const socket = this.jobs[ind]._socket;
       const itemArray = await createItemArray(items);
-      const sender = new Sender(this.jobs[ind]._socket, this.jobs[ind].getId(), itemArray, () => { this.deleteJob(ind); });
+      const sender = new Sender(ind, this.jobs[ind]._socket, this.jobs[ind].getId(), itemArray, () => { this.deleteJob(ind); }, this._sendState);
       this.jobs[ind] = sender;
       socket.write(JSON.stringify({ class: 'ok', numItems: itemArray.length }) + HEADER_END, 'utf-8');
     }

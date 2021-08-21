@@ -3,15 +3,21 @@ const { HEADER_END } = require('./Common');
 
 class Requestee {
   /**
+   * @param {number} ind
    * @param {string} state
    * @param {import('net').Socket} socket
    * @param {string} requestHeader
+   * @param {Function} sendState
    */
-  constructor(state, socket, requestHeader) {
+  constructor(ind, state, socket, requestHeader, sendState) {
+    /** @type {number} */
+    this._ind = ind;
     this._state = state;
     this._socket = socket;
     this._requestHeader = requestHeader;
     this._haveRejectedFlag = false;
+    /** @type {Function} */
+    this._sendState = sendState;
   }
 
   /**

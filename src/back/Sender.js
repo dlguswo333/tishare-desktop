@@ -2,18 +2,20 @@ const fs = require('fs').promises;
 const { STATE, CHUNKSIZE, SOCKET_TIMEOUT } = require('../defs');
 const { HEADER_END, splitHeader } = require('./Common');
 
-/**
- * @typedef {{dir:string, path:string, type:string, size:number, items:Object.<string, any>}} item
- */
+/** @typedef {{dir:string, path:string, type:string, size:number, items:Object.<string, any>}}Item */
 
 class Sender {
   /**
+   * @param {number} ind
    * @param {import('net').Socket} socket
    * @param {string!} receiverId
    * @param {Array.<{path:string, dir:string, name:string, type:string, size:number}>} itemArray
    * @param {Function} deleteCallback
+   * @param {Function} sendState
    */
-  constructor(socket, receiverId, itemArray, deleteCallback) {
+  constructor(ind, socket, receiverId, itemArray, deleteCallback, sendState) {
+    /** @type {number} */
+    this._ind = ind;
     this._state = STATE.SENDING;
     /** @type {import('net').Socket} */
     this._socket = socket;
@@ -26,6 +28,8 @@ class Sender {
     this._itemArray = itemArray;
     /** @type {Function} */
     this._deleteCallback = deleteCallback;
+    /** @type {Function} */
+    this._sendState = sendState;
     /** @type {boolean} */
     this._stopFlag = false;
     /** @type {boolean} */
@@ -199,7 +203,7 @@ class Sender {
   }
   /**
    * Return the number of nested items.
-   * @param {item} item
+   * @param {Item} item
    * @returns {number}
    */
   _getNumItems(item) {
