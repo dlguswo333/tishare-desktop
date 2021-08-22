@@ -2,7 +2,7 @@ This README is to follow the development.
 
 ## Improve JobView response time
 - [x] Add ***sendState*** callback to Server, Client, Sender, Receiver, Requester, Requestee.
-- [ ] Add ***ind*** to every ***state***s.
+- [x] Add ***ind*** to every ***state***s.
 - [ ] Server: Call ***sendState*** everytime a progress occurs.
 - [ ] Client: Call ***sendState*** everytime a progress occurs.
 - [ ] Requester: Call ***sendState*** everytime a progress occurs.

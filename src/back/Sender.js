@@ -265,6 +265,7 @@ class Sender {
         itemName = '';
       }
       return {
+        ind: this._ind,
         state: this._state,
         speed: this.getSpeed(),
         progress: this.getItemProgress(),
@@ -273,7 +274,11 @@ class Sender {
         itemName: itemName
       };
     }
-    return { state: this._state, id: this._receiverId };
+    return {
+      ind: this._ind,
+      state: this._state,
+      id: this._receiverId
+    };
   }
 
   async _send() {

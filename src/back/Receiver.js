@@ -312,6 +312,7 @@ class Receiver {
   getState() {
     if (this._state === STATE.RECVING) {
       return {
+        ind: this._ind,
         state: this._state,
         speed: this.getSpeed(),
         progress: this.getItemProgress(),
@@ -320,7 +321,11 @@ class Receiver {
         itemName: this._itemName,
       };
     }
-    return { state: this._state, id: this._senderId };
+    return {
+      ind: this._ind,
+      state: this._state,
+      id: this._senderId
+    };
   }
 
   /**

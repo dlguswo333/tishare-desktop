@@ -51,6 +51,7 @@ class Requester {
    */
   getState() {
     return {
+      ind: this._ind,
       state: this._state,
       id: this._opponentId
     };

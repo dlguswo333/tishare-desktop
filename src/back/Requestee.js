@@ -62,6 +62,7 @@ class Requestee {
    */
   getState() {
     return {
+      ind: this._ind,
       state: this._state,
       id: this._requestHeader.id
     };
