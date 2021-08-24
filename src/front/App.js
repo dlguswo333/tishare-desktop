@@ -61,6 +61,9 @@ function App() {
   }
 
   const getNetworks = async () => {
+    // Close serve before refreshing networks.
+    if (isServerOpen)
+      await closeServer();
     const ret = await ipcRenderer.getNetworks();
     if (ret)
       setNetworks(ret);
@@ -68,7 +71,7 @@ function App() {
 
   const listNetworks = networks.map((network) => {
     return <option key={network.ip} value={network.ip + '|' + network.netmask} >  {network.ip} ({network.name})</option >;
-  });
+  })
 
   const openServer = async () => {
     const ret = await ipcRenderer.openServer(myIp, myNetmask);
@@ -128,7 +131,7 @@ function App() {
       <div className="Main">
         <div className="MainHead">
           <span className="Item">
-            {"My IP: "}
+            <span>My IP:</span>
             <select className="Networks"
               onChange={(e) => {
                 const [ip, netmask] = e.target.value.split('|');
@@ -142,9 +145,11 @@ function App() {
             >
               {listNetworks}
             </select>
+            <button className="NetworkRefreshButton" onClick={getNetworks}>Refresh</button>
           </span>
           <span className="Item">
-            My ID: {myId}
+            <span>My ID:</span>
+            <span>{myId}</span>
           </span>
           {isServerOpen ?
             <button className="ServerButton ServerOpen"
