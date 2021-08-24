@@ -47,6 +47,20 @@
       .Item {
         padding: 5px 10px;
         font-size: 1.05rem;
+        & > * {
+          margin-right: 5px;
+        }
+        .NetworkRefreshButton {
+          padding: 5px 10px;
+          border-radius: 3px;
+          font-size: 1.05rem;
+          background-color: #fff;
+          border: 1px solid #999;
+          transition: v.$fastTransition;
+          &:hover {
+            background-color: #ddd;
+          }
+        }
       }
       .ServerButton {
         position: absolute;
