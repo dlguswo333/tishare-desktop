@@ -18,6 +18,7 @@ class Requestee {
     this._haveRejectedFlag = false;
     /** @type {Function} */
     this._sendState = sendState;
+    this.setState(state);
   }
 
   /**
@@ -47,6 +48,7 @@ class Requestee {
    */
   setState(state) {
     this._state = state;
+    this._sendState(this.getState());
   }
 
   getId() {

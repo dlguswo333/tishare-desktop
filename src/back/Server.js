@@ -143,7 +143,7 @@ class Server {
   }
 
   /**
-   * Close myself in the network and also close the server sockets.
+   * Close myself in the network and also close the server socket.
    * @returns {boolean} Always true.
    */
   close() {
