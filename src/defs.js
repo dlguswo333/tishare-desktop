@@ -4,6 +4,7 @@ const OS = require('os').platform();
 const { version: VERSION } = require('../package.json');
 const SCANTIMEOUT = 3000;
 const SOCKET_TIMEOUT = 5000;
+const STATE_INTERVAL = 1000;
 const MAX_NUM_JOBS = 4;
 const STATE = {
   // For Server, Client, Sender and Receiver
