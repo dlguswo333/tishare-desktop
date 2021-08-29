@@ -96,7 +96,7 @@ class Server {
               this._handleNetworkErr(ind);
               return;
             }
-            this.jobs[ind] = new Requestee(STATE.RQE_SEND_REQUEST, socket, recvHeader);
+            this.jobs[ind] = new Requestee(ind, STATE.RQE_SEND_REQUEST, socket, recvHeader, this._sendState);
             break;
           case 'recv-request':
             if (!this._validateRequestHeader(recvHeader)) {
@@ -104,7 +104,7 @@ class Server {
               this._handleNetworkErr(ind);
               return;
             }
-            this.jobs[ind] = new Requestee(STATE.RQE_RECV_REQUEST, socket, recvHeader);
+            this.jobs[ind] = new Requestee(ind, STATE.RQE_RECV_REQUEST, socket, recvHeader, this._sendState);
             break;
           case 'end':
             if (this.jobs[ind])
@@ -251,7 +251,7 @@ class Server {
    */
   acceptSendRequest(ind, recvDir) {
     if (this.jobs[ind]) {
-      const receiver = new Receiver(ind, this.jobs[ind]._socket, this.jobs[ind].getId(), recvDir, this.jobs[ind].getNumItems(), () => { this.deleteJob(ind); }, sendState);
+      const receiver = new Receiver(ind, this.jobs[ind]._socket, this.jobs[ind].getId(), recvDir, this.jobs[ind].getNumItems(), () => { this.deleteJob(ind); }, this._sendState);
       this.jobs[ind] = receiver;
       receiver._writeOnSocket();
     }
@@ -314,6 +314,7 @@ class Server {
   _handleNetworkErr(ind) {
     if (this.jobs[ind]) {
       this.jobs[ind]._socket.destroy();
+      this.jobs[ind].setState(STATE.ERR_NETWORK);
     }
   }
 }
