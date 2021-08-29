@@ -4,8 +4,8 @@ This README is to follow the development.
 - [x] Add ***sendState*** callback to Server, Client, Sender, Receiver, Requester, Requestee.
 - [x] Add ***ind*** to every ***state***s.
 - [x] Server: Call ***sendState*** everytime a progress occurs.
-- [ ] Client: Call ***sendState*** everytime a progress occurs.
-- [ ] Requester: Call ***sendState*** everytime a progress occurs.
+- [x] Client: Call ***sendState*** everytime a progress occurs.
+- [x] Requester: Call ***sendState*** everytime a progress occurs.
 - [x] Requestee: Call ***sendState*** everytime a progress occurs.
 - [ ] Sender: Call ***sendState*** everytime a progress occurs.
 - [ ] Receiver: Call ***sendState*** everytime a progress occurs.

@@ -18,6 +18,7 @@ class Requester {
     this._haveWrittenEndFlag = false;
     /** @type {Function} */
     this._sendState = sendState;
+    this._sendState(this.getState());
   }
 
   /**
@@ -44,6 +45,7 @@ class Requester {
    */
   setState(state) {
     this._state = state;
+    this._sendState(this.getState());
   }
 
   /**

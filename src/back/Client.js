@@ -70,7 +70,7 @@ class Client {
     const itemArray = await createItemArray(items);
     const socket = net.createConnection(PORT, receiverIp);
 
-    this.jobs[ind] = new Requester(STATE.RQR_SEND_REQUEST, socket, receiverId);
+    this.jobs[ind] = new Requester(ind, STATE.RQR_SEND_REQUEST, socket, receiverId, this._sendState);
 
     socket.once('connect', async () => {
       console.log('sendRequest: connected to ' + socket.remoteAddress);
@@ -101,7 +101,7 @@ class Client {
       switch (recvHeader.class) {
         case 'ok':
           // Transform Requester into Sender.
-          this.jobs[ind] = new Sender(socket, receiverId, itemArray, () => { this.deleteJob(ind); });
+          this.jobs[ind] = new Sender(ind, socket, receiverId, itemArray, () => { this.deleteJob(ind); }, this._sendState);
           this.jobs[ind].send();
           break;
         case 'no':
@@ -144,7 +144,7 @@ class Client {
     const ind = this._getNextInd();
     if (!this._myId || ind < 0)
       return false;
-    this.jobs[ind] = new Requester(STATE.RQR_PRE_RECV_REQUEST, senderIp, senderId);
+    this.jobs[ind] = new Requester(ind, STATE.RQR_PRE_RECV_REQUEST, senderIp, senderId, this._sendState);
   }
 
   /**
@@ -160,7 +160,7 @@ class Client {
     const senderId = this.jobs[ind]._opponentId;
     const socket = net.createConnection(PORT, senderIp);
 
-    this.jobs[ind] = new Requester(STATE.RQR_RECV_REQUEST, socket, senderId);
+    this.jobs[ind] = new Requester(ind, STATE.RQR_RECV_REQUEST, socket, senderId, this._sendState);
 
     socket.once('connect', async () => {
       console.log('recvRequest: connected to ' + socket.remoteAddress);
@@ -191,7 +191,7 @@ class Client {
       switch (recvHeader.class) {
         case 'ok':
           // Transform Requester into Sender.
-          this.jobs[ind] = new Receiver(socket, senderId, recvDir, recvHeader.numItems, () => { this.deleteJob(ind) });
+          this.jobs[ind] = new Receiver(ind, socket, senderId, recvDir, recvHeader.numItems, () => { this.deleteJob(ind) }, this._sendState);
           // Send ok header explictly to notify it is ready to receive.
           this.jobs[ind]._writeOnSocket();
           break;
