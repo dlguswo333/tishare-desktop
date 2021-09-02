@@ -62,4 +62,4 @@ const printSize = (size) => {
   }
   return size.toFixed(2) + ' B';
 }
-module.exports = { PORT, CHUNKSIZE, STATE, OS, VERSION, SCANTIMEOUT, SOCKET_TIMEOUT, MAX_NUM_JOBS, printSize };
+module.exports = { PORT, CHUNKSIZE, STATE, OS, VERSION, SCANTIMEOUT, SOCKET_TIMEOUT, STATE_INTERVAL, MAX_NUM_JOBS, printSize };
