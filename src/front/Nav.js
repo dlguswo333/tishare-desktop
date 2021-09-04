@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import ClientJobView from './ClientJobView';
-import ServerJobView from './ServerJobView';
+import JobView from './JobView';
 import { ReactComponent as MenuIcon } from './icons/Menu.svg';
 import { ReactComponent as SettingsIcon } from './icons/Settings.svg';
 import { ReactComponent as PinIcon } from './icons/Pin.svg';
 import { MAX_NUM_JOBS } from '../defs';
 import './style/Nav.scss';
-// import { STATE } from '../defs'
 
 const ipcRenderer = window.ipcRenderer;
 
@@ -15,31 +13,19 @@ let hover = false;
  * @param {object} props 
  * @param {Function} props.toggleSettings 
  * @param {object} props.items 
- * @returns 
  */
 function Nav({ toggleSettings, items }) {
   const [grow, setGrow] = useState(false);
   const [pin, setPin] = useState(false);
   const [noti, setNoti] = useState(false);
-  const [senders, setSenders] = useState({});
-  const [receivers, setReceivers] = useState({});
   const [numJobs, setNumJobs] = useState(0);
+  const [jobs, setJobs] = useState({});
 
-  const showClientJobs = () => {
+  const showJobs = () => {
     let ret = [];
-    for (const key in senders) {
+    for (const ind in jobs) {
       ret.push(
-        <ClientJobView state={senders[key]} ind={key} key={key} />
-      )
-    }
-    return ret;
-  }
-
-  const showServerJobs = () => {
-    let ret = [];
-    for (const key in receivers) {
-      ret.push(
-        <ServerJobView state={receivers[key]} ind={key} items={items} key={key} />
+        <JobView state={jobs[ind]} ind={ind} items={items} key={ind} />
       )
     }
     return ret;
@@ -51,19 +37,27 @@ function Nav({ toggleSettings, items }) {
   }, [grow]);
 
   useEffect(() => {
-    const timer = setInterval(async () => {
-      let ret = await ipcRenderer.getClientState();
-      if (ret)
-        setSenders(ret);
-      else
-        setSenders({});
-      ret = await ipcRenderer.getServerState();
-      if (ret)
-        setReceivers(ret);
-      else
-        setReceivers({});
-    }, 600);
-    return () => { clearInterval(timer); };
+    ipcRenderer.onJobState((_, job) => {
+      setJobs((jobs) => {
+        let tmp = {};
+        Object.assign(tmp, jobs);
+        tmp[job['ind']] = job;
+        return tmp;
+      });
+    });
+    return () => { ipcRenderer.removeJobStateCallback(); };
+  }, []);
+
+  useEffect(() => {
+    ipcRenderer.onDeleteJobState((_, ind) => {
+      setJobs((jobs) => {
+        let tmp = {};
+        Object.assign(tmp, jobs);
+        delete tmp[ind];
+        return tmp;
+      });
+    });
+    return () => { ipcRenderer.removeDeleteJobStateCallback(); };
   }, []);
 
   useEffect(() => {
@@ -112,12 +106,11 @@ function Nav({ toggleSettings, items }) {
       </div>
       <div className="Body">
 
-        {/* <ServerJobView state={{ state: STATE.RQE_RECV_REQUEST, speed: 483344, progress: 50, id: 'july', itemName: 'files_that_has_too_long_file_name_and_this_is_going_to_be_trimmed.jpg', totalProgress: '1/2' }} />
-        <ClientJobView state={{ state: STATE.RQR_RECV_REQUEST, speed: 110203, progress: 100, id: 'mason', itemName: 'files_that_has_too_long_file_name.jpg' }} />
-        <ClientJobView state={{ state: STATE.SENDING, speed: 11033403, progress: 60, id: 'july', itemName: 'report about theme ui.docx', totalProgress: '1/2' }} /> */}
+        {/* <JobView state={{ state: STATE.RQE_RECV_REQUEST, speed: 483344, progress: 50, id: 'july', itemName: 'files_that_has_too_long_file_name_and_this_is_going_to_be_trimmed.jpg', totalProgress: '1/2' }} />
+        <JobView state={{ state: STATE.RQR_RECV_REQUEST, speed: 110203, progress: 100, id: 'mason', itemName: 'files_that_has_too_long_file_name.jpg' }} />
+        <JobView state={{ state: STATE.SENDING, speed: 11033403, progress: 60, id: 'july', itemName: 'report about theme ui.docx', totalProgress: '1/2' }} /> */}
 
-        {showClientJobs()}
-        {showServerJobs()}
+        {showJobs()}
       </div>
     </nav>
   )

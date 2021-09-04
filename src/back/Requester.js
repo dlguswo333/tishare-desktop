@@ -3,15 +3,22 @@ const { HEADER_END } = require('./Common');
 
 class Requester {
   /**
+   * @param {number} ind
    * @param {string} state
    * @param {import('net').Socket|string} socket it will be used for saving sender IP.
    * @param {string} opponentId
+   * @param {Function} sendState
    */
-  constructor(state, socket, opponentId) {
+  constructor(ind, state, socket, opponentId, sendState) {
+    /** @type {number} */
+    this._ind = ind;
     this._state = state;
     this._socket = socket;
     this._opponentId = opponentId;
     this._haveWrittenEndFlag = false;
+    /** @type {Function} */
+    this._sendState = sendState;
+    this._sendState(this.getState());
   }
 
   /**
@@ -38,6 +45,7 @@ class Requester {
    */
   setState(state) {
     this._state = state;
+    this._sendState(this.getState());
   }
 
   /**
@@ -45,6 +53,7 @@ class Requester {
    */
   getState() {
     return {
+      ind: this._ind,
       state: this._state,
       id: this._opponentId
     };

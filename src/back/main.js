@@ -11,11 +11,26 @@ const Indexer = require('./Indexer');
 /** @type {BrowserWindow} */
 var mainWindow = null;
 
+/**
+ * Send state to renderer process.
+ */
+const sendState = (state) => {
+  mainWindow.webContents.send('jobState', state);
+}
+
+/**
+ * Tell front to delete the job with ind.
+ */
+const deleteJobState = (ind) => {
+  mainWindow.webContents.send('deleteJobState', ind);
+}
+
 const indexer = new Indexer((numJobs) => {
   mainWindow?.webContents.send('numJobs', numJobs);
-});
-const server = new Server(indexer);
-const client = new Client(indexer);
+}, deleteJobState);
+
+const server = new Server(indexer, sendState);
+const client = new Client(indexer, sendState);
 
 function createMainWindow() {
   // Create the browser window.
@@ -131,10 +146,9 @@ ipcMain.handle('openServer', (event, myIp, netmask) => {
 })
 
 ipcMain.handle('closeServer', () => {
-  if (server) {
-    server.close();
-    return true;
-  }
+  let ret = server.close();
+  if (ret)
+    return ret;
   return false;
 })
 
@@ -142,7 +156,7 @@ ipcMain.handle('isServerOpen', () => {
   return server && server.isOpen();
 })
 
-ipcMain.handle('scan', (event, myIp, netmask, myId) => {
+ipcMain.handle('scan', (_, myIp, netmask, myId) => {
   network.scan(myIp, netmask, myId, (deviceIp, deviceVersion, deviceId, deviceOs) => {
     mainWindow.webContents.send('scannedDevice', deviceIp, deviceVersion, deviceId, deviceOs);
   });
@@ -158,78 +172,48 @@ ipcMain.handle('setMyId', (event, myId) => {
 })
 
 ipcMain.handle('sendRequest', (_, items, ip, id) => {
-  if (client) {
-    client.sendRequest(items, ip, id);
-  }
+  client.sendRequest(items, ip, id);
 })
 
 ipcMain.handle('preRecvRequest', (_, ip, id) => {
-  if (client) {
-    client.preRecvRequest(ip, id);
-  }
+  client.preRecvRequest(ip, id);
 })
 
 ipcMain.handle('recvRequest', (_, ind, recvDir) => {
-  if (client) {
-    client.recvRequest(ind, recvDir);
-  }
+  client.recvRequest(ind, recvDir);
 })
 
-ipcMain.handle('getServerState', () => {
-  if (server) {
-    return server.getState();
-  }
-  return undefined;
-})
-
-ipcMain.handle('getClientState', () => {
-  if (client) {
-    return client.getState();
-  }
-  return undefined;
-})
-
-ipcMain.handle('endServerJob', (_, ind) => {
-  if (server) {
-    return server.endJob(ind);
-  }
+ipcMain.handle('endJob', (_, ind) => {
+  let ret = server.endJob(ind);
+  if (ret)
+    return ret;
+  ret = client.endJob(ind);
+  if (ret)
+    return ret;
   return false;
 })
 
-ipcMain.handle('endClientJob', (_, ind) => {
-  if (client) {
-    return client.endJob(ind);
-  }
-  return false;
-})
 
-ipcMain.handle('deleteServerJob', (_, ind) => {
-  if (server) {
-    return server.deleteJob(ind);
-  }
-  return false;
-})
-
-ipcMain.handle('deleteClientJob', (_, ind) => {
-  if (client) {
-    return client.deleteJob(ind);
-  }
+ipcMain.handle('deleteJob', (_, ind) => {
+  let ret = server.deleteJob(ind);
+  if (ret)
+    return ret;
+  ret = client.deleteJob(ind);
+  if (ret)
+    return ret;
   return false;
 })
 
 ipcMain.handle('acceptSendRequest', (_, ind, recvDir) => {
-  if (server)
-    server.acceptSendRequest(ind, recvDir);
+  server.acceptSendRequest(ind, recvDir);
 })
 
 ipcMain.handle('acceptRecvRequest', (_, ind, items) => {
-  if (server)
-    server.acceptRecvRequest(ind, items);
+  server.acceptRecvRequest(ind, items);
 })
 
 ipcMain.handle('rejectRequest', (_, ind) => {
-  if (server)
-    server.rejectRequest(ind);
+  server.rejectRequest(ind);
 })
 
 ipcMain.handle('setRecvDir', () => {
@@ -242,6 +226,6 @@ ipcMain.handle('setRecvDir', () => {
   return null;
 })
 
-ipcMain.handle('showMessage', (event, message) => {
+ipcMain.handle('showMessage', (_, message) => {
   dialog.showMessageBox(mainWindow, { title: 'tiShare', message: message });
 })

@@ -12,12 +12,28 @@ const ipcRenderer = window.ipcRenderer;
  * @param {string} props.state.totalProgress
  * @param {string} props.state.id
  * @param {number} props.ind
+ * @param {object} props.items
  */
-function ClientJobView({ state, ind }) {
+function JobView({ state, ind, items }) {
   const [recvDir, setRecvDir] = useState(localStorage.getItem('recvDir'));
 
   const showHead = () => {
     switch (state.state) {
+      case STATE.RQE_SEND_REQUEST:
+        return <>
+          <span className={style.Title}>Send Request</span>
+          <span className={style.Id}>{state.id}</span>
+        </>
+      case STATE.RQE_RECV_REQUEST:
+        return <>
+          <span className={style.Title}>Receive Request</span>
+          <span className={style.Id}>{state.id}</span>
+        </>
+      case STATE.RQE_CANCEL:
+        return <>
+          <span className={style.Title}>Request Cancelled</span>
+          <span className={style.Id}>{state.id}</span>
+        </>
       case STATE.RQR_SEND_REQUEST:
       case STATE.RQR_RECV_REQUEST:
         return <>
@@ -73,6 +89,44 @@ function ClientJobView({ state, ind }) {
 
   const showBody = () => {
     switch (state.state) {
+      case STATE.RQE_SEND_REQUEST:
+        return (
+          <>
+            <div className={style.Element}>
+              {`${state.id} wants to send you files.`}
+            </div>
+            <div className={style.Element}>
+              {`📁`}
+              <input type='text'
+                readOnly
+                value={recvDir}
+              />
+              <button
+                onClick={async () => {
+                  const ret = await ipcRenderer.setRecvDir();
+                  if (ret)
+                    setRecvDir(ret);
+                }}
+              >Find</button>
+            </div>
+          </>
+        )
+      case STATE.RQE_RECV_REQUEST:
+        return (
+          <>
+            <div className={style.Element}>
+              {`${state.id} wants to receive files.`}
+            </div>
+          </>
+        )
+      case STATE.RQE_CANCEL:
+        return (
+          <>
+            <div className={style.Element}>
+              {`${state.id} cancelled the request.`}
+            </div>
+          </>
+        )
       case STATE.RQR_SEND_REQUEST:
       case STATE.RQR_RECV_REQUEST:
         return (
@@ -154,7 +208,7 @@ function ClientJobView({ state, ind }) {
         return (
           <>
             <div className={style.Element}>
-              File System Error detected.
+              Network Error
             </div>
           </>
         )
@@ -162,7 +216,7 @@ function ClientJobView({ state, ind }) {
         return (
           <>
             <div className={style.Element}>
-              Network Error detected.
+              Network Error
             </div>
           </>
         )
@@ -173,13 +227,58 @@ function ClientJobView({ state, ind }) {
 
   const showFoot = () => {
     switch (state.state) {
+      case STATE.RQE_SEND_REQUEST:
+        return (
+          <>
+            <button className={style.Neg}
+              onClick={() => {
+                ipcRenderer.rejectRequest(ind);
+              }}
+            >REJECT</button>
+            <button className={style.Pos}
+              onClick={() => {
+                if (!recvDir) {
+                  // Prevent receiving if recvDir is empty.
+                  ipcRenderer.showMessage('Set your receive directory.');
+                  return;
+                }
+                ipcRenderer.acceptSendRequest(ind, recvDir);
+              }}
+            >ACCEPT</button>
+          </>
+        )
+      case STATE.RQE_RECV_REQUEST:
+        return (
+          <>
+            <button className={style.Neg}
+              onClick={() => {
+                ipcRenderer.rejectRequest(ind);
+              }}
+            >REJECT</button>
+            <button className={style.Pos}
+              onClick={() => {
+                ipcRenderer.acceptRecvRequest(ind, items);
+              }}
+            >ACCEPT</button>
+          </>
+        )
+      case STATE.RQE_CANCEL:
+        return (
+          <>
+            <button className={style.Neg}
+              onClick={() => {
+                ipcRenderer.deleteJob(ind);
+              }}
+            >OK</button>
+          </>
+        )
       case STATE.RQR_SEND_REQUEST:
       case STATE.RQR_RECV_REQUEST:
         return (
           <>
             <button className={style.Neg}
               onClick={() => {
-                ipcRenderer.endClientJob(ind);
+                ipcRenderer.endJob(ind);
               }}
             >CANCEL</button>
           </>
@@ -190,7 +289,7 @@ function ClientJobView({ state, ind }) {
           <>
             <button className={style.Neg}
               onClick={() => {
-                ipcRenderer.deleteClientJob(ind);
+                ipcRenderer.deleteJob(ind);
               }}
             >OK</button>
           </>
@@ -200,7 +299,7 @@ function ClientJobView({ state, ind }) {
           <>
             <button className={style.Neg}
               onClick={() => {
-                ipcRenderer.endClientJob(ind);
+                ipcRenderer.endJob(ind);
               }}
             >CANCEL</button>
             <button className={style.Pos}
@@ -220,7 +319,7 @@ function ClientJobView({ state, ind }) {
           <>
             <button className={style.Neg}
               onClick={() => {
-                ipcRenderer.deleteClientJob(ind);
+                ipcRenderer.deleteJob(ind);
               }}
             >OK</button>
           </>
@@ -231,7 +330,7 @@ function ClientJobView({ state, ind }) {
           <>
             <button className={style.Neg}
               onClick={() => {
-                ipcRenderer.endClientJob(ind);
+                ipcRenderer.endJob(ind);
               }}
             >CANCEL</button>
           </>
@@ -242,7 +341,7 @@ function ClientJobView({ state, ind }) {
           <>
             <button className={style.Pos}
               onClick={() => {
-                ipcRenderer.deleteClientJob(ind);
+                ipcRenderer.deleteJob(ind);
               }}
             >OK</button>
           </>
@@ -253,7 +352,7 @@ function ClientJobView({ state, ind }) {
           <>
             <button className={style.Neg}
               onClick={() => {
-                ipcRenderer.deleteClientJob(ind);
+                ipcRenderer.deleteJob(ind);
               }}
             >OK</button>
           </>
@@ -278,4 +377,4 @@ function ClientJobView({ state, ind }) {
   );
 }
 
-export default ClientJobView;
+export default JobView;

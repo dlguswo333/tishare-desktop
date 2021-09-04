@@ -41,23 +41,11 @@ contextBridge.exposeInMainWorld('ipcRenderer',
     recvRequest: (ind, recvDir) => {
       ipcRenderer.invoke('recvRequest', ind, recvDir);
     },
-    getServerState: async () => {
-      return (await ipcRenderer.invoke('getServerState'));
+    endJob: (ind) => {
+      ipcRenderer.invoke('endJob', ind);
     },
-    getClientState: async () => {
-      return (await ipcRenderer.invoke('getClientState'));
-    },
-    endServerJob: (ind) => {
-      ipcRenderer.invoke('endServerJob', ind);
-    },
-    endClientJob: (ind) => {
-      ipcRenderer.invoke('endClientJob', ind);
-    },
-    deleteServerJob: (ind) => {
-      ipcRenderer.invoke('deleteServerJob', ind);
-    },
-    deleteClientJob: (ind) => {
-      ipcRenderer.invoke('deleteClientJob', ind);
+    deleteJob: (ind) => {
+      ipcRenderer.invoke('deleteJob', ind);
     },
     acceptSendRequest: (ind, recvDir) => {
       ipcRenderer.invoke('acceptSendRequest', ind, recvDir);
@@ -79,6 +67,18 @@ contextBridge.exposeInMainWorld('ipcRenderer',
     },
     removeNumJobsCallback: () => {
       ipcRenderer.removeAllListeners('numJobs');
+    },
+    onJobState: (callback) => {
+      ipcRenderer.on('jobState', callback);
+    },
+    removeJobStateCallback: () => {
+      ipcRenderer.removeAllListeners('jobState');
+    },
+    onDeleteJobState: (callback) => {
+      ipcRenderer.on('deleteJobState', callback);
+    },
+    removeDeleteJobStateCallback: () => {
+      ipcRenderer.removeAllListeners('deleteJobState');
     }
   }
 )

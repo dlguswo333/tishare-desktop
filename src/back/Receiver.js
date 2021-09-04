@@ -1,17 +1,21 @@
 const fs = require('fs').promises;
 const path = require('path');
 const { HEADER_END, splitHeader } = require('./Common');
-const { STATE, SOCKET_TIMEOUT } = require('../defs');
+const { STATE, SOCKET_TIMEOUT, STATE_INTERVAL } = require('../defs');
 
 class Receiver {
   /**
+   * @param {number} ind
    * @param {import('net').Socket} socket 
    * @param {string!} senderId 
    * @param {string!} recvDir 
    * @param {number!} numItems 
    * @param {Function} deleteCallback
+   * @param {Function} sendState
    */
-  constructor(socket, senderId, recvDir, numItems, deleteCallback) {
+  constructor(ind, socket, senderId, recvDir, numItems, deleteCallback, sendState) {
+    /** @type {number} */
+    this._ind = ind;
     this._state = STATE.RECVING;
     /** @type {import('net').Socket} */
     this._socket = socket;
@@ -23,6 +27,8 @@ class Receiver {
     this._numItems = numItems;
     /** @type {Function} */
     this._deleteCallback = deleteCallback;
+    /** @type {Function} */
+    this._sendState = sendState;
     /** @type {Buffer} */
     this._recvBuf = Buffer.from([]);
     /** @type {Array.<Buffer>} */
@@ -86,12 +92,18 @@ class Receiver {
      * Previous speed measure time in millisecond.
      * @type {number} 
      */
-    this._prevSpeedTime = null;
+    this._prevSpeedTime = Date.now();
     /**
      * More previous speed measure time in millisecond.
      * @type {number} 
      */
     this._prevPrevSpeedTime = null;
+    /**
+     * Handle of send state time interval.
+     * @type {number}
+     */
+    this._sendStateHandle = this._prevSpeedTime;
+
     this._init();
   }
 
@@ -103,13 +115,16 @@ class Receiver {
     this._socket.removeAllListeners('data');
     this._socket.removeAllListeners('close');
     this._socket.removeAllListeners('error');
+    this._sendState(this.getState());
+    this._sendStateHandle = setInterval(() => {
+      this._sendState(this.getState());
+    }, STATE_INTERVAL);
 
     this._socket.on('data', async (data) => {
       if (this._haveWrittenEndHeader) {
         // Have written end header but received data.
         // Consider it as an error.
-        this._state = STATE.ERR_NETWORK;
-        this._socket.destroy();
+        this._handleNetworkErr();
         return;
       }
       let ret = null;
@@ -124,7 +139,7 @@ class Receiver {
         try {
           this._recvHeader = JSON.parse(ret.header);
         } catch (err) {
-          this._state = STATE.ERR_NETWORK;
+          this._setState(STATE.ERR_NETWORK);
           console.error('Header parsing error. Not JSON format.');
           this._socket.destroy();
           return;
@@ -185,7 +200,7 @@ class Receiver {
                   if (err.code !== 'EEXIST') {
                     // Making directory failed.
                     // Even making directory failed means there are serious issues.
-                    this._state = STATE.ERR_FILE_SYSTEM;
+                    this._setState(STATE.ERR_FILE_SYSTEM);
                     this._socket.destroy();
                     return;
                   }
@@ -225,11 +240,11 @@ class Receiver {
                 await this._itemHandle.close();
                 this._itemHandle = null;
               }
-              this._state = STATE.RECV_COMPLETE;
+              this._setState(STATE.RECV_COMPLETE);
               this._socket.end();
               break;
             case 'end':
-              this._state = STATE.OTHER_END;
+              this._setState(STATE.OTHER_END);
               if (this._itemHandle) {
                 // Close previous item handle.
                 await this._itemHandle.close();
@@ -242,17 +257,17 @@ class Receiver {
         default:
           // What the hell?
           // Unhandled Receiver state case.
-          this._socket.destroy();
-          break;
+          this._handleNetworkErr();
+          return;
       }
     })
 
     this._socket.on('close', () => {
       if (!(this._state === STATE.RECV_COMPLETE || this._state === STATE.OTHER_END || this._haveWrittenEndHeader))
         // Unexpected close event.
-        this._state = STATE.ERR_NETWORK;
+        this._handleNetworkErr();
       else if (this._haveWrittenEndHeader)
-        this._deleteCallback();
+        this._deleteCallback(this._ind);
     })
 
     this._socket.on('error', (err) => {
@@ -273,7 +288,7 @@ class Receiver {
     const now = Date.now();
     let ret = 0;
     if (now === this._prevSpeedTime || this._speedBytes === 0) {
-      if (this._prevPrevSpeedTime === 0)
+      if (this._prevPrevSpeedTime === null)
         return 0;
       return this._prevSpeedBytes / (now - this._prevPrevSpeedTime);
     }
@@ -306,6 +321,7 @@ class Receiver {
   getState() {
     if (this._state === STATE.RECVING) {
       return {
+        ind: this._ind,
         state: this._state,
         speed: this.getSpeed(),
         progress: this.getItemProgress(),
@@ -314,7 +330,21 @@ class Receiver {
         itemName: this._itemName,
       };
     }
-    return { state: this._state, id: this._senderId };
+    return {
+      ind: this._ind,
+      state: this._state,
+      id: this._senderId
+    };
+  }
+
+  /**
+     * @param {string} state
+     * Sets the state and call sendState.
+     */
+  _setState(state) {
+    clearInterval(this._sendStateHandle);
+    this._state = state;
+    this._sendState(this.getState());
   }
 
   /**
@@ -362,10 +392,16 @@ class Receiver {
     if (err) {
       console.error('Sender: Error Occurred during writing to Socket.');
       console.error(err);
-      this._socket.destroy();
-      this._socket = null;
-      this._state = STATE.ERR_NETWORK;
+      this._handleNetworkErr();
     }
+  }
+
+  /**
+   * Handle on corrupted data from receiver.
+   */
+  _handleNetworkErr = () => {
+    this._setState(STATE.ERR_NETWORK);
+    this._socket.destroy();
   }
 }
 
