@@ -10,12 +10,16 @@
       "name": "Launch Program",
       "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
       "windows": {
+        "name": "Launch Program",
+        "type": "pwa-node",
+        "request": "launch",
         "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
       },
       "skipFiles": [
-        "<node_internals>/**"
+        "<node_internals>/**",
+        "${workspaceFolder}/node_modules/**"
       ],
-      "program": "${workspaceFolder}\\src\\back\\main.js"
+      "program": "${workspaceFolder}/src/back/main.js"
     },
     {
       "type": "node",
