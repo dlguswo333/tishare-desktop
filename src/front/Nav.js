@@ -43,9 +43,6 @@ function Nav({ toggleSettings, items }) {
         Object.assign(tmp, jobs);
         tmp[job['ind']] = job;
         return tmp;
-        // Object.assign(tmp, jobs, job);
-        // console.log(tmp);
-        // return tmp;
       });
     });
     return () => { ipcRenderer.removeJobStateCallback(); };
@@ -55,10 +52,8 @@ function Nav({ toggleSettings, items }) {
     ipcRenderer.onDeleteJobState((_, ind) => {
       setJobs((jobs) => {
         let tmp = {};
-        console.log(jobs);
         Object.assign(tmp, jobs);
         delete tmp[ind];
-        console.log(tmp);
         return tmp;
       });
     });

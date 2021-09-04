@@ -342,6 +342,7 @@ class Receiver {
      * Sets the state and call sendState.
      */
   _setState(state) {
+    clearInterval(this._sendStateHandle);
     this._state = state;
     this._sendState(this.getState());
   }

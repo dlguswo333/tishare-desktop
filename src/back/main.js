@@ -15,7 +15,6 @@ var mainWindow = null;
  * Send state to renderer process.
  */
 const sendState = (state) => {
-  console.log('jobstate', state);
   mainWindow.webContents.send('jobState', state);
 }
 
