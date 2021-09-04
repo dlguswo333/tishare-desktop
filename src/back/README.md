@@ -9,7 +9,7 @@ This README is to follow the development.
 - [x] Requestee: Call ***sendState*** everytime a progress occurs.
 - [x] Sender: Call ***sendState*** everytime a progress occurs.
 - [x] Receiver: Call ***sendState*** everytime a progress occurs.
-- [ ] Inflate all ***deleteCallback*** from `() => { this.deleteJob(ind); }` to `this.deleteJob` because now every Job knows its `ind`.
+- [x] Inflate all ***deleteCallback*** from `() => { this.deleteJob(ind); }` to `this.deleteJob` because now every Job knows its `ind`.
 - [ ] Remove callbacks from `main.js`.
 - [ ] Remove callbacks from `Nav.js`.
 - [ ] Add new callbaks into `Nav.js`.

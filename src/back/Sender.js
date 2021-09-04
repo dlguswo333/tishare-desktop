@@ -189,7 +189,7 @@ class Sender {
         // Unexpected close event.
         this._setState(STATE.ERR_NETWORK);
       else if (this._haveWrittenEndHeader)
-        this._deleteCallback();
+        this._deleteCallback(this._ind);
     })
 
     this._socket.on('error', (err) => {

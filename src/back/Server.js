@@ -251,7 +251,7 @@ class Server {
    */
   acceptSendRequest(ind, recvDir) {
     if (this.jobs[ind]) {
-      const receiver = new Receiver(ind, this.jobs[ind]._socket, this.jobs[ind].getId(), recvDir, this.jobs[ind].getNumItems(), () => { this.deleteJob(ind); }, this._sendState);
+      const receiver = new Receiver(ind, this.jobs[ind]._socket, this.jobs[ind].getId(), recvDir, this.jobs[ind].getNumItems(), this.deleteJob, this._sendState);
       this.jobs[ind] = receiver;
       receiver._writeOnSocket();
     }
@@ -266,7 +266,7 @@ class Server {
     if (this.jobs[ind]) {
       const socket = this.jobs[ind]._socket;
       const itemArray = await createItemArray(items);
-      const sender = new Sender(ind, this.jobs[ind]._socket, this.jobs[ind].getId(), itemArray, () => { this.deleteJob(ind); }, this._sendState);
+      const sender = new Sender(ind, this.jobs[ind]._socket, this.jobs[ind].getId(), itemArray, this.deleteJob, this._sendState);
       this.jobs[ind] = sender;
       socket.write(JSON.stringify({ class: 'ok', numItems: itemArray.length }) + HEADER_END, 'utf-8');
     }

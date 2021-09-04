@@ -101,7 +101,7 @@ class Client {
       switch (recvHeader.class) {
         case 'ok':
           // Transform Requester into Sender.
-          this.jobs[ind] = new Sender(ind, socket, receiverId, itemArray, () => { this.deleteJob(ind); }, this._sendState);
+          this.jobs[ind] = new Sender(ind, socket, receiverId, itemArray, this.deleteJob, this._sendState);
           this.jobs[ind].send();
           break;
         case 'no':
@@ -191,7 +191,7 @@ class Client {
       switch (recvHeader.class) {
         case 'ok':
           // Transform Requester into Sender.
-          this.jobs[ind] = new Receiver(ind, socket, senderId, recvDir, recvHeader.numItems, () => { this.deleteJob(ind) }, this._sendState);
+          this.jobs[ind] = new Receiver(ind, socket, senderId, recvDir, recvHeader.numItems, this.deleteJob, this._sendState);
           // Send ok header explictly to notify it is ready to receive.
           this.jobs[ind]._writeOnSocket();
           break;

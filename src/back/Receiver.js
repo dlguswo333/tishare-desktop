@@ -267,7 +267,7 @@ class Receiver {
         // Unexpected close event.
         this._handleNetworkErr();
       else if (this._haveWrittenEndHeader)
-        this._deleteCallback();
+        this._deleteCallback(this._ind);
     })
 
     this._socket.on('error', (err) => {
