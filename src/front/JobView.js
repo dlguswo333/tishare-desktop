@@ -267,7 +267,7 @@ function JobView({ state, ind, items }) {
           <>
             <button className={style.Neg}
               onClick={() => {
-                ipcRenderer.deleteServerJob(ind);
+                ipcRenderer.deleteJob(ind);
               }}
             >OK</button>
           </>
@@ -278,7 +278,7 @@ function JobView({ state, ind, items }) {
           <>
             <button className={style.Neg}
               onClick={() => {
-                ipcRenderer.endClientJob(ind);
+                ipcRenderer.endJob(ind);
               }}
             >CANCEL</button>
           </>
@@ -289,7 +289,7 @@ function JobView({ state, ind, items }) {
           <>
             <button className={style.Neg}
               onClick={() => {
-                ipcRenderer.deleteClientJob(ind);
+                ipcRenderer.deleteJob(ind);
               }}
             >OK</button>
           </>
@@ -299,7 +299,7 @@ function JobView({ state, ind, items }) {
           <>
             <button className={style.Neg}
               onClick={() => {
-                ipcRenderer.endClientJob(ind);
+                ipcRenderer.endJob(ind);
               }}
             >CANCEL</button>
             <button className={style.Pos}
@@ -319,7 +319,7 @@ function JobView({ state, ind, items }) {
           <>
             <button className={style.Neg}
               onClick={() => {
-                ipcRenderer.deleteServerJob(ind);
+                ipcRenderer.deleteJob(ind);
               }}
             >OK</button>
           </>
@@ -330,7 +330,7 @@ function JobView({ state, ind, items }) {
           <>
             <button className={style.Neg}
               onClick={() => {
-                ipcRenderer.endServerJob(ind);
+                ipcRenderer.endJob(ind);
               }}
             >CANCEL</button>
           </>
@@ -341,7 +341,7 @@ function JobView({ state, ind, items }) {
           <>
             <button className={style.Pos}
               onClick={() => {
-                ipcRenderer.deleteServerJob(ind);
+                ipcRenderer.deleteJob(ind);
               }}
             >OK</button>
           </>
@@ -352,7 +352,7 @@ function JobView({ state, ind, items }) {
           <>
             <button className={style.Neg}
               onClick={() => {
-                ipcRenderer.deleteServerJob(ind);
+                ipcRenderer.deleteJob(ind);
               }}
             >OK</button>
           </>
