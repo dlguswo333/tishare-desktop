@@ -9,7 +9,7 @@ const { MAX_NUM_JOBS } = require('../defs')
 /** @typedef {{dir:string, path:string, type:string, size:number}} Item */
 
 describe('Indexer', () => {
-  const indexer = new Indexer(() => { })
+  const indexer = new Indexer(() => { }, () => { })
   const indices = []
   it('Unique index', () => {
     for (let i = 0; i < MAX_NUM_JOBS; ++i) {
