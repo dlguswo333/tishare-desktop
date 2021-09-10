@@ -124,9 +124,23 @@ function App() {
       setMyId(id);
   }, [showSettings]);
 
-
   return (
-    <div className="App">
+    <div className="App"
+      onDragOver={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+      }}
+      onDrop={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        if (!e.dataTransfer.files) {
+          return;
+        }
+        for (let f of e.dataTransfer.files) {
+          // TODO Add these paths to ItemView.
+          console.log(f.path);
+        }
+      }}>
       <div className="NavGhost" />
       <div className="Main">
         <div className="MainHead">
