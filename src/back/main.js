@@ -99,6 +99,29 @@ app.on('window-all-closed', function () {
   }
 })
 
+/**
+ * @param {Object} ret
+ */
+async function addDirectory(itemPath, ret) {
+  try {
+    const size = (await fs.readdir(itemPath)).length;
+    ret[path.basename(itemPath)] = { path: itemPath, name: path.basename(itemPath), dir: '.', type: 'directory', size: size };
+  } catch (err) {
+    // Do nothing.
+  }
+  return;
+}
+
+async function addFile(itemPath, ret) {
+  try {
+    const size = (await fs.stat(itemPath)).size;
+    ret[path.basename(itemPath)] = { path: itemPath, name: path.basename(itemPath), dir: '.', type: 'file', size: size };
+  } catch (err) {
+    // Do nothing.
+  }
+  return;
+}
+
 // Handle inter process communications with renderer processes.
 ipcMain.handle('openFile', async () => {
   let tmp = dialog.showOpenDialogSync(mainWindow, {
@@ -109,12 +132,7 @@ ipcMain.handle('openFile', async () => {
   if (!tmp)
     return ret;
   for (item of tmp) {
-    try {
-      const size = (await fs.stat(item)).size;
-      ret[path.basename(item)] = { path: item, name: path.basename(item), dir: '.', type: 'file', size: size };
-    } catch (err) {
-      // Maybe No permission or file system error. Skip it.
-    }
+    await addFile(item, ret);
   }
   return ret;
 })
@@ -128,8 +146,21 @@ ipcMain.handle('openDirectory', async () => {
   if (!tmp)
     return ret;
   for (let item of tmp) {
-    const size = (await fs.readdir(item)).length;
-    ret[path.basename(item)] = { path: item, name: path.basename(item), dir: '.', type: 'directory', size: size };
+    await addDirectory(item, ret);
+  }
+  return ret;
+})
+
+ipcMain.handle('dragAndDrop', async (_, paths) => {
+  let ret = {}
+  for (let itemPath of paths) {
+    const stat = await fs.stat(itemPath);
+    if (stat.isFile()) {
+      await addFile(itemPath, ret);
+    }
+    else if (stat.isDirectory()) {
+      await addDirectory(itemPath, ret);
+    }
   }
   return ret;
 })

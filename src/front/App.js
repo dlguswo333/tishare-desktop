@@ -133,13 +133,18 @@ function App() {
       onDrop={(e) => {
         e.stopPropagation();
         e.preventDefault();
-        if (!e.dataTransfer.files) {
+        if (!e.dataTransfer.files)
           return;
-        }
+        let paths = []
         for (let f of e.dataTransfer.files) {
           // TODO Add these paths to ItemView.
-          console.log(f.path);
+          paths.push(f.path);
         }
+        ipcRenderer.dragAndDrop(paths).then((ret) => {
+          setItems(Object.assign({}, ret, items));
+        }).catch(() => {
+          ipcRenderer.showMessage('Unknown error occurred.')
+        })
       }}>
       <div className="NavGhost" />
       <div className="Main">
