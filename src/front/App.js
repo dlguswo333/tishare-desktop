@@ -3,6 +3,7 @@ import Nav from './Nav';
 import ItemView from './ItemView';
 import DeviceView from './DeviceView';
 import Settings from './Settings';
+import Blind from './Blind';
 import './style/App.scss';
 
 // Below lines are importing modules from window object.
@@ -12,6 +13,7 @@ const ipcRenderer = window.ipcRenderer;
 function App() {
   const [items, setItems] = useState({});
   const [showSettings, setShowSettings] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const [myId, _setMyId] = useState("");
   const [myIp, setMyIp] = useState("");
   const [myNetmask, setMyNetmask] = useState("");
@@ -124,28 +126,45 @@ function App() {
       setMyId(id);
   }, [showSettings]);
 
+  useEffect(() => {
+    window.ondragover = (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (e.dataTransfer.files)
+        // Only show dragging effects if the event has files.
+        setIsDragging(true);
+    };
+
+    window.ondragleave = (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (e.target.className === 'Blind') {
+        setIsDragging(false);
+      }
+    };
+
+    window.ondrop = (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      console.log('drop');
+      setIsDragging(false);
+      if (!e.dataTransfer.files)
+        return;
+      let paths = []
+      for (let f of e.dataTransfer.files) {
+        // TODO Add these paths to ItemView.
+        paths.push(f.path);
+      }
+      ipcRenderer.dragAndDrop(paths).then((ret) => {
+        setItems((items) => Object.assign({}, ret, items));
+      }).catch(() => {
+        ipcRenderer.showMessage('Unknown error occurred.')
+      })
+    };
+  }, []);
+
   return (
-    <div className="App"
-      onDragOver={(e) => {
-        e.stopPropagation();
-        e.preventDefault();
-      }}
-      onDrop={(e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        if (!e.dataTransfer.files)
-          return;
-        let paths = []
-        for (let f of e.dataTransfer.files) {
-          // TODO Add these paths to ItemView.
-          paths.push(f.path);
-        }
-        ipcRenderer.dragAndDrop(paths).then((ret) => {
-          setItems(Object.assign({}, ret, items));
-        }).catch(() => {
-          ipcRenderer.showMessage('Unknown error occurred.')
-        })
-      }}>
+    <div className="App">
       <div className="NavGhost" />
       <div className="Main">
         <div className="MainHead">
@@ -207,6 +226,12 @@ function App() {
       </div>
       <Nav toggleSettings={toggleSettings} items={items} />
       {showSettings && <Settings setShowSettings={setShowSettings} />}
+      {isDragging &&
+        <>
+          <Blind>
+            {'Drag and drop here!'}
+          </Blind>
+        </>}
     </div>
   );
 };
