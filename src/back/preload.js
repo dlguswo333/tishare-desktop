@@ -8,6 +8,9 @@ contextBridge.exposeInMainWorld('ipcRenderer',
     openDirectory: async () => {
       return (await ipcRenderer.invoke('openDirectory'));
     },
+    dragAndDrop: async (paths) => {
+      return (await ipcRenderer.invoke('dragAndDrop', paths));
+    },
     getNetworks: async () => {
       return (await ipcRenderer.invoke('getNetworks'));
     },

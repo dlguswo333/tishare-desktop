@@ -125,21 +125,3 @@
     }
   }
 }
-
-.FileList {
-  width: 95%;
-  max-height: 80%;
-  overflow-y: auto;
-  border: 1px solid black;
-  align-items: center;
-  margin: 10px auto;
-  padding: 10px;
-}
-
-.FileElement {
-  border-left: 1px solid black;
-  margin: 5px;
-  padding: 5px;
-  overflow: hidden;
-  white-space: nowrap;
-}

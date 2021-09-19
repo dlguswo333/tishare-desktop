@@ -1,9 +1,11 @@
 import React from 'react';
 import './style/Blind.scss';
 
-function Blind() {
+function Blind({ children }) {
   return (
-    <div className='Blind' />
+    <div className='Blind'>
+      {children}
+    </div>
   )
 }
 
