@@ -152,7 +152,6 @@ function App() {
         return;
       let paths = []
       for (let f of e.dataTransfer.files) {
-        // TODO Add these paths to ItemView.
         paths.push(f.path);
       }
       ipcRenderer.dragAndDrop(paths).then((ret) => {

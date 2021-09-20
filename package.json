@@ -3,8 +3,8 @@
   "author": {
     "name": "dlguswo333"
   },
+  "version": "0.3.0",
   "description": "Share files and folders across devices easily with cross-platform support.",
-  "version": "0.2.0",
   "private": true,
   "dependencies": {
     "electron-is-dev": "^2.0.0"
@@ -38,7 +38,7 @@
     ],
     "win": {
       "target": "nsis",
-      "icon": "build/icon.ico"
+      "icon": "public/icon.ico"
     },
     "linux": {
       "target": "AppImage"
