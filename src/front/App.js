@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import Nav from './Nav';
 import ItemView from './ItemView';
 import DeviceView from './DeviceView';
@@ -9,6 +9,9 @@ import './style/App.scss';
 // Below lines are importing modules from window object.
 // Look at 'preload.js' for more understanding.
 const ipcRenderer = window.ipcRenderer;
+
+// To run the function only once.
+const useMountEffect = (cb) => useEffect(cb, []);
 
 function App() {
   const [items, setItems] = useState({});
@@ -62,14 +65,14 @@ function App() {
     }
   }
 
-  const getNetworks = useCallback(async () => {
-    // Close serve before refreshing networks.
+  const getNetworks = async () => {
+    // Close server before refreshing networks.
     if (isServerOpen)
       await closeServer();
     const ret = await ipcRenderer.getNetworks();
     if (ret)
       setNetworks(ret);
-  }, [isServerOpen]);
+  }
 
   const listNetworks = networks.map((network) => {
     return <option key={network.ip} value={network.ip + '|' + network.netmask} >  {network.ip} ({network.name})</option >;
@@ -91,9 +94,9 @@ function App() {
     setShowSettings(!showSettings);
   }
 
-  useEffect(() => {
+  useMountEffect(() => {
     getNetworks();
-  }, [getNetworks]);
+  });
 
   useEffect(() => {
     if (networks.length > 0) {
@@ -179,6 +182,7 @@ function App() {
                   closeServer();
                 }
               }}
+              value={`${myIp}|${myNetmask}`}
             >
               {listNetworks}
             </select>
