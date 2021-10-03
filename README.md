@@ -34,3 +34,7 @@ npx electron-builder --win --x64
 # Execute above with one npm script.
 npm run builder
 ```
+
+## Implementation
+If you want to know more about the implementation behind tiShare,
+You can read [README in src directory](src/README.md).

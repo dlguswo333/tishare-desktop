@@ -4,7 +4,7 @@ This README describes the implementations and logics behind `tiShare`.
 # 1. Basic Idea
 Sender and receiver communicates with `TCP` connection, which is a stream of data.<br>
 TCP connection splits data into packets, and those packet sizes can differ under various factors, such as OS, network interface, and etc.<br>
-That makes application layer networks a little bit hard, because once received data, it cannot be guranteed that the data is intact, or is splitted.<br>
+That makes application layer networking a little bit hard, because once received data, it cannot be guranteed that the data is intact, or is splitted.<br>
 Thus `tiShare` must distinguish between the metadata(header), response and the actual file data. Otherwise it can write metadata into files.<br>
 To distinguish the header from actual data, the header always ends with two consecutive `\n`.<br>
 Upon failed to find `\n\n` in the data received, it means the header has been splitted, telling to wait for remaining header to arrive.<br>
@@ -14,6 +14,7 @@ We will use JSON formatted header and `JSON.stringify` to convert header into st
 
 There are some cases where header is followed by binary data or not.<br>
 On any cases, the header is always encoded in `utf-8`.
+JSON format is always in `utf-8`, anyway.
 <br>
 
 # 2. Scan
@@ -24,15 +25,12 @@ so that other devices can reach you.
 
 There are two devices, one is scanner(Who initiates scan),<br>
 and the other is scannee(Who responds to scan).<br>
-Scanner(Who initiates scan) starts with the first IP address with the given local area network(LAN).<br>
+Scanner(Who initiates scan) starts scanning by sending packets to the local broadcast IP.<br>
 **NOTE** that port number is constant.<br>
-Loop each IP, and finalize with the last IP address in that LAN.<br>
-For example, if the LAN is 192.168.0.1/24, then starts with 192.168.0.0,<br>
-finishes with 192.168.0.254.<br>
 **NOTE** that It should not connect to itself, and need not connect to broadcast IP.
 <br>
 
-If scanner successfully connects to an IP address, it sends a header like the following:
+If scanner sends a header like the following:
 ```json
 {
   "app": "tiShare",
@@ -46,7 +44,7 @@ Each field has its own meaning, and the field names tell what they mean.
 <br>
 
 If scannee that is the other side of TCP connection is truly `tiShare`,<br>
-then it sends back this header to the scanner:
+then it sends back the below header to the scanner:
 ```json
 {
   "app": "tiShare",
@@ -58,6 +56,8 @@ then it sends back this header to the scanner:
 ```
 <br>
 
+Once the scanner received a header, it recognizes the scannee and its IP address.<br>
+
 # 3. Send Request
 Sender connects to receiver and sends the following header first.
 ```json
@@ -66,27 +66,6 @@ Sender connects to receiver and sends the following header first.
   "version": "0.2.0",
   "class": "send-request",
   "id": "device_1",
-  "itemArray": [
-    {
-      "name": "file_1",
-      "type": "file",
-      "size": 1234
-    },
-    {
-      "name": "file_2",
-      "type": "file",
-      "size": 4321
-    },
-    {
-      "name": "sub_directory",
-      "type": "directory"
-    },
-    {
-      "name": "sub_directory/file_1",
-      "type": "file",
-      "size": 1000
-    }
-  ]
 }
 ```
 The above `json` data is stringified and followed by `\n\n`, which notifies the end of the header, as stated [above](#basic-idea).<br>
