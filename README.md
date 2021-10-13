@@ -1,6 +1,6 @@
 
 # tiShare-Desktop
-<img src="https://raw.githubusercontent.com/dlguswo333/tishare-desktop/main/public/icon.png" width="300px"/>
+<img src="https://raw.githubusercontent.com/dlguswo333/tishare-docs/main/public/logo.svg" width="256px"/>
 <br>
 
 <img src="https://dlguswo333.github.io/tishare-docs/desktop-run.png" width="960px"/>
