@@ -11,6 +11,7 @@ import './style/App.scss';
 const ipcRenderer = window.ipcRenderer;
 
 // To run the function only once.
+// eslint-disable-next-line
 const useMountEffect = (cb) => useEffect(cb, []);
 
 function App() {
