@@ -93,7 +93,7 @@ function JobView({ state, ind, items }) {
         return (
           <>
             <div className={style.Element}>
-              {`${state.id} wants to send you files.`}
+              {`Opponent wants to send files to you.`}
             </div>
             <div className={style.Element}>
               {`📁`}
@@ -115,7 +115,7 @@ function JobView({ state, ind, items }) {
         return (
           <>
             <div className={style.Element}>
-              {`${state.id} wants to receive files.`}
+              {`Opponent wants to receive files from you.`}
             </div>
           </>
         )
@@ -123,7 +123,7 @@ function JobView({ state, ind, items }) {
         return (
           <>
             <div className={style.Element}>
-              {`${state.id} cancelled the request.`}
+              {`Opponent cancelled the request.`}
             </div>
           </>
         )
@@ -132,7 +132,7 @@ function JobView({ state, ind, items }) {
         return (
           <>
             <div className={style.Element}>
-              {`Waiting for ${state.id} to accept...`}
+              {`Waiting for the opponent to accept...`}
             </div>
           </>
         )
@@ -141,7 +141,7 @@ function JobView({ state, ind, items }) {
         return (
           <>
             <div className={style.Element}>
-              {`${state.id} rejected your request.`}
+              {`Opponent rejected your request.`}
             </div>
           </>
         )
@@ -168,7 +168,7 @@ function JobView({ state, ind, items }) {
         return (
           <>
             <div className={style.Element}>
-              {`${state.id} cancelled the process.`}
+              {`Opponent cancelled the process.`}
             </div>
           </>
         )
@@ -192,7 +192,7 @@ function JobView({ state, ind, items }) {
         return (
           <>
             <div className={style.Element}>
-              {`Sending to ${state.id} has been completed.`}
+              {`Sending has been completed.`}
             </div>
           </>
         )
@@ -200,7 +200,7 @@ function JobView({ state, ind, items }) {
         return (
           <>
             <div className={style.Element}>
-              {`Receiving from ${state.id} has been completed.`}
+              {`Receiving has been completed.`}
             </div>
           </>
         )
