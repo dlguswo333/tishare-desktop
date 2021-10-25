@@ -17,7 +17,7 @@
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-scripts": "4.0.3",
-    "sass": "^1.43.2"
+    "sass": "^1.43.3"
   },
   "homepage": "./",
   "main": "src/back/main.js",
