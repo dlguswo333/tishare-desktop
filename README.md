@@ -7,6 +7,7 @@
 <br>
 
 This is a reporitory for tiShare, desktop version.<br>
+tiShare has been inspired by my former team project, [SendDone](https://github.com/La-Beaute/SendDone-Desktop).
 <br>
 
 tiShare aims to help users transfer both files and folders across cross-platform devices.<br>
