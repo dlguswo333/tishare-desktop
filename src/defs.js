@@ -1,6 +1,5 @@
 const PORT = 9238;
 const CHUNKSIZE = 2097152;
-const OS = require('os').platform();
 const { version: VERSION } = require('../package.json');
 const SCANTIMEOUT = 3000;
 const SOCKET_TIMEOUT = 5000;
@@ -44,7 +43,7 @@ const STATE = {
 
 /**
  * Print file size in pretty.
- * @param {number} size 
+ * @param {number} size
  * @returns {string}
  */
 const printSize = (size) => {
@@ -62,4 +61,4 @@ const printSize = (size) => {
   }
   return size.toFixed(2) + ' B';
 }
-module.exports = { PORT, CHUNKSIZE, STATE, OS, VERSION, SCANTIMEOUT, SOCKET_TIMEOUT, STATE_INTERVAL, MAX_NUM_JOBS, printSize };
+module.exports = { PORT, CHUNKSIZE, STATE, VERSION, SCANTIMEOUT, SOCKET_TIMEOUT, STATE_INTERVAL, MAX_NUM_JOBS, printSize };

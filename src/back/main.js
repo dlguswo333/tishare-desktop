@@ -131,7 +131,7 @@ ipcMain.handle('openFile', async () => {
   let ret = {};
   if (!tmp)
     return ret;
-  for (item of tmp) {
+  for (const item of tmp) {
     await addFile(item, ret);
   }
   return ret;
