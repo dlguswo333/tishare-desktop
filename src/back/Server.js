@@ -26,6 +26,7 @@ class Server {
     this._serverSocket = null;
     /** @type {Object.<number, (Sender|Receiver|Requestee)>} */
     this.jobs = {};
+    this.deleteJob = this.deleteJob.bind(this);
   }
 
   /**

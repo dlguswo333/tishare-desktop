@@ -21,6 +21,7 @@ class Client {
     this.jobs = {};
     /** @type {number} */
     this._nextInd = 1;
+    this.deleteJob = this.deleteJob.bind(this);
   }
 
   /**
