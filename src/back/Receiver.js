@@ -6,10 +6,10 @@ const { STATE, SOCKET_TIMEOUT, STATE_INTERVAL } = require('../defs');
 class Receiver {
   /**
    * @param {number} ind
-   * @param {import('net').Socket} socket 
-   * @param {string!} senderId 
-   * @param {string!} recvDir 
-   * @param {number!} numItems 
+   * @param {import('net').Socket} socket
+   * @param {string!} senderId
+   * @param {string!} recvDir
+   * @param {number!} numItems
    * @param {Function} deleteCallback
    * @param {Function} sendState
    */
@@ -75,27 +75,27 @@ class Receiver {
     this._itemWrittenBytes = 0;
     /**
      * Number of received items so far.
-     * @type {number} 
+     * @type {number}
      */
     this._numRecvItem = 0;
     /**
-     * The number of bytes after the previous speed measure. 
+     * The number of bytes after the previous speed measure.
      * @type {number}
      */
     this._speedBytes = 0;
     /**
-     * The number of previous bytes after the previous speed measure. 
+     * The number of previous bytes after the previous speed measure.
      * @type {number}
      */
     this._prevSpeedBytes = 0;
     /**
      * Previous speed measure time in millisecond.
-     * @type {number} 
+     * @type {number}
      */
     this._prevSpeedTime = Date.now();
     /**
      * More previous speed measure time in millisecond.
-     * @type {number} 
+     * @type {number}
      */
     this._prevPrevSpeedTime = null;
     /**
@@ -252,6 +252,10 @@ class Receiver {
               }
               this._socket.end();
               break;
+            default:
+              this._setState(STATE.ERR_NETWORK);
+              this._socket.destroy();
+              return;
           }
           break;
         default:
@@ -382,11 +386,14 @@ class Receiver {
         header = { class: this._itemFlag };
         this._socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this._onWriteError);
         break;
+      default:
+        // TODO Handle edge case.
+        break;
     }
   }
 
   /**
-   * @param {Error} err 
+   * @param {Error} err
    */
   _onWriteError = (err) => {
     if (err) {

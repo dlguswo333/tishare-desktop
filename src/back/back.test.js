@@ -6,6 +6,7 @@ const Indexer = require('./Indexer')
 const Server = require('./Server')
 const Client = require('./Client')
 const { MAX_NUM_JOBS } = require('../defs')
+const { after, before } = require('mocha')
 /** @typedef {{dir:string, path:string, type:string, size:number}} Item */
 
 describe('Indexer', () => {
@@ -93,7 +94,7 @@ describe('Server and client', () => {
       assert.strictEqual(server.close(), true)
     })
   })
-  describe('Client', async () => {
+  describe('Client', () => {
     /** @type {Object.<string, Item>} */
     let items = null
     before(async () => {

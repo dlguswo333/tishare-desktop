@@ -3,7 +3,7 @@ const net = require('net');
 const Requestee = require('./Requestee');
 const Sender = require('./Sender');
 const Receiver = require('./Receiver');
-const { PORT, OS, VERSION, STATE, MAX_NUM_JOBS } = require('../defs');
+const { PORT, OS, VERSION, STATE } = require('../defs');
 const { _getBroadcastIp } = require('./Network');
 const { splitHeader, MAX_HEADER_LEN, createItemArray, HEADER_END } = require('./Common');
 
@@ -31,7 +31,7 @@ class Server {
   /**
    * Set Server's ID.
    * @param {string} id
-   * @returns {boolean} The result of the execution. 
+   * @returns {boolean} The result of the execution.
    */
   setMyId(id) {
     if (id) {
@@ -163,7 +163,7 @@ class Server {
 
   /**
    * Return State of Receivers or a Receiver with the index.
-   * @param {number} ind 
+   * @param {number} ind
    */
   getState(ind) {
     if (ind === undefined) {
@@ -181,7 +181,7 @@ class Server {
 
   /**
    * Initialize an udp socket which responds to scans.
-   * @param {string} ip 
+   * @param {string} ip
    * @param {string} broadcastIp
    */
   _initScannee(ip, broadcastIp) {
@@ -246,8 +246,8 @@ class Server {
 
   /**
    * Accept send request.
-   * @param {number} ind 
-   * @param {string} recvDir 
+   * @param {number} ind
+   * @param {string} recvDir
    */
   acceptSendRequest(ind, recvDir) {
     if (this.jobs[ind]) {
@@ -259,8 +259,8 @@ class Server {
 
   /**
    * Accept receive request.
-   * @param {number} ind 
-   * @param {import('./Common').item} items 
+   * @param {number} ind
+   * @param {import('./Common').item} items
    */
   async acceptRecvRequest(ind, items) {
     if (this.jobs[ind]) {
@@ -274,7 +274,7 @@ class Server {
 
   /**
    * Reject send request.
-   * @param {number} ind 
+   * @param {number} ind
    */
   rejectRequest(ind) {
     if (this.jobs[ind]) {
@@ -296,7 +296,7 @@ class Server {
   /**
    * Delete a Job from jobs.
    * This function must be preceded by endJob.
-   * @param {number} ind 
+   * @param {number} ind
    * @returns {boolean} Whether the execution has been successful.
    */
   deleteJob(ind) {
