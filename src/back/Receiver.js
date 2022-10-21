@@ -379,6 +379,8 @@ class Receiver {
       this._haveWrittenEndHeader = true;
       header = { class: 'end' };
       this._socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this._onWriteError);
+      this._deleteCallback(this._ind);
+      clearInterval(this._sendStateHandle);
       return;
     }
     switch (this._state) {
