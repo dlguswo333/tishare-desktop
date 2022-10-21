@@ -59,23 +59,23 @@ class Sender {
      */
     this._recvBuf = new Buffer.from([]);
     /**
-     * The number of bytes after the previous speed measure. 
+     * The number of bytes after the previous speed measure.
      * @type {number}
      */
     this._speedBytes = 0;
     /**
-     * The number of previous bytes after the previous speed measure. 
+     * The number of previous bytes after the previous speed measure.
      * @type {number}
      */
     this._prevSpeedBytes = 0;
     /**
      * Previous speed measure time in millisecond.
-     * @type {number} 
+     * @type {number}
      */
     this._prevSpeedTime = Date.now();
     /**
      * More previous speed measure time in millisecond.
-     * @type {number} 
+     * @type {number}
      */
     this._prevPrevSpeedTime = null;
     /**
@@ -109,7 +109,7 @@ class Sender {
 
   /**
    * Initialize all event listeners necessary.
-   * The function removes all pre-existing event listeners. 
+   * The function removes all pre-existing event listeners.
    */
   _init() {
     this._socket.removeAllListeners('data');

@@ -27,7 +27,7 @@ class Client {
   /**
    * Set Client's ID.
    * @param {string} id
-   * @returns {boolean} The result of the execution. 
+   * @returns {boolean} The result of the execution.
    */
   setMyId(id) {
     if (id) {
@@ -39,7 +39,7 @@ class Client {
 
   /**
    * Return State of Senders or a Sender with the index.
-   * @param {number} ind 
+   * @param {number} ind
    */
   getState(ind) {
     if (ind === undefined) {
@@ -58,8 +58,8 @@ class Client {
    * Request to send to opponent Server.
    * NOTE that it does not embed itemArray.
    * @param {Object.<string, {dir:string, path:string, type:string, size:number}>} items
-   * @param {string} receiverIp 
-   * @param {string} receiverId 
+   * @param {string} receiverIp
+   * @param {string} receiverId
    * @returns {Promise.<number|boolean>} Index value of the Sender or false.
    */
   async sendRequest(items, receiverIp, receiverId) {
@@ -138,7 +138,7 @@ class Client {
 
   /**
    * Prepare to request to receive from the opponent.
-   * @param {number} ind 
+   * @param {number} ind
    * @returns {boolean}
    */
   preRecvRequest(senderIp, senderId) {
@@ -150,8 +150,8 @@ class Client {
 
   /**
    * Send Receive request to receive from the opponent.
-   * @param {number} ind 
-   * @param {string} recvDir 
+   * @param {number} ind
+   * @param {string} recvDir
    * @returns {number|boolean} Index value of the Receiver or false.
    */
   recvRequest(ind, recvDir) {
@@ -244,7 +244,7 @@ class Client {
 
   /**
    * End a job with the ind.
-   * @param {number} ind 
+   * @param {number} ind
    * @returns {boolean} Whether the execution has been successful.
    */
   endJob(ind) {
@@ -261,7 +261,7 @@ class Client {
   /**
    * Delete a Job from jobs.
    * This function must be preceded by endJob.
-   * @param {number} ind 
+   * @param {number} ind
    * @returns {boolean} Whether the execution has been successful.
    */
   deleteJob(ind) {
