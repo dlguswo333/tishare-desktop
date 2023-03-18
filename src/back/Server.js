@@ -3,7 +3,8 @@ const net = require('net');
 const Requestee = require('./Requestee');
 const Sender = require('./Sender');
 const Receiver = require('./Receiver');
-const { PORT, OS, VERSION, STATE } = require('../defs');
+const { PORT, VERSION, STATE } = require('../defs');
+const { OS } = require('./defs');
 const { _getBroadcastIp } = require('./Network');
 const { splitHeader, MAX_HEADER_LEN, createItemArray, HEADER_END } = require('./Common');
 
