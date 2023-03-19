@@ -3,7 +3,7 @@
   "author": {
     "name": "dlguswo333"
   },
-  "version": "0.3.5",
+  "version": "0.3.6",
   "description": "Share files and folders across devices easily with cross-platform support.",
   "private": false,
   "dependencies": {
@@ -11,13 +11,13 @@
   },
   "devDependencies": {
     "@dlguswo333/react-simple-spinner": "^0.6.0",
-    "electron": "^21.1.0",
+    "electron": "^21.4.3",
     "electron-builder": "^23.6.0",
-    "mocha": "^9.0.3",
+    "mocha": "^9.2.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "^5.0.1",
-    "sass": "^1.43.3"
+    "sass": "^1.59.3"
   },
   "homepage": "./",
   "main": "src/back/main.js",
