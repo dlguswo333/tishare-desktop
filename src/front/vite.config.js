@@ -1,4 +1,4 @@
-import {defineConfig, loadEnv} from 'vite';
+import {defineConfig} from 'vite';
 import react from '@vitejs/plugin-react';
 import commonjs from 'vite-plugin-commonjs'
 import svgr from "vite-plugin-svgr";
@@ -10,9 +10,6 @@ export default defineConfig({
   publicDir: 'public',
   server: {
     port: 3000,
-  },
-  optimizeDeps: {
-    include: ['src/defs.js'],
   },
   build: {
     target: 'es2020',
