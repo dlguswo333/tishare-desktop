@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ThemeButton from './ThemeButton';
-import { printSize } from '../defs';
+import * as DEFS from '../defs';
+const { printSize } = DEFS.default;
+
 import './style/ItemView.scss';
 /**
  * @param {object} props

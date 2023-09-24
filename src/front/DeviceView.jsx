@@ -1,21 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import ThemeButton from './ThemeButton';
-import { ReactComponent as WindowsIcon } from './icons/Windows.svg';
-import { ReactComponent as AndroidIcon } from './icons/Android.svg';
-import { ReactComponent as LinuxIcon } from './icons/Linux.svg';
+import WindowsIcon from './icons/Windows.svg?react';
+import AndroidIcon from './icons/Android.svg?react';
+import LinuxIcon from './icons/Linux.svg?react';
 import Spinner from '@dlguswo333/react-simple-spinner';
-import { SCANTIMEOUT } from '../defs';
+import * as DEFS from '../defs';
+const { SCANTIMEOUT } = DEFS.default;
 import './style/DeviceView.scss';
 const ipcRenderer = window.ipcRenderer;
 
 /**
- * 
- * @param {Object} props 
- * @param {Object} props.items 
- * @param {string} props.myIp 
- * @param {string} props.myNetmask 
- * @param {string} props.myId 
- * @returns 
+ *
+ * @param {Object} props
+ * @param {Object} props.items
+ * @param {string} props.myIp
+ * @param {string} props.myNetmask
+ * @param {string} props.myId
+ * @returns
  */
 function DeviceView({ items, myIp, myNetmask, myId }) {
   const [devices, setDevices] = useState({});
