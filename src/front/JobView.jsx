@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { STATE, printSize } from '../defs';
+import * as DEFS from '../defs';
 import style from './style/JobView.module.scss';
 const ipcRenderer = window.ipcRenderer;
 
+const { STATE, printSize } = DEFS.default;
+
 /**
- * @param {object} props 
+ * @param {object} props
  * @param {object} props.state
  * @param {string} props.state.state
  * @param {string} props.state.speed

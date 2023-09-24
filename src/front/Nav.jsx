@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import JobView from './JobView';
-import { ReactComponent as MenuIcon } from './icons/Menu.svg';
-import { ReactComponent as SettingsIcon } from './icons/Settings.svg';
-import { ReactComponent as PinIcon } from './icons/Pin.svg';
-import { MAX_NUM_JOBS } from '../defs';
+import MenuIcon from './icons/Menu.svg?react';
+import SettingsIcon from './icons/Settings.svg?react';
+import PinIcon from './icons/Pin.svg?react';
+import * as DEFS from '../defs';
 import './style/Nav.scss';
 
+const { MAX_NUM_JOBS } = DEFS.default;
 const ipcRenderer = window.ipcRenderer;
 
 let hover = false;
 /**
- * @param {object} props 
- * @param {Function} props.toggleSettings 
- * @param {object} props.items 
+ * @param {object} props
+ * @param {Function} props.toggleSettings
+ * @param {object} props.items
  */
 function Nav({ toggleSettings, items }) {
   const [grow, setGrow] = useState(false);
