@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import JobView from './JobView';
-import MenuIcon from './icons/Menu.svg?react';
-import SettingsIcon from './icons/Settings.svg?react';
-import PinIcon from './icons/Pin.svg?react';
-import * as DEFS from '../defs';
-import './style/Nav.scss';
+import MenuIcon from '../icons/Menu.svg?react';
+import SettingsIcon from '../icons/Settings.svg?react';
+import PinIcon from '../icons/Pin.svg?react';
+import * as DEFS from '../../defs';
+import '../style/Nav.scss';
 
 const { MAX_NUM_JOBS } = DEFS.default;
 const ipcRenderer = window.ipcRenderer;

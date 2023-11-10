@@ -4,7 +4,7 @@ import ItemView from './ItemView';
 import DeviceView from './DeviceView';
 import Settings from './Settings';
 import Blind from './Blind';
-import './style/App.scss';
+import '../style/App.scss';
 
 // Below lines are importing modules from window object.
 // Look at 'preload.js' for more understanding.
@@ -57,7 +57,7 @@ function App() {
 
   /**
    * Change ID in state and also server ID.
-   * @param {string} id 
+   * @param {string} id
    */
   const setMyId = (id) => {
     if (id) {

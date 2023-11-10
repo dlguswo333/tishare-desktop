@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import ThemeButton from './ThemeButton';
-import WindowsIcon from './icons/Windows.svg?react';
-import AndroidIcon from './icons/Android.svg?react';
-import LinuxIcon from './icons/Linux.svg?react';
+import WindowsIcon from '../icons/Windows.svg?react';
+import AndroidIcon from '../icons/Android.svg?react';
+import LinuxIcon from '../icons/Linux.svg?react';
 import Spinner from '@dlguswo333/react-simple-spinner';
-import * as DEFS from '../defs';
+import * as DEFS from '../../defs';
 const { SCANTIMEOUT } = DEFS.default;
-import './style/DeviceView.scss';
+import '../style/DeviceView.scss';
 const ipcRenderer = window.ipcRenderer;
 
 /**
