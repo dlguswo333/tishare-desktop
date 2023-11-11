@@ -5,14 +5,11 @@ import DeviceView from './DeviceView';
 import Settings from './Settings';
 import Blind from './Blind';
 import '../style/App.scss';
+import useMountEffect from '../hook/useMountEffect';
 
 // Below lines are importing modules from window object.
 // Look at 'preload.js' for more understanding.
 const ipcRenderer = window.ipcRenderer;
-
-// To run the function only once.
-// eslint-disable-next-line
-const useMountEffect = (cb) => useEffect(cb, []);
 
 function App() {
   const [items, setItems] = useState({});
