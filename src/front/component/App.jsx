@@ -7,6 +7,7 @@ import Blind from './Blind';
 import '../style/App.scss';
 import useMountEffect from '../hook/useMountEffect';
 import useDragDrop from '../hook/useDragDrop';
+import useServer from '../hook/useServer';
 
 // Below lines are importing modules from window object.
 // Look at 'preload.js' for more understanding.
@@ -23,6 +24,7 @@ function App() {
   const [isServerOpen, setIsServerOpen] = useState(false);
 
   const { isDragging } = useDragDrop({ setItems });
+  const { openServer, closeServer } = useServer({ myIp, myNetmask });
 
   // Select local files.
   const openFile = async () => {
@@ -77,18 +79,6 @@ function App() {
   const listNetworks = networks.map((network) => {
     return <option key={network.ip} value={network.ip + '|' + network.netmask} >  {network.ip} ({network.name})</option >;
   })
-
-  const openServer = async () => {
-    const ret = await ipcRenderer.openServer(myIp, myNetmask);
-    if (!ret)
-      console.error('tried to open server but returned false');
-  }
-
-  const closeServer = async () => {
-    const ret = await ipcRenderer.closeServer();
-    if (!ret)
-      console.error('tried to open server but returned false');
-  }
 
   const toggleSettings = () => {
     setShowSettings(!showSettings);
