@@ -8,6 +8,11 @@ import '../style/App.scss';
 import useMountEffect from '../hook/useMountEffect';
 import useDragDrop from '../hook/useDragDrop';
 import useServer from '../hook/useServer';
+import useNetworks from '../hook/useNetworks';
+
+/**
+ * @typedef {{name:string, ip:string, netmask:string}} Network
+*/
 
 // Below lines are importing modules from window object.
 // Look at 'preload.js' for more understanding.
@@ -19,12 +24,12 @@ function App() {
   const [myId, _setMyId] = useState("");
   const [myIp, setMyIp] = useState("");
   const [myNetmask, setMyNetmask] = useState("");
-  /** @type {[{name:string, ip:string, netmask:string}[], Function]} */
-  const [networks, setNetworks] = useState([]);
+  const [networks, setNetworks] = useState(/** @type {Network[]} */([]));
   const [isServerOpen, setIsServerOpen] = useState(false);
 
   const { isDragging } = useDragDrop({ setItems });
   const { openServer, closeServer } = useServer({ myIp, myNetmask });
+  const { getNetworks } = useNetworks({ isServerOpen, closeServer, setNetworks });
 
   // Select local files.
   const openFile = async () => {
@@ -65,15 +70,6 @@ function App() {
       _setMyId(id);
       ipcRenderer.setMyId(id);
     }
-  }
-
-  const getNetworks = async () => {
-    // Close server before refreshing networks.
-    if (isServerOpen)
-      await closeServer();
-    const ret = await ipcRenderer.getNetworks();
-    if (ret)
-      setNetworks(ret);
   }
 
   const listNetworks = networks.map((network) => {
