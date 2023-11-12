@@ -6,6 +6,7 @@ import Settings from './Settings';
 import Blind from './Blind';
 import '../style/App.scss';
 import useMountEffect from '../hook/useMountEffect';
+import useDragDrop from '../hook/useDragDrop';
 
 // Below lines are importing modules from window object.
 // Look at 'preload.js' for more understanding.
@@ -14,13 +15,14 @@ const ipcRenderer = window.ipcRenderer;
 function App() {
   const [items, setItems] = useState({});
   const [showSettings, setShowSettings] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
   const [myId, _setMyId] = useState("");
   const [myIp, setMyIp] = useState("");
   const [myNetmask, setMyNetmask] = useState("");
   /** @type {[{name:string, ip:string, netmask:string}[], Function]} */
   const [networks, setNetworks] = useState([]);
   const [isServerOpen, setIsServerOpen] = useState(false);
+
+  const { isDragging } = useDragDrop({ setItems });
 
   // Select local files.
   const openFile = async () => {
@@ -126,42 +128,6 @@ function App() {
     else
       setMyId(id);
   }, [showSettings]);
-
-  useEffect(() => {
-    window.ondragover = (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-      if (e.dataTransfer.files)
-        // Only show dragging effects if the event has files.
-        setIsDragging(true);
-    };
-
-    window.ondragleave = (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-      if (e.target.className === 'Blind') {
-        setIsDragging(false);
-      }
-    };
-
-    window.ondrop = (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-      console.log('drop');
-      setIsDragging(false);
-      if (!e.dataTransfer.files)
-        return;
-      let paths = []
-      for (let f of e.dataTransfer.files) {
-        paths.push(f.path);
-      }
-      ipcRenderer.dragAndDrop(paths).then((ret) => {
-        setItems((items) => Object.assign({}, ret, items));
-      }).catch(() => {
-        ipcRenderer.showMessage('Unknown error occurred.')
-      })
-    };
-  }, []);
 
   return (
     <div className="App">
