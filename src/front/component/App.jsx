@@ -9,6 +9,7 @@ import useMountEffect from '../hook/useMountEffect';
 import useDragDrop from '../hook/useDragDrop';
 import useServer from '../hook/useServer';
 import useNetworks from '../hook/useNetworks';
+import useItems from '../hook/useItems';
 
 /**
  * @typedef {{name:string, ip:string, netmask:string}} Network
@@ -19,7 +20,6 @@ import useNetworks from '../hook/useNetworks';
 const ipcRenderer = window.ipcRenderer;
 
 function App() {
-  const [items, setItems] = useState({});
   const [showSettings, setShowSettings] = useState(false);
   const [myId, _setMyId] = useState("");
   const [myIp, setMyIp] = useState("");
@@ -27,6 +27,7 @@ function App() {
   const [networks, setNetworks] = useState(/** @type {Network[]} */([]));
   const [isServerOpen, setIsServerOpen] = useState(false);
 
+  const { items, setItems, deleteChecked } = useItems();
   const { isDragging } = useDragDrop({ setItems });
   const { openServer, closeServer } = useServer({ myIp, myNetmask });
   const { getNetworks } = useNetworks({ isServerOpen, closeServer, setNetworks });
@@ -44,22 +45,6 @@ function App() {
     var ret = await ipcRenderer.openDirectory();
     setItems(Object.assign({}, ret, items));
   };
-
-  /**
-   * @param {Object.<string, bool>|undefined} checked
-   */
-  const deleteChecked = (checked) => {
-    const ret = { ...items };
-    if (checked === undefined) {
-      setItems({});
-    }
-    else {
-      for (let itemName in checked) {
-        delete ret[itemName];
-      }
-      setItems(ret);
-    }
-  }
 
   /**
    * Change ID in state and also server ID.
