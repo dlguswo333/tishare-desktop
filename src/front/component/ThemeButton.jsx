@@ -1,8 +1,8 @@
 import React from 'react';
-import style from './style/ThemeButton.module.scss';
+import style from '../style/ThemeButton.module.scss';
 
 /**
- * @param {Object} props 
+ * @param {Object} props
  * @param {React.ReactNode} props.children
  * @param {Function} props.onClick
  * @param {boolean} props.opaqueText

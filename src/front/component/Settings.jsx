@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Blind from './Blind';
-import style from './style/Settings.module.scss';
+import style from '../style/Settings.module.scss';
 
 /*
   Settings could have been inside Nav component because Settings is positioned fixed,
@@ -10,8 +10,8 @@ import style from './style/Settings.module.scss';
 */
 
 /**
- * @param {object} props 
- * @param {Function} props.setShowSettings 
+ * @param {object} props
+ * @param {Function} props.setShowSettings
  */
 function Settings({ setShowSettings }) {
   const [tmpRecvDir, setTmpRecvDir] = useState(null);

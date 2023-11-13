@@ -4,26 +4,33 @@ import ItemView from './ItemView';
 import DeviceView from './DeviceView';
 import Settings from './Settings';
 import Blind from './Blind';
-import './style/App.scss';
+import '../style/App.scss';
+import useMountEffect from '../hook/useMountEffect';
+import useDragDrop from '../hook/useDragDrop';
+import useServer from '../hook/useServer';
+import useNetworks from '../hook/useNetworks';
+import useItems from '../hook/useItems';
+
+/**
+ * @typedef {{name:string, ip:string, netmask:string}} Network
+*/
 
 // Below lines are importing modules from window object.
 // Look at 'preload.js' for more understanding.
 const ipcRenderer = window.ipcRenderer;
 
-// To run the function only once.
-// eslint-disable-next-line
-const useMountEffect = (cb) => useEffect(cb, []);
-
 function App() {
-  const [items, setItems] = useState({});
   const [showSettings, setShowSettings] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
   const [myId, _setMyId] = useState("");
   const [myIp, setMyIp] = useState("");
   const [myNetmask, setMyNetmask] = useState("");
-  /** @type {[{name:string, ip:string, netmask:string}[], Function]} */
-  const [networks, setNetworks] = useState([]);
+  const [networks, setNetworks] = useState(/** @type {Network[]} */([]));
   const [isServerOpen, setIsServerOpen] = useState(false);
+
+  const { items, setItems, deleteChecked } = useItems();
+  const { isDragging } = useDragDrop({ setItems });
+  const { openServer, closeServer } = useServer({ myIp, myNetmask });
+  const { getNetworks } = useNetworks({ isServerOpen, closeServer, setNetworks });
 
   // Select local files.
   const openFile = async () => {
@@ -40,24 +47,8 @@ function App() {
   };
 
   /**
-   * @param {Object.<string, bool>|undefined} checked
-   */
-  const deleteChecked = (checked) => {
-    const ret = { ...items };
-    if (checked === undefined) {
-      setItems({});
-    }
-    else {
-      for (let itemName in checked) {
-        delete ret[itemName];
-      }
-      setItems(ret);
-    }
-  }
-
-  /**
    * Change ID in state and also server ID.
-   * @param {string} id 
+   * @param {string} id
    */
   const setMyId = (id) => {
     if (id) {
@@ -66,30 +57,9 @@ function App() {
     }
   }
 
-  const getNetworks = async () => {
-    // Close server before refreshing networks.
-    if (isServerOpen)
-      await closeServer();
-    const ret = await ipcRenderer.getNetworks();
-    if (ret)
-      setNetworks(ret);
-  }
-
   const listNetworks = networks.map((network) => {
     return <option key={network.ip} value={network.ip + '|' + network.netmask} >  {network.ip} ({network.name})</option >;
   })
-
-  const openServer = async () => {
-    const ret = await ipcRenderer.openServer(myIp, myNetmask);
-    if (!ret)
-      console.error('tried to open server but returned false');
-  }
-
-  const closeServer = async () => {
-    const ret = await ipcRenderer.closeServer();
-    if (!ret)
-      console.error('tried to open server but returned false');
-  }
 
   const toggleSettings = () => {
     setShowSettings(!showSettings);
@@ -129,42 +99,6 @@ function App() {
     else
       setMyId(id);
   }, [showSettings]);
-
-  useEffect(() => {
-    window.ondragover = (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-      if (e.dataTransfer.files)
-        // Only show dragging effects if the event has files.
-        setIsDragging(true);
-    };
-
-    window.ondragleave = (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-      if (e.target.className === 'Blind') {
-        setIsDragging(false);
-      }
-    };
-
-    window.ondrop = (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-      console.log('drop');
-      setIsDragging(false);
-      if (!e.dataTransfer.files)
-        return;
-      let paths = []
-      for (let f of e.dataTransfer.files) {
-        paths.push(f.path);
-      }
-      ipcRenderer.dragAndDrop(paths).then((ret) => {
-        setItems((items) => Object.assign({}, ret, items));
-      }).catch(() => {
-        ipcRenderer.showMessage('Unknown error occurred.')
-      })
-    };
-  }, []);
 
   return (
     <div className="App">
