@@ -1,5 +1,5 @@
-const { STATE } = require('../defs');
-const { HEADER_END } = require('./Common');
+const {STATE} = require('../defs');
+const {HEADER_END} = require('./Common');
 
 class Requester {
   /**
@@ -9,7 +9,7 @@ class Requester {
    * @param {string} opponentId
    * @param {Function} sendState
    */
-  constructor(ind, state, socket, opponentId, sendState) {
+  constructor (ind, state, socket, opponentId, sendState) {
     /** @type {number} */
     this._ind = ind;
     this._state = state;
@@ -24,10 +24,10 @@ class Requester {
   /**
    * Cancel Request.
    */
-  end() {
+  end () {
     this._haveWrittenEndFlag = true;
     if (this._state === STATE.RQR_SEND_REQUEST || this._state === STATE.RQR_RECV_REQUEST) {
-      this._socket.write(JSON.stringify({ class: 'end' }) + HEADER_END, 'utf-8', this._onWriteError);
+      this._socket.write(JSON.stringify({class: 'end'}) + HEADER_END, 'utf-8', this._onWriteError);
     }
   }
 
@@ -35,7 +35,7 @@ class Requester {
    * Get have written end flag.
    * @returns {boolean}
    */
-  getHaveWrittenEndFlag() {
+  getHaveWrittenEndFlag () {
     return this._haveWrittenEndFlag;
   }
 
@@ -43,7 +43,7 @@ class Requester {
    * Set state.
    * @param {string} state
    */
-  setState(state) {
+  setState (state) {
     this._state = state;
     this._sendState(this.getState());
   }
@@ -51,7 +51,7 @@ class Requester {
   /**
    * Return the current state.
    */
-  getState() {
+  getState () {
     return {
       ind: this._ind,
       state: this._state,
@@ -59,7 +59,7 @@ class Requester {
     };
   }
 
-  _onWriteError(err) {
+  _onWriteError (err) {
     if (err) {
       console.error(err.message);
       this.setState(STATE.ERR_NETWORK);

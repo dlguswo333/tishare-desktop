@@ -1,5 +1,5 @@
-const { STATE } = require('../defs');
-const { HEADER_END } = require('./Common');
+const {STATE} = require('../defs');
+const {HEADER_END} = require('./Common');
 
 class Requestee {
   /**
@@ -9,7 +9,7 @@ class Requestee {
    * @param {string} requestHeader
    * @param {Function} sendState
    */
-  constructor(ind, state, socket, requestHeader, sendState) {
+  constructor (ind, state, socket, requestHeader, sendState) {
     /** @type {number} */
     this._ind = ind;
     this._state = state;
@@ -24,13 +24,13 @@ class Requestee {
   /**
    * Reject Request.
    */
-  reject() {
+  reject () {
     this._haveRejectedFlag = true;
     if (this._state === STATE.RQE_SEND_REQUEST) {
-      this._socket.write(JSON.stringify({ class: 'no' }) + HEADER_END, 'utf-8', this._onWriteError);
+      this._socket.write(JSON.stringify({class: 'no'}) + HEADER_END, 'utf-8', this._onWriteError);
     }
     if (this._state === STATE.RQE_RECV_REQUEST) {
-      this._socket.write(JSON.stringify({ class: 'no' }) + HEADER_END, 'utf-8', this._onWriteError);
+      this._socket.write(JSON.stringify({class: 'no'}) + HEADER_END, 'utf-8', this._onWriteError);
     }
   }
 
@@ -38,7 +38,7 @@ class Requestee {
    * Return the reject flag.
    * @returns {boolean}
    */
-  getRejectFlag() {
+  getRejectFlag () {
     return this._haveRejectedFlag;
   }
 
@@ -46,23 +46,23 @@ class Requestee {
    * Set state.
    * @param {string} state
    */
-  setState(state) {
+  setState (state) {
     this._state = state;
     this._sendState(this.getState());
   }
 
-  getId() {
+  getId () {
     return this._requestHeader.id;
   }
 
-  getNumItems() {
+  getNumItems () {
     return (this._requestHeader.numItems ? this._requestHeader.numItems : 0);
   }
 
   /**
    * Return the current state.
    */
-  getState() {
+  getState () {
     return {
       ind: this._ind,
       state: this._state,
@@ -70,7 +70,7 @@ class Requestee {
     };
   }
 
-  _onWriteError(err) {
+  _onWriteError (err) {
     if (err) {
       console.error(err.message);
       this.setState(STATE.ERR_NETWORK);

@@ -1,4 +1,4 @@
-const { MAX_NUM_JOBS } = require('../defs');
+const {MAX_NUM_JOBS} = require('../defs');
 class Indexer {
   /**
    * @callback NumJobsCallback
@@ -12,7 +12,7 @@ class Indexer {
    * @param {!NumJobsCallback} numJobsCallback
    * @param {!ReturnCallback} returnCallback
    */
-  constructor(numJobsCallback, returnCallback) {
+  constructor (numJobsCallback, returnCallback) {
     this._nextInd = 0;
     this._indexer = {};
     this._numJobsCallback = numJobsCallback;
@@ -22,7 +22,7 @@ class Indexer {
    * Get a index.
    * @returns {number} A valid index or -1 if not available.
    */
-  getInd() {
+  getInd () {
     if (Object.keys(this._indexer).length >= MAX_NUM_JOBS)
       return -1;
     const ind = this._nextInd++;
@@ -36,14 +36,14 @@ class Indexer {
    * @param {number} ind
    * @returns {boolean} Whether the function succeeded.
    */
-  returnInd(ind) {
+  returnInd (ind) {
     if (this._indexer[ind]) {
       delete this._indexer[ind];
       this._numJobsCallback(this.getNumJobs());
       this._returnCallback(ind);
       return true;
     }
-    console.log(`Indexer error: tried to return ind ${ind} that does not exist.`)
+    console.log(`Indexer error: tried to return ind ${ind} that does not exist.`);
     return false;
   }
 
@@ -51,7 +51,7 @@ class Indexer {
    * Return the numer of running jobs.
    * @returns {number}
    */
-  getNumJobs() {
+  getNumJobs () {
     return Object.keys(this._indexer).length;
   }
 }

@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import {useCallback} from 'react';
 
 const ipcRenderer = window.ipcRenderer;
 
@@ -9,7 +9,7 @@ const ipcRenderer = window.ipcRenderer;
  * @param {(networks: (import('../component/App').Network)[]) => void} props.setNetworks
  *
  */
-const useNetworks = ({ isServerOpen, closeServer, setNetworks }) => {
+const useNetworks = ({isServerOpen, closeServer, setNetworks}) => {
   const getNetworks = useCallback(async () => {
     // Close server before refreshing networks.
     if (isServerOpen)
@@ -21,7 +21,7 @@ const useNetworks = ({ isServerOpen, closeServer, setNetworks }) => {
 
   return {
     getNetworks,
-  }
-}
+  };
+};
 
 export default useNetworks;

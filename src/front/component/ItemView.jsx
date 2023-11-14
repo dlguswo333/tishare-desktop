@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import ThemeButton from './ThemeButton';
 import * as DEFS from '../../defs';
-const { printSize } = DEFS.default;
+const {printSize} = DEFS.default;
 
 import '../style/ItemView.scss';
 /**
@@ -11,7 +11,7 @@ import '../style/ItemView.scss';
  * @param {function} props.openDirectory
  * @param {function} props.deleteChecked
  */
-function ItemView({ items, openFile, openDirectory, deleteChecked }) {
+function ItemView ({items, openFile, openDirectory, deleteChecked}) {
   const [checkAll, setCheckAll] = useState(false);
   const [scrollable, setScrollable] = useState(false);
   const [checked, setChecked] = useState({});
@@ -46,7 +46,7 @@ function ItemView({ items, openFile, openDirectory, deleteChecked }) {
                       return;
                     }
                     if (thisInd < lastInd) {
-                      const tmp = { ...checked };
+                      const tmp = {...checked};
                       for (let ind = thisInd; ind !== lastInd; ++ind) {
                         if (keys[ind] in checked)
                           delete tmp[keys[ind]];
@@ -56,7 +56,7 @@ function ItemView({ items, openFile, openDirectory, deleteChecked }) {
                       setChecked(tmp);
                     }
                     else {
-                      const tmp = { ...checked };
+                      const tmp = {...checked};
                       for (let ind = thisInd; ind !== lastInd; --ind) {
                         if (keys[ind] in checked)
                           delete tmp[keys[ind]];
@@ -68,7 +68,7 @@ function ItemView({ items, openFile, openDirectory, deleteChecked }) {
                   }
                   return;
                 }
-                const tmp = { ...checked };
+                const tmp = {...checked};
                 if (itemName in checked) {
                   delete tmp[itemName];
                 }
@@ -80,10 +80,10 @@ function ItemView({ items, openFile, openDirectory, deleteChecked }) {
             />
           </div>
         </div>
-      )
+      );
     }
     return ret;
-  }
+  };
 
   useEffect(() => {
     if (Object.keys(items).length > 0 && Object.keys(items).length === Object.keys(checked).length) {
@@ -151,7 +151,7 @@ function ItemView({ items, openFile, openDirectory, deleteChecked }) {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default ItemView;

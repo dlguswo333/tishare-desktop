@@ -1,4 +1,4 @@
-const { useState, useCallback } = require('react');
+import {useState, useCallback} from 'react';
 
 const useItems = () => {
   const [items, setItems] = useState({});
@@ -8,7 +8,7 @@ const useItems = () => {
      * @param {Object.<string, boolean>|undefined} checked
      */
     (checked) => {
-      const ret = { ...items };
+      const ret = {...items};
       if (checked === undefined) {
         setItems({});
       }
@@ -24,7 +24,7 @@ const useItems = () => {
     items,
     setItems,
     deleteChecked,
-  }
-}
+  };
+};
 
 export default useItems;

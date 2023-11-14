@@ -1,5 +1,5 @@
-const { PORT, VERSION, STATE, MAX_NUM_JOBS } = require('../defs');
-const { HEADER_END, splitHeader, MAX_HEADER_LEN, createItemArray } = require('./Common');
+const {PORT, VERSION, STATE} = require('../defs');
+const {HEADER_END, splitHeader, MAX_HEADER_LEN, createItemArray} = require('./Common');
 const net = require('net');
 const Sender = require('./Sender');
 const Requester = require('./Requester');
@@ -10,7 +10,7 @@ class Client {
    * @param {import('./Indexer')} indexer
    * @param {Function} sendState
    */
-  constructor(indexer, sendState) {
+  constructor (indexer, sendState) {
     /** @type {import('./Indexer')} */
     this._indexer = indexer;
     /** @type {Function} */
@@ -29,7 +29,7 @@ class Client {
    * @param {string} id
    * @returns {boolean} The result of the execution.
    */
-  setMyId(id) {
+  setMyId (id) {
     if (id) {
       this._myId = id;
       return true;
@@ -41,7 +41,7 @@ class Client {
    * Return State of Senders or a Sender with the index.
    * @param {number} ind
    */
-  getState(ind) {
+  getState (ind) {
     if (ind === undefined) {
       let ret = {};
       for (const sender in this.jobs) {
@@ -62,7 +62,7 @@ class Client {
    * @param {string} receiverId
    * @returns {Promise.<number|boolean>} Index value of the Sender or false.
    */
-  async sendRequest(items, receiverIp, receiverId) {
+  async sendRequest (items, receiverIp, receiverId) {
     const ind = this._getNextInd();
     if (!this._myId || ind < 0)
       return false;
@@ -100,23 +100,23 @@ class Client {
         return;
       }
       switch (recvHeader.class) {
-        case 'ok':
-          // Transform Requester into Sender.
-          this.jobs[ind] = new Sender(ind, socket, receiverId, itemArray, this.deleteJob, this._sendState);
-          this.jobs[ind].send();
-          break;
-        case 'no':
-          this.jobs[ind].setState(STATE.RQR_SEND_REJECT);
-          socket.end();
-          break;
-        default:
-          this._handleNetworkErr(ind);
+      case 'ok':
+        // Transform Requester into Sender.
+        this.jobs[ind] = new Sender(ind, socket, receiverId, itemArray, this.deleteJob, this._sendState);
+        this.jobs[ind].send();
+        break;
+      case 'no':
+        this.jobs[ind].setState(STATE.RQR_SEND_REJECT);
+        socket.end();
+        break;
+      default:
+        this._handleNetworkErr(ind);
       }
     });
 
     socket.on('close', () => {
       if (this.jobs[ind]) {
-        const state = this.jobs[ind].getState().state
+        const state = this.jobs[ind].getState().state;
         if (state === STATE.RQR_SEND_REJECT || this.jobs[ind].getHaveWrittenEndFlag()) {
           if (this.jobs[ind].getHaveWrittenEndFlag())
             this.deleteJob(ind);
@@ -141,7 +141,7 @@ class Client {
    * @param {number} ind
    * @returns {boolean}
    */
-  preRecvRequest(senderIp, senderId) {
+  preRecvRequest (senderIp, senderId) {
     const ind = this._getNextInd();
     if (!this._myId || ind < 0)
       return false;
@@ -154,7 +154,7 @@ class Client {
    * @param {string} recvDir
    * @returns {number|boolean} Index value of the Receiver or false.
    */
-  recvRequest(ind, recvDir) {
+  recvRequest (ind, recvDir) {
     /** @type {Buffer} */
     let _recvBuf = Buffer.from([]);
     const senderIp = this.jobs[ind]._socket;
@@ -190,37 +190,37 @@ class Client {
         return;
       }
       switch (recvHeader.class) {
-        case 'ok':
-          // Transform Requester into Sender.
-          this.jobs[ind] = new Receiver(ind, socket, senderId, recvDir, recvHeader.numItems, this.deleteJob, this._sendState);
-          // Send ok header explictly to notify it is ready to receive.
-          this.jobs[ind]._writeOnSocket();
-          break;
-        case 'no':
-          this.jobs[ind].setState(STATE.RQR_RECV_REJECT);
-          socket.end();
-          break;
-        default:
-          this._handleNetworkErr(ind);
+      case 'ok':
+        // Transform Requester into Sender.
+        this.jobs[ind] = new Receiver(ind, socket, senderId, recvDir, recvHeader.numItems, this.deleteJob, this._sendState);
+        // Send ok header explictly to notify it is ready to receive.
+        this.jobs[ind]._writeOnSocket();
+        break;
+      case 'no':
+        this.jobs[ind].setState(STATE.RQR_RECV_REJECT);
+        socket.end();
+        break;
+      default:
+        this._handleNetworkErr(ind);
       }
-    })
+    });
 
     socket.on('close', () => {
-      const state = this.jobs[ind].getState().state
+      const state = this.jobs[ind].getState().state;
       if (!(state === STATE.RQR_RECV_REJECT || this.jobs[ind].getHaveWrittenEndFlag())) {
         this._handleNetworkErr(ind);
       }
       else if (this.jobs[ind].getHaveWrittenEndFlag()) {
         this.deleteJob(ind);
       }
-    })
+    });
 
     socket.on('error', (err) => {
       if (err) {
         socket.destroy();
         this._handleNetworkErr(ind);
       }
-    })
+    });
   }
 
   /**
@@ -228,8 +228,8 @@ class Client {
    * @param {number} _numItems
    * @returns {{app:string, version: string, class: string, id: string}}
    */
-  _createSendRequestHeader(_numItems) {
-    let header = { app: 'tiShare', version: VERSION, class: 'send-request', id: this._myId, numItems: _numItems };
+  _createSendRequestHeader (_numItems) {
+    let header = {app: 'tiShare', version: VERSION, class: 'send-request', id: this._myId, numItems: _numItems};
     return header;
   }
 
@@ -237,8 +237,8 @@ class Client {
    * Create and return recv request header.
    * @returns {{app:string, version: string, class: string, id: string}}
    */
-  _createRecvRequestHeader() {
-    let header = { app: 'tiShare', version: VERSION, class: 'recv-request', id: this._myId };
+  _createRecvRequestHeader () {
+    let header = {app: 'tiShare', version: VERSION, class: 'recv-request', id: this._myId};
     return header;
   }
 
@@ -247,7 +247,7 @@ class Client {
    * @param {number} ind
    * @returns {boolean} Whether the execution has been successful.
    */
-  endJob(ind) {
+  endJob (ind) {
     if (this.jobs[ind]) {
       if (this.jobs[ind].getState().state === STATE.RQR_PRE_RECV_REQUEST)
         this.deleteJob(ind);
@@ -264,7 +264,7 @@ class Client {
    * @param {number} ind
    * @returns {boolean} Whether the execution has been successful.
    */
-  deleteJob(ind) {
+  deleteJob (ind) {
     if (this.jobs[ind]) {
       delete this.jobs[ind];
       this._indexer.returnInd(ind);
@@ -273,14 +273,14 @@ class Client {
     return false;
   }
 
-  _getNextInd() {
+  _getNextInd () {
     return this._indexer.getInd();
   }
 
   /**
    * Handle network error on Requester.
    */
-  _handleNetworkErr(ind) {
+  _handleNetworkErr (ind) {
     if (this.jobs[ind]) {
       this.jobs[ind]._socket.destroy();
       this.jobs[ind].setState(STATE.ERR_NETWORK);

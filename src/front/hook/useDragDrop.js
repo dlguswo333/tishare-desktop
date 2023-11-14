@@ -1,11 +1,11 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import {useCallback, useEffect, useState} from 'react';
 
 const ipcRenderer = window.ipcRenderer;
 
 /**
  * @param {{setItems: React.Dispatch<React.SetStateAction<{}>>}} param0
  */
-const useDragDrop = ({ setItems }) => {
+const useDragDrop = ({setItems}) => {
   const [isDragging, setIsDragging] = useState(false);
 
   const onDragOver = useCallback(
@@ -18,7 +18,7 @@ const useDragDrop = ({ setItems }) => {
       if (e.dataTransfer?.files)
         // Only show dragging effects if the event has files.
         setIsDragging(true);
-    }, [])
+    }, []);
 
   const onDragLeave = useCallback(
     /**
@@ -46,16 +46,16 @@ const useDragDrop = ({ setItems }) => {
       setIsDragging(false);
       if (!e.dataTransfer?.files)
         return;
-      let paths = []
+      let paths = [];
       for (let f of e.dataTransfer.files) {
         paths.push(f.path);
       }
       ipcRenderer.dragAndDrop(paths).then((ret) => {
         setItems((items) => Object.assign({}, ret, items));
       }).catch(() => {
-        ipcRenderer.showMessage('Unknown error occurred.')
-      })
-    }, []);
+        ipcRenderer.showMessage('Unknown error occurred.');
+      });
+    }, [setItems]);
 
   useEffect(() => {
     window.ondragover = onDragOver;
@@ -66,12 +66,12 @@ const useDragDrop = ({ setItems }) => {
       window.ondragover = null;
       window.ondragleave = null;
       window.ondrop = null;
-    }
+    };
   }, [onDragOver, onDragLeave, onDrop]);
 
   return {
     isDragging
   };
-}
+};
 
 export default useDragDrop;

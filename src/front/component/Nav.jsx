@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import JobView from './JobView';
 import MenuIcon from '../icons/Menu.svg?react';
 import SettingsIcon from '../icons/Settings.svg?react';
@@ -6,7 +6,7 @@ import PinIcon from '../icons/Pin.svg?react';
 import * as DEFS from '../../defs';
 import '../style/Nav.scss';
 
-const { MAX_NUM_JOBS } = DEFS.default;
+const {MAX_NUM_JOBS} = DEFS.default;
 const ipcRenderer = window.ipcRenderer;
 
 let hover = false;
@@ -15,7 +15,7 @@ let hover = false;
  * @param {Function} props.toggleSettings
  * @param {object} props.items
  */
-function Nav({ toggleSettings, items }) {
+function Nav ({toggleSettings, items}) {
   const [grow, setGrow] = useState(false);
   const [pin, setPin] = useState(false);
   const [noti, setNoti] = useState(false);
@@ -27,10 +27,10 @@ function Nav({ toggleSettings, items }) {
     for (const ind in jobs) {
       ret.push(
         <JobView state={jobs[ind]} ind={ind} items={items} key={ind} />
-      )
+      );
     }
     return ret;
-  }
+  };
 
   useEffect(() => {
     if (grow)
@@ -64,12 +64,12 @@ function Nav({ toggleSettings, items }) {
   useEffect(() => {
     ipcRenderer.onNumJobs((_, numJobs) => {
       setNumJobs(numJobs);
-    })
+    });
     return () => { ipcRenderer.removeNumJobsCallback(); };
   }, []);
 
   return (
-    <nav className={(pin || grow) ? "Nav Grow" : "Nav"}
+    <nav className={(pin || grow) ? 'Nav Grow' : 'Nav'}
       onMouseEnter={() => {
         hover = true;
         setGrow(true);
@@ -82,14 +82,14 @@ function Nav({ toggleSettings, items }) {
         }, 300);
       }}
     >
-      <div className="Head">
+      <div className='Head'>
         <div className='Element'>
-          <div className="Settings"
+          <div className='Settings'
             onClick={toggleSettings}
           >
             <SettingsIcon />
           </div>
-          <div className={pin ? "Pin Active" : "Pin"}
+          <div className={pin ? 'Pin Active' : 'Pin'}
             onClick={() => { setPin((value) => !value); }}
           >
             <PinIcon />
@@ -99,13 +99,13 @@ function Nav({ toggleSettings, items }) {
           <div className={numJobs === MAX_NUM_JOBS ? 'NumJobs Full' : 'NumJobs'}>{`${numJobs}/${MAX_NUM_JOBS}`}</div>
         </div>
         <div className='Element'>
-          <div className="Menu">
+          <div className='Menu'>
             <MenuIcon />
-            {noti && <div className="Circle" />}
+            {noti && <div className='Circle' />}
           </div>
         </div>
       </div>
-      <div className="Body">
+      <div className='Body'>
 
         {/* <JobView state={{ state: STATE.RQE_RECV_REQUEST, speed: 483344, progress: 50, id: 'july', itemName: 'files_that_has_too_long_file_name_and_this_is_going_to_be_trimmed.jpg', totalProgress: '1/2' }} />
         <JobView state={{ state: STATE.RQR_RECV_REQUEST, speed: 110203, progress: 100, id: 'mason', itemName: 'files_that_has_too_long_file_name.jpg' }} />
@@ -114,7 +114,7 @@ function Nav({ toggleSettings, items }) {
         {showJobs()}
       </div>
     </nav>
-  )
+  );
 }
 
 export default Nav;

@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import {useCallback} from 'react';
 
 const ipcRenderer = window.ipcRenderer;
 
@@ -8,7 +8,7 @@ const ipcRenderer = window.ipcRenderer;
  * @param {string} props.myNetmask
  *
  */
-const useServer = ({ myIp, myNetmask }) => {
+const useServer = ({myIp, myNetmask}) => {
   const openServer = useCallback(async () => {
     const ret = await ipcRenderer.openServer(myIp, myNetmask);
     if (!ret)
@@ -24,7 +24,7 @@ const useServer = ({ myIp, myNetmask }) => {
   return {
     openServer,
     closeServer,
-  }
-}
+  };
+};
 
 export default useServer;

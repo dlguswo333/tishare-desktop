@@ -1,3 +1,3 @@
 const OS = require('os').platform();
 
-module.exports = { OS };
+module.exports = {OS};

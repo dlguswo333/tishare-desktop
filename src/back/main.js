@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const {app, BrowserWindow, ipcMain, dialog} = require('electron');
 const fs = require('fs').promises;
 const path = require('path');
 const network = require('./Network');
@@ -16,14 +16,14 @@ var mainWindow = null;
  */
 const sendState = (state) => {
   mainWindow.webContents.send('jobState', state);
-}
+};
 
 /**
  * Tell front to delete the job with ind.
  */
 const deleteJobState = (ind) => {
   mainWindow.webContents.send('deleteJobState', ind);
-}
+};
 
 const indexer = new Indexer((numJobs) => {
   mainWindow?.webContents.send('numJobs', numJobs);
@@ -32,7 +32,7 @@ const indexer = new Indexer((numJobs) => {
 const server = new Server(indexer, sendState);
 const client = new Client(indexer, sendState);
 
-function createMainWindow() {
+function createMainWindow () {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     title: 'tiShare',
@@ -53,7 +53,7 @@ function createMainWindow() {
     console.log('Running in development');
     // When in development, run react start first.
     // The main electron window will load the react webpage like below.
-    mainWindow.setIcon(path.join(__dirname, '../../public/icon.ico'))
+    mainWindow.setIcon(path.join(__dirname, '../../public/icon.ico'));
     mainWindow.loadURL('http://localhost:3000');
     mainWindow.maximize();
   }
@@ -77,7 +77,7 @@ app.whenReady().then(() => {
   mainWindow.once('ready-to-show', () => {
     // Show the window only after fully loaded.
     mainWindow.show();
-  })
+  });
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
@@ -85,7 +85,7 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) {
       mainWindow = createMainWindow();
     }
-  })
+  });
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -97,25 +97,25 @@ app.on('window-all-closed', function () {
       server.close();
     app.quit();
   }
-})
+});
 
 /**
  * @param {Object} ret
  */
-async function addDirectory(itemPath, ret) {
+async function addDirectory (itemPath, ret) {
   try {
     const size = (await fs.readdir(itemPath)).length;
-    ret[path.basename(itemPath)] = { path: itemPath, name: path.basename(itemPath), dir: '.', type: 'directory', size: size };
+    ret[path.basename(itemPath)] = {path: itemPath, name: path.basename(itemPath), dir: '.', type: 'directory', size: size};
   } catch (err) {
     // Do nothing.
   }
   return;
 }
 
-async function addFile(itemPath, ret) {
+async function addFile (itemPath, ret) {
   try {
     const size = (await fs.stat(itemPath)).size;
-    ret[path.basename(itemPath)] = { path: itemPath, name: path.basename(itemPath), dir: '.', type: 'file', size: size };
+    ret[path.basename(itemPath)] = {path: itemPath, name: path.basename(itemPath), dir: '.', type: 'file', size: size};
   } catch (err) {
     // Do nothing.
   }
@@ -125,8 +125,8 @@ async function addFile(itemPath, ret) {
 // Handle inter process communications with renderer processes.
 ipcMain.handle('openFile', async () => {
   let tmp = dialog.showOpenDialogSync(mainWindow, {
-    title: "Open File(s)",
-    properties: ["openFile", "multiSelections"]
+    title: 'Open File(s)',
+    properties: ['openFile', 'multiSelections']
   });
   let ret = {};
   if (!tmp)
@@ -135,12 +135,12 @@ ipcMain.handle('openFile', async () => {
     await addFile(item, ret);
   }
   return ret;
-})
+});
 
 ipcMain.handle('openDirectory', async () => {
   let tmp = dialog.showOpenDialogSync(mainWindow, {
-    title: "Open Directory(s)",
-    properties: ["openDirectory", "multiSelections"]
+    title: 'Open Directory(s)',
+    properties: ['openDirectory', 'multiSelections']
   });
   let ret = {};
   if (!tmp)
@@ -149,10 +149,10 @@ ipcMain.handle('openDirectory', async () => {
     await addDirectory(item, ret);
   }
   return ret;
-})
+});
 
 ipcMain.handle('dragAndDrop', async (_, paths) => {
-  let ret = {}
+  let ret = {};
   for (let itemPath of paths) {
     const stat = await fs.stat(itemPath);
     if (stat.isFile()) {
@@ -163,35 +163,35 @@ ipcMain.handle('dragAndDrop', async (_, paths) => {
     }
   }
   return ret;
-})
+});
 
 ipcMain.handle('getNetworks', () => {
   return network.getNetworks();
-})
+});
 
 ipcMain.handle('openServer', (event, myIp, netmask) => {
   if (server.isOpen()) {
     return true;
   }
   return server.open(myIp, netmask);
-})
+});
 
 ipcMain.handle('closeServer', () => {
   let ret = server.close();
   if (ret)
     return ret;
   return false;
-})
+});
 
 ipcMain.handle('isServerOpen', () => {
   return server && server.isOpen();
-})
+});
 
 ipcMain.handle('scan', (_, myIp, netmask, myId) => {
   network.scan(myIp, netmask, myId, (deviceIp, deviceVersion, deviceId, deviceOs) => {
     mainWindow.webContents.send('scannedDevice', deviceIp, deviceVersion, deviceId, deviceOs);
   });
-})
+});
 
 ipcMain.handle('setMyId', (event, myId) => {
   if (myId) {
@@ -200,19 +200,19 @@ ipcMain.handle('setMyId', (event, myId) => {
     return true;
   }
   return false;
-})
+});
 
 ipcMain.handle('sendRequest', (_, items, ip, id) => {
   client.sendRequest(items, ip, id);
-})
+});
 
 ipcMain.handle('preRecvRequest', (_, ip, id) => {
   client.preRecvRequest(ip, id);
-})
+});
 
 ipcMain.handle('recvRequest', (_, ind, recvDir) => {
   client.recvRequest(ind, recvDir);
-})
+});
 
 ipcMain.handle('endJob', (_, ind) => {
   let ret = server.endJob(ind);
@@ -222,7 +222,7 @@ ipcMain.handle('endJob', (_, ind) => {
   if (ret)
     return ret;
   return false;
-})
+});
 
 
 ipcMain.handle('deleteJob', (_, ind) => {
@@ -233,30 +233,30 @@ ipcMain.handle('deleteJob', (_, ind) => {
   if (ret)
     return ret;
   return false;
-})
+});
 
 ipcMain.handle('acceptSendRequest', (_, ind, recvDir) => {
   server.acceptSendRequest(ind, recvDir);
-})
+});
 
 ipcMain.handle('acceptRecvRequest', (_, ind, items) => {
   server.acceptRecvRequest(ind, items);
-})
+});
 
 ipcMain.handle('rejectRequest', (_, ind) => {
   server.rejectRequest(ind);
-})
+});
 
 ipcMain.handle('setRecvDir', () => {
   let ret = dialog.showOpenDialogSync(mainWindow, {
-    title: "Set Receive Directory",
-    properties: ["openDirectory"]
+    title: 'Set Receive Directory',
+    properties: ['openDirectory']
   });
   if (ret)
     return ret[0];
   return null;
-})
+});
 
 ipcMain.handle('showMessage', (_, message) => {
-  dialog.showMessageBox(mainWindow, { title: 'tiShare', message: message });
-})
+  dialog.showMessageBox(mainWindow, {title: 'tiShare', message: message});
+});

@@ -7,7 +7,7 @@ import style from '../style/ThemeButton.module.scss';
  * @param {Function} props.onClick
  * @param {boolean} props.opaqueText
  */
-function ThemeButton({ children, onClick, opaqueText }) {
+function ThemeButton ({children, onClick, opaqueText}) {
   return (
     <button
       className={style.ThemeButton + (opaqueText ? ' ' + style.OpaqueText : '')}
@@ -15,7 +15,7 @@ function ThemeButton({ children, onClick, opaqueText }) {
     >
       {children}
     </button>
-  )
+  );
 }
 
 export default ThemeButton;
