@@ -1,11 +1,11 @@
 const os = require('os');
 const dgram = require('dgram');
-const { PORT, OS, VERSION, SCANTIMEOUT } = require('../defs');
+const {PORT, OS, VERSION, SCANTIMEOUT} = require('../defs');
 /**
  * Return an array of dictionary each looks like: { name, ip, netmask }.
  * @returns {Array.<{name:String, ip:String, netmask:String}>} Array of networks.
  */
-function getNetworks() {
+function getNetworks () {
   var array = [];
   const interfaces = os.networkInterfaces();
   for (const network in interfaces) {
@@ -13,7 +13,7 @@ function getNetworks() {
     for (const ip of one) {
       // Only IPv4 and external IP which falls into the local IP address range.
       if (ip['family'] === 'IPv4' && !ip['internal'] && isLocalIp(ip['address'])) {
-        array.push({ name: network, ip: ip['address'], netmask: ip['netmask'] });
+        array.push({name: network, ip: ip['address'], netmask: ip['netmask']});
       }
     }
   }
@@ -25,8 +25,8 @@ function getNetworks() {
  * @param {string} ip
  * @returns {boolean}
  */
-function isLocalIp(ip) {
-  const ipAsNum = _ipStringToNumber(ip)
+function isLocalIp (ip) {
+  const ipAsNum = _ipStringToNumber(ip);
   if ((167772160 <= ipAsNum && ipAsNum <= 184549375) || (2886729728 <= ipAsNum && ipAsNum <= 2887778303) || (3232235520 <= ipAsNum && ipAsNum <= 3232301055)) {
     return true;
   }
@@ -47,7 +47,7 @@ function isLocalIp(ip) {
  * @param {String} myId 
  * @param {scanCallback} callback Callback function to call when found a device.
  */
-function scan(ip, netmask, myId, callback) {
+function scan (ip, netmask, myId, callback) {
   const broadcastIp = _getBroadcastIp(ip, netmask);
   const socket = dgram.createSocket('udp4');
 
@@ -56,9 +56,9 @@ function scan(ip, netmask, myId, callback) {
   socket.bind(ip, () => {
     socket.setBroadcast(true);
     const header = {
-      app: "tiShare",
+      app: 'tiShare',
       version: VERSION,
-      class: "scan",
+      class: 'scan',
       id: myId,
       os: OS
     };
@@ -89,7 +89,7 @@ function scan(ip, netmask, myId, callback) {
  * @param {String} ip String representation of IPv4.
  * @returns {number} Number representation of IPv4.
  */
-function _ipStringToNumber(ip) {
+function _ipStringToNumber (ip) {
   let tmp = ip.split('.');
   let ret = 0;
   for (let i = 0; i < 4; ++i) {
@@ -104,7 +104,7 @@ function _ipStringToNumber(ip) {
  * @param {number} ip Number representation of IPv4.
  * @returns {String} String representation of IPv4.
  */
-function _ipNumberToString(ip) {
+function _ipNumberToString (ip) {
   let ret = '';
   for (let i = 0; i < 4; ++i) {
     let tmp = 255 & ip;
@@ -122,8 +122,8 @@ function _ipNumberToString(ip) {
  * @param {String} netmask 
  * @returns {String}
  */
-function _getBroadcastIp(ip, netmask) {
+function _getBroadcastIp (ip, netmask) {
   return _ipNumberToString((_ipStringToNumber(ip) | (2 ** 32 - 1 - _ipStringToNumber(netmask))) >>> 0);
 }
 
-module.exports = { getNetworks, isLocalIp, scan, _getBroadcastIp };
+module.exports = {getNetworks, isLocalIp, scan, _getBroadcastIp};

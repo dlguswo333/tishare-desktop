@@ -1,4 +1,4 @@
-const { contextBridge, ipcRenderer } = require('electron');
+const {contextBridge, ipcRenderer} = require('electron');
 
 contextBridge.exposeInMainWorld('ipcRenderer',
   {
@@ -84,4 +84,4 @@ contextBridge.exposeInMainWorld('ipcRenderer',
       ipcRenderer.removeAllListeners('deleteJobState');
     }
   }
-)
+);

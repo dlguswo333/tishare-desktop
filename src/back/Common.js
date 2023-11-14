@@ -1,5 +1,5 @@
 /** Header must not and cannot exceed this length. @type {number} */
-const path = require('path')
+const path = require('path');
 const fs = require('fs').promises;
 const MAX_HEADER_LEN = 10000;
 const HEADER_END = '\n\n';
@@ -13,12 +13,12 @@ const HEADER_END = '\n\n';
  * @param {Buffer} buf 
  * @returns {{header:String, buf:Buffer}|undefined}
  */
-function splitHeader(buf) {
+function splitHeader (buf) {
   const endInd = buf.indexOf(HEADER_END, 0, 'utf-8');
   if (endInd >= 0) {
     const header = buf.toString('utf8', 0, endInd);
-    return { header: header, buf: buf.slice(endInd + 2) };
-  };
+    return {header: header, buf: buf.slice(endInd + 2)};
+  }
   return undefined;
 }
 
@@ -27,7 +27,7 @@ function splitHeader(buf) {
  * Before calling the function, be sure that this._itemArray is an empty array.
  * @param {Object.<string, item>} items
  */
-async function createItemArray(items) {
+async function createItemArray (items) {
   let ret = [];
   await _createItemArray(items, ret);
   return ret;
@@ -37,7 +37,7 @@ async function createItemArray(items) {
  * @param {Object.<string, item>} items
  * @param {any[]} ret
  */
-async function _createItemArray(items, ret) {
+async function _createItemArray (items, ret) {
   for (let itemName in items) {
     const item = items[itemName];
     if (item.type === 'directory') {
@@ -48,7 +48,7 @@ async function _createItemArray(items, ret) {
         const subItemStat = (await fs.stat(subItemPath));
         const subItemType = (subItemStat.isDirectory() ? 'directory' : 'file');
         const subItemSize = (subItemType === 'file' ? subItemStat.size : 0);
-        tmp[subItemName] = { path: path.join(item.path, subItemName), name: subItemName, dir: path.join(item.dir, itemName), type: subItemType, size: subItemSize };
+        tmp[subItemName] = {path: path.join(item.path, subItemName), name: subItemName, dir: path.join(item.dir, itemName), type: subItemType, size: subItemSize};
       }
       await _createItemArray(tmp, ret);
     }
@@ -65,8 +65,8 @@ async function _createItemArray(items, ret) {
  * @param {number} size Size of the item.
  * @returns {{name:string, type: string, size: number}} 
  */
-function _createFileHeader(path, name, dir, size) {
-  const header = { path: path, name: name, dir: dir.split('\\').join('/'), type: 'file', size: size }
+function _createFileHeader (path, name, dir, size) {
+  const header = {path: path, name: name, dir: dir.split('\\').join('/'), type: 'file', size: size};
   return header;
 }
 
@@ -76,9 +76,9 @@ function _createFileHeader(path, name, dir, size) {
  * @param {string} dir Directory of the item.
  * @returns {{name:string, type: string}} 
  */
-function _createDirectoryHeader(path, name, dir) {
-  const header = { path: path, name: name, dir: dir.split('\\').join('/'), type: 'directory' }
+function _createDirectoryHeader (path, name, dir) {
+  const header = {path: path, name: name, dir: dir.split('\\').join('/'), type: 'directory'};
   return header;
 }
 
-module.exports = { MAX_HEADER_LEN, HEADER_END, createItemArray, splitHeader };
+module.exports = {MAX_HEADER_LEN, HEADER_END, createItemArray, splitHeader};

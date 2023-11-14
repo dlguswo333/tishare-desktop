@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import Nav from './Nav';
 import ItemView from './ItemView';
 import DeviceView from './DeviceView';
@@ -19,18 +19,18 @@ import useItems from '../hook/useItems';
 // Look at 'preload.js' for more understanding.
 const ipcRenderer = window.ipcRenderer;
 
-function App() {
+function App () {
   const [showSettings, setShowSettings] = useState(false);
-  const [myId, _setMyId] = useState("");
-  const [myIp, setMyIp] = useState("");
-  const [myNetmask, setMyNetmask] = useState("");
+  const [myId, _setMyId] = useState('');
+  const [myIp, setMyIp] = useState('');
+  const [myNetmask, setMyNetmask] = useState('');
   const [networks, setNetworks] = useState(/** @type {Network[]} */([]));
   const [isServerOpen, setIsServerOpen] = useState(false);
 
-  const { items, setItems, deleteChecked } = useItems();
-  const { isDragging } = useDragDrop({ setItems });
-  const { openServer, closeServer } = useServer({ myIp, myNetmask });
-  const { getNetworks } = useNetworks({ isServerOpen, closeServer, setNetworks });
+  const {items, setItems, deleteChecked} = useItems();
+  const {isDragging} = useDragDrop({setItems});
+  const {openServer, closeServer} = useServer({myIp, myNetmask});
+  const {getNetworks} = useNetworks({isServerOpen, closeServer, setNetworks});
 
   // Select local files.
   const openFile = async () => {
@@ -55,15 +55,15 @@ function App() {
       _setMyId(id);
       ipcRenderer.setMyId(id);
     }
-  }
+  };
 
   const listNetworks = networks.map((network) => {
     return <option key={network.ip} value={network.ip + '|' + network.netmask} >  {network.ip} ({network.name})</option >;
-  })
+  });
 
   const toggleSettings = () => {
     setShowSettings(!showSettings);
-  }
+  };
 
   useMountEffect(() => {
     getNetworks();
@@ -87,7 +87,7 @@ function App() {
 
     return () => {
       clearInterval(timer);
-    }
+    };
   }, []);
 
   useEffect(() => {
@@ -101,13 +101,13 @@ function App() {
   }, [showSettings]);
 
   return (
-    <div className="App">
-      <div className="NavGhost" />
-      <div className="Main">
-        <div className="MainHead">
-          <span className="Item">
+    <div className='App'>
+      <div className='NavGhost' />
+      <div className='Main'>
+        <div className='MainHead'>
+          <span className='Item'>
             <span>My IP:</span>
-            <select className="Networks"
+            <select className='Networks'
               onChange={(e) => {
                 const [ip, netmask] = e.target.value.split('|');
                 setMyIp(ip);
@@ -121,30 +121,30 @@ function App() {
             >
               {listNetworks}
             </select>
-            <button className="NetworkRefreshButton" onClick={getNetworks}>Refresh</button>
+            <button className='NetworkRefreshButton' onClick={getNetworks}>Refresh</button>
           </span>
-          <span className="Item">
+          <span className='Item'>
             <span>My ID:</span>
             <span>{myId}</span>
           </span>
           {isServerOpen ?
-            <button className="ServerButton ServerOpen"
+            <button className='ServerButton ServerOpen'
               onClick={closeServer}
               title='Close this device from the network.'
             >
-              Close me <span className="Open"></span>
+              Close me <span className='Open'></span>
             </button>
             :
-            <button className="ServerButton ServerClose"
+            <button className='ServerButton ServerClose'
               onClick={openServer}
               title='Open this device to the network.'
             >
-              Open me <span className="Close"></span>
+              Open me <span className='Close'></span>
             </button>
           }
         </div>
-        <div className="MainBody">
-          <div className="ItemGrid">
+        <div className='MainBody'>
+          <div className='ItemGrid'>
             <ItemView
               items={items}
               openFile={openFile}
@@ -152,7 +152,7 @@ function App() {
               deleteChecked={deleteChecked}
             />
           </div>
-          <div className="DeviceGrid">
+          <div className='DeviceGrid'>
             <DeviceView
               items={items}
               myIp={myIp}
@@ -172,6 +172,6 @@ function App() {
         </>}
     </div>
   );
-};
+}
 
 export default App;

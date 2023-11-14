@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import Blind from './Blind';
 import style from '../style/Settings.module.scss';
 
@@ -13,7 +13,7 @@ import style from '../style/Settings.module.scss';
  * @param {object} props
  * @param {Function} props.setShowSettings
  */
-function Settings({ setShowSettings }) {
+function Settings ({setShowSettings}) {
   const [tmpRecvDir, setTmpRecvDir] = useState(null);
   const [tmpMyId, setTmpMyId] = useState(null);
   const [IdEmptyWarn, setIdEmptyWarn] = useState(false);
@@ -22,7 +22,7 @@ function Settings({ setShowSettings }) {
   const resetWarns = () => {
     setIdEmptyWarn(false);
     setRecvDirEmptyWarn(false);
-  }
+  };
 
   const save = () => {
     resetWarns();
@@ -37,7 +37,7 @@ function Settings({ setShowSettings }) {
     }
     window.localStorage.setItem('recvDir', tmpRecvDir);
     setShowSettings(false);
-  }
+  };
 
   useEffect(() => {
     let tmp = window.localStorage.getItem('myId');
@@ -98,7 +98,7 @@ function Settings({ setShowSettings }) {
         </div>
       </div>
     </>
-  )
+  );
 }
 
 export default Settings;

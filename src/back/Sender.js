@@ -1,6 +1,6 @@
 const fs = require('fs').promises;
-const { STATE, CHUNKSIZE, SOCKET_TIMEOUT, STATE_INTERVAL } = require('../defs');
-const { HEADER_END, splitHeader } = require('./Common');
+const {STATE, CHUNKSIZE, SOCKET_TIMEOUT, STATE_INTERVAL} = require('../defs');
+const {HEADER_END, splitHeader} = require('./Common');
 
 /** @typedef {{dir:string, path:string, type:string, size:number, items:Object.<string, any>}}Item */
 
@@ -13,7 +13,7 @@ class Sender {
    * @param {Function} deleteCallback
    * @param {Function} sendState
    */
-  constructor(ind, socket, receiverId, itemArray, deleteCallback, sendState) {
+  constructor (ind, socket, receiverId, itemArray, deleteCallback, sendState) {
     /** @type {number} */
     this._ind = ind;
     this._state = STATE.SENDING;
@@ -91,7 +91,7 @@ class Sender {
    * Send items to Receiver.
    * Call this if this was Requester.
    */
-  send() {
+  send () {
     this._send();
   }
 
@@ -99,7 +99,7 @@ class Sender {
    * End sending.
    * @returns {boolean}
    */
-  async end() {
+  async end () {
     if (this._state === STATE.SENDING) {
       this._endFlag = true;
       return true;
@@ -111,7 +111,7 @@ class Sender {
    * Initialize all event listeners necessary.
    * The function removes all pre-existing event listeners.
    */
-  _init() {
+  _init () {
     this._socket.removeAllListeners('data');
     this._socket.removeAllListeners('close');
     this._socket.removeAllListeners('error');
@@ -143,42 +143,42 @@ class Sender {
       }
       this._recvBuf = ret.buf;
       switch (this._state) {
-        case STATE.SENDING:
-          switch (recvHeader.class) {
-            case 'ok':
-              // Send header and chunk.
-              this._send();
-              break;
-            case 'end':
-              this._setState(STATE.OTHER_END);
-              if (this._itemHandle) {
-                await this._itemHandle.close();
-                this._itemHandle = null;
-              }
-              this._socket.end();
-              break
-            case 'next':
-              if (this._itemHandle) {
-                // _itemHandle is not null only when sending the current item is not finished.
-                // Thus checking it will prevent any unexpected skip.
-                await this._itemHandle.close();
-                this._goToNextItem();
-              }
-              this._send();
-              break;
-            default:
-              // What the hell?
-              console.error('header class value error: Unexpected value ' + recvHeader.class);
-              return;
+      case STATE.SENDING:
+        switch (recvHeader.class) {
+        case 'ok':
+          // Send header and chunk.
+          this._send();
+          break;
+        case 'end':
+          this._setState(STATE.OTHER_END);
+          if (this._itemHandle) {
+            await this._itemHandle.close();
+            this._itemHandle = null;
           }
+          this._socket.end();
+          break;
+        case 'next':
+          if (this._itemHandle) {
+            // _itemHandle is not null only when sending the current item is not finished.
+            // Thus checking it will prevent any unexpected skip.
+            await this._itemHandle.close();
+            this._goToNextItem();
+          }
+          this._send();
           break;
         default:
           // What the hell?
-          console.error(`Sender: current state is ${this._state} but received ${recvHeader.class}`);
-          this._handleNetworkErr();
+          console.error('header class value error: Unexpected value ' + recvHeader.class);
           return;
+        }
+        break;
+      default:
+        // What the hell?
+        console.error(`Sender: current state is ${this._state} but received ${recvHeader.class}`);
+        this._handleNetworkErr();
+        return;
       }
-    })
+    });
 
     this._socket.on('close', async () => {
       if (this._itemHandle) {
@@ -190,22 +190,22 @@ class Sender {
         this._setState(STATE.ERR_NETWORK);
       else if (this._haveWrittenEndHeader)
         this._deleteCallback(this._ind);
-    })
+    });
 
     this._socket.on('error', (err) => {
       console.error(err.message);
-    })
+    });
 
     this._socket.setTimeout(SOCKET_TIMEOUT, () => {
       this._handleNetworkErr();
-    })
+    });
   }
 
   /**
    * Return the total number of items.
    * @returns {number}
    */
-  getTotalNumItems() {
+  getTotalNumItems () {
     return this._itemArray.length;
   }
   /**
@@ -213,7 +213,7 @@ class Sender {
    * @param {Item} item
    * @returns {number}
    */
-  _getNumItems(item) {
+  _getNumItems (item) {
     let ret = 0;
     for (let subItem in item.items) {
       ++ret;
@@ -228,7 +228,7 @@ class Sender {
    * If the # of bytes or the interval is 0, calculate speed based on previous measure.
    * @returns {number}
    */
-  getSpeed() {
+  getSpeed () {
     const now = Date.now();
     let ret = 0;
     if (now === this._prevSpeedTime || this._speedBytes === 0) {
@@ -247,7 +247,7 @@ class Sender {
    * Return the current item progress out of 100.
    * @returns {number}
    */
-  getItemProgress() {
+  getItemProgress () {
     // If item type is directory, set this._itemSize to 0.
     // In case of empty file whose size is 0, progress is 100%.
     return (this._itemSize === 0 ? 100 : Math.floor(this._itemSentBytes / this._itemSize * 100));
@@ -255,14 +255,14 @@ class Sender {
   /**
    * Return a string representing the total progress.
    */
-  getTotalProgress() {
+  getTotalProgress () {
     return this._index + '/' + this.getTotalNumItems();
   }
 
   /**
    * Return the current state.
    */
-  getState() {
+  getState () {
     if (this._state === STATE.SENDING) {
       let itemName = '';
       try {
@@ -292,17 +292,17 @@ class Sender {
    * @param {string} state
    * Sets the state and call sendState.
    */
-  _setState(state) {
+  _setState (state) {
     clearInterval(this._sendStateHandle);
     this._state = state;
     this._sendState(this.getState());
   }
 
-  async _send() {
+  async _send () {
     let header = null;
     if (this._endFlag) {
       this._haveWrittenEndHeader = true;
-      header = { class: 'end' };
+      header = {class: 'end'};
       this._socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this._onWriteError);
       this._deleteCallback(this._ind);
       clearInterval(this._sendStateHandle);
@@ -311,7 +311,7 @@ class Sender {
     if (this._index >= this._itemArray.length) {
       // End of send.
       this._setState(STATE.SEND_COMPLETE);
-      header = { class: 'done' };
+      header = {class: 'done'};
       this._socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this._onWriteError);
       return;
     }
@@ -369,7 +369,7 @@ class Sender {
           await this._itemHandle.close();
           throw new Error('File Changed');
         }
-        header = { class: 'ok', size: ret.bytesRead };
+        header = {class: 'ok', size: ret.bytesRead};
         header = JSON.stringify(header);
         this._socket.write(Buffer.concat([Buffer.from(header + HEADER_END, 'utf-8'), chunk]), (err) => {
           this._speedBytes += chunk.byteLength;
@@ -387,12 +387,12 @@ class Sender {
   /**
    * Reset the item related variable and go to next item.
    */
-  _goToNextItem() {
+  _goToNextItem () {
     this._index++;
     this._itemHandle = null;
   }
 
-  _onWriteError = (err) => {
+  _onWriteError (err) {
     if (err) {
       console.error('Sender: Error Occurred during writing to Socket.');
       console.error(err);
@@ -403,7 +403,7 @@ class Sender {
   /**
    * Handle on corrupted data from receiver.
    */
-  _handleNetworkErr = () => {
+  _handleNetworkErr () {
     this._setState(STATE.ERR_NETWORK);
     this._socket.destroy();
   }

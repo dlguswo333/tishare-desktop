@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import ThemeButton from './ThemeButton';
 import WindowsIcon from '../icons/Windows.svg?react';
 import AndroidIcon from '../icons/Android.svg?react';
 import LinuxIcon from '../icons/Linux.svg?react';
 import Spinner from '@dlguswo333/react-simple-spinner';
 import * as DEFS from '../../defs';
-const { SCANTIMEOUT } = DEFS.default;
+const {SCANTIMEOUT} = DEFS.default;
 import '../style/DeviceView.scss';
 const ipcRenderer = window.ipcRenderer;
 
@@ -18,7 +18,7 @@ const ipcRenderer = window.ipcRenderer;
  * @param {string} props.myId
  * @returns
  */
-function DeviceView({ items, myIp, myNetmask, myId }) {
+function DeviceView ({items, myIp, myNetmask, myId}) {
   const [devices, setDevices] = useState({});
   // const [devices, setDevices] = useState({ '10.221.151.210': { ip: '10.221.151.210', id: 'linuxmachine', os: 'linux', version: '0.2.0' }, '10.221.151.200': { ip: '10.221.151.200', id: 'my phone', os: 'android', version: '0.2.0' } });
   const [selectedIp, setSelectedIp] = useState(null);
@@ -32,17 +32,17 @@ function DeviceView({ items, myIp, myNetmask, myId }) {
     if (os.includes('win'))
       return (
         <WindowsIcon />
-      )
+      );
     if (os.includes('and'))
       return (
         <AndroidIcon />
-      )
+      );
     if (os.includes('linux'))
       return (
         <LinuxIcon />
-      )
+      );
     return os;
-  }
+  };
 
   const showDevices = () => {
     const ret = [];
@@ -66,10 +66,10 @@ function DeviceView({ items, myIp, myNetmask, myId }) {
             </div>
           </div>
         </div>
-      )
+      );
     }
     return ret;
-  }
+  };
 
   const scan = () => {
     setScanning(true);
@@ -77,7 +77,7 @@ function DeviceView({ items, myIp, myNetmask, myId }) {
     setSelectedIp(null);
     setDevices({});
     ipcRenderer.scan(myIp, myNetmask, myId);
-  }
+  };
 
   const sendRequest = () => {
     if (!selectedIp) {
@@ -86,7 +86,7 @@ function DeviceView({ items, myIp, myNetmask, myId }) {
     }
     setNoDeviceWarn(false);
     ipcRenderer.sendRequest(items, selectedIp, devices[selectedIp].id);
-  }
+  };
 
   const preRecvRequest = () => {
     if (!selectedIp) {
@@ -95,12 +95,12 @@ function DeviceView({ items, myIp, myNetmask, myId }) {
     }
     setNoDeviceWarn(false);
     ipcRenderer.preRecvRequest(selectedIp, devices[selectedIp].id);
-  }
+  };
 
   useEffect(() => {
     ipcRenderer.scanCallback((_, deviceIp, deviceVersion, deviceId, deviceOs) => {
       let tmp = {};
-      tmp[deviceIp] = { ip: deviceIp, version: deviceVersion, id: deviceId, os: deviceOs };
+      tmp[deviceIp] = {ip: deviceIp, version: deviceVersion, id: deviceId, os: deviceOs};
       /**
        * NOTE
        * Here I Pass an arrow function inside setState.
@@ -143,7 +143,7 @@ function DeviceView({ items, myIp, myNetmask, myId }) {
         {showDevices()}
       </div>
     </div>
-  )
+  );
 }
 
 export default DeviceView;
