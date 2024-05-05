@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import ThemeButton from './ThemeButton';
 import WindowsIcon from '../icons/Windows.svg?react';
 import AndroidIcon from '../icons/Android.svg?react';

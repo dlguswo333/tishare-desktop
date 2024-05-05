@@ -1,4 +1,3 @@
-import React from 'react';
 import '../style/Blind.scss';
 
 function Blind ({children}) {

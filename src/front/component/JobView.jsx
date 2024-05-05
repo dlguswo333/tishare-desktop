@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import {useState} from 'react';
 import * as DEFS from '../../defs';
 import style from '../style/JobView.module.scss';
 const ipcRenderer = window.ipcRenderer;

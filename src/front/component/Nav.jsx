@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import JobView from './JobView';
 import MenuIcon from '../icons/Menu.svg?react';
 import SettingsIcon from '../icons/Settings.svg?react';

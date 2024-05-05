@@ -1,4 +1,3 @@
-import React from 'react';
 import * as DEFS from '../../defs';
 
 const {printSize} = DEFS.default;
