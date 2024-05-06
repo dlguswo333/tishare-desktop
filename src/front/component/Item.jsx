@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import * as DEFS from '../../defs';
 
-const {printSize} = DEFS.default;
+const {printSize, WELL_KNOWN_IMAGE_EXTENSIONS} = DEFS.default;
 
 /**
  * @param {object} props
@@ -18,7 +18,10 @@ const {printSize} = DEFS.default;
  * @param {size} props.item.number
  */
 const Item = ({item, items, checkAll, lastClick, setLastClick, checked, setChecked}) => {
-  const [isThumbnailVisible, setIsThumbnailVisible] = useState(item.type !== 'directory');
+  const [isThumbnailVisible, setIsThumbnailVisible] = useState(
+    item.type !== 'directory' &&
+    WELL_KNOWN_IMAGE_EXTENSIONS.some(ext => item.path.toLowerCase().endsWith(`.${ext}`))
+  );
   const onThumbnailError = () => setIsThumbnailVisible(false);
 
   /** @type React.MouseEventHandler<HTMLInputElement> */
