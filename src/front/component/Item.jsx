@@ -18,7 +18,8 @@ const {printSize} = DEFS.default;
  * @param {size} props.item.number
  */
 const Item = ({item, items, checkAll, lastClick, setLastClick, checked, setChecked}) => {
-  const [thumbnailErrFlag, setThumbnailErrFlag] = useState(false);
+  const [isThumbnailVisible, setIsThumbnailVisible] = useState(item.type !== 'directory');
+  const onThumbnailError = () => setIsThumbnailVisible(false);
 
   /** @type React.MouseEventHandler<HTMLInputElement> */
   const onCheckboxClick = (e) => {
@@ -63,13 +64,13 @@ const Item = ({item, items, checkAll, lastClick, setLastClick, checked, setCheck
 
   return <div className='ItemElement' key={item.name}>
     <span className='ItemThumbnailHolder'>
-      {!thumbnailErrFlag && <img
-        onError={() => setThumbnailErrFlag(true)}
+      {isThumbnailVisible && <img
+        onError={onThumbnailError}
         src={'app:' + item.path.replace(/\\/g, '/')}
         loading='lazy'
         alt={item.type === 'directory' ? '📁 ' : '📄 '}
       />}
-      {thumbnailErrFlag && (item.type === 'directory' ? '📁 ' : '📄 ')}
+      {!isThumbnailVisible && (item.type === 'directory' ? '📁 ' : '📄 ')}
     </span>
     <div className='ItemInfo' title={item.name}>
       <div className='ItemName'>
