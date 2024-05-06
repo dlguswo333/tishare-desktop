@@ -1,3 +1,4 @@
+import {useState} from 'react';
 import * as DEFS from '../../defs';
 
 const {printSize} = DEFS.default;
@@ -13,9 +14,12 @@ const {printSize} = DEFS.default;
  * @param {object} props.item
  * @param {string} props.item.name
  * @param {string} props.item.type
+ * @param {string} props.item.path
  * @param {size} props.item.number
  */
 const Item = ({item, items, checkAll, lastClick, setLastClick, checked, setChecked}) => {
+  const [thumbnailErrFlag, setThumbnailErrFlag] = useState(false);
+
   /** @type React.MouseEventHandler<HTMLInputElement> */
   const onCheckboxClick = (e) => {
     setLastClick(item.name);
@@ -58,9 +62,18 @@ const Item = ({item, items, checkAll, lastClick, setLastClick, checked, setCheck
   };
 
   return <div className='ItemElement' key={item.name}>
+    <span className='ItemThumbnailHolder'>
+      {!thumbnailErrFlag && <img
+        onError={() => setThumbnailErrFlag(true)}
+        src={'app:' + item.path.replace(/\\/g, '/')}
+        loading='lazy'
+        alt={item.type === 'directory' ? '📁 ' : '📄 '}
+      />}
+      {thumbnailErrFlag && (item.type === 'directory' ? '📁 ' : '📄 ')}
+    </span>
     <div className='ItemInfo' title={item.name}>
       <div className='ItemName'>
-        {(item.type === 'directory' ? '📁 ' : '📄 ') + item.name}
+        {item.name}
       </div>
       <div className='ItemProperty'>
         {(item.type === 'directory' ? item.size + ' items' : printSize(item.size))}
