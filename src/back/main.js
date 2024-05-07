@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow, ipcMain, dialog} = require('electron');
+const {app, BrowserWindow, ipcMain, dialog, protocol, net} = require('electron');
 const fs = require('fs').promises;
 const path = require('path');
 const network = require('./Network');
@@ -86,6 +86,12 @@ app.whenReady().then(() => {
       mainWindow = createMainWindow();
     }
   });
+
+  protocol.handle('app', (req) => {
+    // Send local files as they are.
+    return net.fetch('file:' + req.url.slice('app:'.length));
+  }
+  );
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
