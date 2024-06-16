@@ -1,5 +1,6 @@
 import {useState} from 'react';
 import * as DEFS from '../../defs';
+import useFormatDate from '../hook/useFormatDate';
 
 const {printSize, WELL_KNOWN_IMAGE_EXTENSIONS} = DEFS.default;
 
@@ -15,6 +16,7 @@ const {printSize, WELL_KNOWN_IMAGE_EXTENSIONS} = DEFS.default;
  * @param {string} props.item.name
  * @param {string} props.item.type
  * @param {string} props.item.path
+ * @param {Date | undefined} props.item.mtime
  * @param {size} props.item.number
  */
 const Item = ({item, items, checkAll, lastClick, setLastClick, checked, setChecked}) => {
@@ -23,6 +25,7 @@ const Item = ({item, items, checkAll, lastClick, setLastClick, checked, setCheck
     WELL_KNOWN_IMAGE_EXTENSIONS.some(ext => item.path.toLowerCase().endsWith(`.${ext}`))
   );
   const onThumbnailError = () => setIsThumbnailVisible(false);
+  const formattedMtime = useFormatDate(item.mtime);
 
   /** @type React.MouseEventHandler<HTMLInputElement> */
   const onCheckboxClick = (e) => {
@@ -81,6 +84,7 @@ const Item = ({item, items, checkAll, lastClick, setLastClick, checked, setCheck
       </div>
       <div className='ItemProperty'>
         {(item.type === 'directory' ? item.size + ' items' : printSize(item.size))}
+        {!!formattedMtime && ('｜' + formattedMtime)}
       </div>
     </div>
     <div className='ItemCheck'>
