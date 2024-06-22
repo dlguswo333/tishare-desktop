@@ -110,8 +110,16 @@ app.on('window-all-closed', function () {
  */
 async function addDirectory (itemPath, ret) {
   try {
+    const {mtime} = await fs.stat(itemPath);
     const size = (await fs.readdir(itemPath)).length;
-    ret[path.basename(itemPath)] = {path: itemPath, name: path.basename(itemPath), dir: '.', type: 'directory', size: size};
+    ret[path.basename(itemPath)] = {
+      path: itemPath,
+      name: path.basename(itemPath),
+      dir: '.',
+      type: 'directory',
+      size,
+      mtime,
+    };
   } catch (err) {
     // Do nothing.
   }
@@ -120,8 +128,15 @@ async function addDirectory (itemPath, ret) {
 
 async function addFile (itemPath, ret) {
   try {
-    const size = (await fs.stat(itemPath)).size;
-    ret[path.basename(itemPath)] = {path: itemPath, name: path.basename(itemPath), dir: '.', type: 'file', size: size};
+    const {size, mtime} = await fs.stat(itemPath);
+    ret[path.basename(itemPath)] = {
+      path: itemPath,
+      name: path.basename(itemPath),
+      dir: '.',
+      type: 'file',
+      size,
+      mtime,
+    };
   } catch (err) {
     // Do nothing.
   }
