@@ -15,7 +15,7 @@ const useFormattedDate = (date) => {
     const month = date.getMonth() + 1;
     const day = date.getDate();
     const amOrPm = date.getHours() >= 12 ? 'pm' : 'am';
-    const hour = date.getHours() % 12;
+    const hour = (date.getHours() % 12) + (date.getHours() % 12 === 0 ? 12 : 0);
     const minute = date.getMinutes();
 
     /**
