@@ -6,7 +6,7 @@ import {useMemo} from 'react';
  * @param {Date | undefined} date
  * @returns {string}
  */
-const useFormatDate = (date) => {
+const useFormattedDate = (date) => {
   return useMemo(() => {
     if (!date) {
       return '';
@@ -34,4 +34,4 @@ const useFormatDate = (date) => {
   }, [date]);
 };
 
-export default useFormatDate;
+export default useFormattedDate;

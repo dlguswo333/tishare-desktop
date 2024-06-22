@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import * as DEFS from '../../defs';
-import useFormatDate from '../hook/useFormatDate';
+import useFormattedDate from '../hook/useFormattedDate';
 
 const {printSize, WELL_KNOWN_IMAGE_EXTENSIONS} = DEFS.default;
 
@@ -25,7 +25,7 @@ const Item = ({item, items, checkAll, lastClick, setLastClick, checked, setCheck
     WELL_KNOWN_IMAGE_EXTENSIONS.some(ext => item.path.toLowerCase().endsWith(`.${ext}`))
   );
   const onThumbnailError = () => setIsThumbnailVisible(false);
-  const formattedMtime = useFormatDate(item.mtime);
+  const formattedMtime = useFormattedDate(item.mtime);
 
   /** @type React.MouseEventHandler<HTMLInputElement> */
   const onCheckboxClick = (e) => {
