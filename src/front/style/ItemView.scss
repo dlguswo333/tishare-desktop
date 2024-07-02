@@ -20,8 +20,9 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    box-shadow: 0 1px 3px black;
-    padding: 5px;
+    box-shadow: 0 1px 3px #5559;
+    padding: 8px;
+    border-radius: 8px;
     .Body {
       flex: 1;
       overflow-y: auto;
