@@ -3,10 +3,11 @@ const {app, BrowserWindow, ipcMain, dialog, protocol, net} = require('electron')
 const fs = require('fs').promises;
 const path = require('path');
 const network = require('./Network');
-const isDev = require('electron-is-dev');
 const Server = require('./Server');
 const Client = require('./Client');
 const Indexer = require('./Indexer');
+
+const isDev = !app.isPackaged;
 
 /** @type {BrowserWindow} */
 var mainWindow = null;
