@@ -6,7 +6,7 @@ const SOCKET_TIMEOUT = 5000;
 const STATE_INTERVAL = 1000;
 const MAX_NUM_JOBS = 4;
 /** Each member should is lower case string for simplicity. */
-const WELL_KNOWN_IMAGE_EXTENSIONS = ['jepg', 'jpg', 'jfif', 'png', 'webp', 'bmp', 'gif', 'svg', 'apng', 'avif'];
+const WELL_KNOWN_IMAGE_EXTENSIONS = ['jpeg', 'jpg', 'jfif', 'png', 'webp', 'bmp', 'gif', 'svg', 'apng', 'avif'];
 const STATE = {
   // For Server, Client, Sender and Receiver
   ERR_FILE_SYSTEM: 'ERR_FILE_SYSTEM',
