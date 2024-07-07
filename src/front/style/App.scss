@@ -115,6 +115,7 @@
       overflow-y: hidden;
       display: grid;
       grid-template-columns: 6fr 4fr;
+      gap: 6px;
       padding: 5px;
       .ItemGrid {
         width: 100%;
