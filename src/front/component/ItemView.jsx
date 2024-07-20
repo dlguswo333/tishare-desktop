@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import ThemeButton from './ThemeButton';
 import Item from './Item';
 import '../style/ItemView.scss';
@@ -11,19 +11,29 @@ import '../style/ItemView.scss';
  * @param {function} props.deleteChecked
  */
 function ItemView ({items, openFile, openDirectory, deleteChecked}) {
-  const [checkAll, setCheckAll] = useState(false);
   const [scrollable, setScrollable] = useState(false);
   const [checked, setChecked] = useState({});
   const [lastClick, setLastClick] = useState(null);
   const bodyRef = useRef(null);
+  const numItems = useMemo(() => Object.keys(items).length, [items]);
+  const numCheckedItems = useMemo(() => Object.keys(checked).length, [checked]);
+  const isCheckAll = useMemo(
+    () => numItems > 0 && numItems === numCheckedItems,
+    [numCheckedItems, numItems]
+  );
+  const [checkAll, setCheckAll] = useState(isCheckAll);
+
+  const deleteCheckedItems = useCallback(() => {
+    if (checkAll)
+      deleteChecked(undefined);
+    else
+      deleteChecked(checked);
+    setChecked({});
+  }, [checkAll, checked, deleteChecked]);
 
   useEffect(() => {
-    if (Object.keys(items).length > 0 && Object.keys(items).length === Object.keys(checked).length) {
-      setCheckAll(true);
-    }
-    else
-      setCheckAll(false);
-  }, [items, checked]);
+    setCheckAll(isCheckAll);
+  }, [isCheckAll]);
 
   useEffect(() => {
     if (bodyRef && bodyRef.current)
@@ -39,14 +49,7 @@ function ItemView ({items, openFile, openDirectory, deleteChecked}) {
         <div className='Buttons'>
           <ThemeButton onClick={openFile}>+ File</ThemeButton>
           <ThemeButton onClick={openDirectory}>+ Directory</ThemeButton>
-          <ThemeButton onClick={() => {
-            if (checkAll)
-              deleteChecked(undefined);
-            else
-              deleteChecked(checked);
-            setChecked({});
-          }
-          }>- Checked</ThemeButton>
+          <ThemeButton onClick={deleteCheckedItems} disabled={numCheckedItems === 0}>- Checked</ThemeButton>
         </div>
       </div>
       <div className='ItemViewBody'>
@@ -60,7 +63,7 @@ function ItemView ({items, openFile, openDirectory, deleteChecked}) {
             }
           </div>
           <div className='ItemCheck'>
-            <input type='checkbox' checked={checkAll}
+            <input type='checkbox' checked={checkAll} disabled={numItems === 0}
               onChange={() => {
                 const tmp = checkAll;
                 if (tmp) {

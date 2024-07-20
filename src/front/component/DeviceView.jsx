@@ -120,19 +120,20 @@ function DeviceView ({items, myIp, myNetmask, myId}) {
       <div className='DeviceViewHead'>
         <div className='Buttons'>
           <ThemeButton
-            onClick={() => {
-              !scanning && scan();
-            }}
+            onClick={scan}
+            disabled={!myIp || scanning}
             opaqueText={scanning}>
             <>
-              {scanning && <span className='Overlay'>
-                <Spinner fill={false} width='10' size='20px' colors={['#5bf', '#eee']} />
-              </span>}
+              {scanning &&
+                <span className='Overlay'>
+                  <Spinner fill={false} width='10' size='20px' colors={['#5bf', '#eee']} />
+                </span>
+              }
               Scan
             </>
           </ThemeButton>
-          <ThemeButton onClick={sendRequest}>Send</ThemeButton>
-          <ThemeButton onClick={preRecvRequest}>Receive</ThemeButton>
+          <ThemeButton disabled={!selectedIp} onClick={sendRequest}>Send</ThemeButton>
+          <ThemeButton disabled={!selectedIp} onClick={preRecvRequest}>Receive</ThemeButton>
         </div>
       </div>
       <div className='DeviceViewBody'>
