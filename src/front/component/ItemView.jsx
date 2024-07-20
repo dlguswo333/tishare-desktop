@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import ThemeButton from './ThemeButton';
 import Item from './Item';
 import '../style/ItemView.scss';
@@ -23,6 +23,14 @@ function ItemView ({items, openFile, openDirectory, deleteChecked}) {
   );
   const [checkAll, setCheckAll] = useState(isCheckAll);
 
+  const deleteCheckedItems = useCallback(() => {
+    if (checkAll)
+      deleteChecked(undefined);
+    else
+      deleteChecked(checked);
+    setChecked({});
+  }, [checkAll, checked, deleteChecked]);
+
   useEffect(() => {
     setCheckAll(isCheckAll);
   }, [isCheckAll]);
@@ -41,14 +49,7 @@ function ItemView ({items, openFile, openDirectory, deleteChecked}) {
         <div className='Buttons'>
           <ThemeButton onClick={openFile}>+ File</ThemeButton>
           <ThemeButton onClick={openDirectory}>+ Directory</ThemeButton>
-          <ThemeButton onClick={() => {
-            if (checkAll)
-              deleteChecked(undefined);
-            else
-              deleteChecked(checked);
-            setChecked({});
-          }
-          }>- Checked</ThemeButton>
+          <ThemeButton onClick={deleteCheckedItems} disabled={numCheckedItems === 0}>- Checked</ThemeButton>
         </div>
       </div>
       <div className='ItemViewBody'>
