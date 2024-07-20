@@ -9,14 +9,18 @@
   cursor: pointer;
   border: none;
   border-radius: 3px;
-  &:hover {
+  &:hover:not(:disabled) {
     background-color: #25f;
   }
-  &:active {
+  &:active:not(:disabled) {
     background-color: #00f;
   }
   &:not(:last-child) {
     margin-right: 10px;
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
   }
 }
 .OpaqueText {
