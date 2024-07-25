@@ -10,6 +10,7 @@ import useDragDrop from '../hook/useDragDrop';
 import useServer from '../hook/useServer';
 import useNetworks from '../hook/useNetworks';
 import useItems from '../hook/useItems';
+import RefreshIcon from '../icons/Refresh.svg?react';
 
 /**
  * @typedef {{name:string, ip:string, netmask:string}} Network
@@ -121,7 +122,9 @@ function App () {
             >
               {listNetworks}
             </select>
-            <button className='NetworkRefreshButton' onClick={getNetworks}>Refresh</button>
+            <button className='NetworkRefreshButton' onClick={getNetworks} title='Refresh'>
+              <RefreshIcon />
+            </button>
           </span>
           <span className='Item'>
             <span>My ID:</span>

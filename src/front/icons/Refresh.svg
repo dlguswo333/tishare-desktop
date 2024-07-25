@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" className="Icon" width="100%"
+  viewBox="0 0 100 100" fill="none">
+  <title>Refresh</title>
+  <path d="M30 15.4 A40 40 130 1 0 65.7 12.5" stroke-width="12" stroke="white" />
+  <!-- <path d="M36.3 12.5 A40 40 140 1 0 65.7 12.5" /> -->
+  <path d="M38 10 l -27.2 -3 l 22.8 28.8 Z" stroke="none" fill="white" />
+</svg>
