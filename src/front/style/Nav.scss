@@ -6,9 +6,8 @@
   width: v.$navGrowWidth;
   height: 100vh;
   backdrop-filter: blur(2px);
-  background-color: #eff5;
-  transition: 0.6s;
-  box-shadow: 1px 1px 3px black;
+  background-color: #f9f9f9a0;
+  box-shadow: 1px 1px 1px #0006;
   overflow-x: hidden;
   overflow-y: hidden;
   display: flex;
@@ -19,7 +18,7 @@
     width: 100%;
     height: v.$navWidth;
     justify-content: space-between;
-    background-color: #9992;
+    background-color: #9993;
     .Element {
       display: flex;
       flex-direction: row;
@@ -55,6 +54,14 @@
       .Menu {
         stroke: black;
         margin-left: auto;
+        .MenuButton {
+          background-color: unset;
+          border: none;
+          &:hover {
+            background-color: #1166ff60;
+            stroke: white;
+          }
+        }
         .Circle {
           position: absolute;
           top: 2px;

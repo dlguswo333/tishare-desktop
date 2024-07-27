@@ -9,7 +9,6 @@ import '../style/Nav.scss';
 const {MAX_NUM_JOBS} = DEFS.default;
 const ipcRenderer = window.ipcRenderer;
 
-let hover = false;
 /**
  * @param {object} props
  * @param {Function} props.toggleSettings
@@ -69,19 +68,7 @@ function Nav ({toggleSettings, items}) {
   }, []);
 
   return (
-    <nav className={(pin || grow) ? 'Nav Grow' : 'Nav'}
-      onMouseEnter={() => {
-        hover = true;
-        setGrow(true);
-      }}
-      onMouseLeave={() => {
-        hover = false;
-        setTimeout(() => {
-          if (!hover)
-            setGrow(false);
-        }, 300);
-      }}
-    >
+    <nav className={(pin || grow) ? 'Nav Grow' : 'Nav'}>
       <div className='Head'>
         <div className='Element'>
           <div className='Settings'
@@ -100,7 +87,9 @@ function Nav ({toggleSettings, items}) {
         </div>
         <div className='Element'>
           <div className='Menu'>
-            <MenuIcon />
+            <button className='Icon MenuButton' onClick={() => setGrow(!grow)}>
+              <MenuIcon />
+            </button>
             {noti && <div className='Circle' />}
           </div>
         </div>
