@@ -7,6 +7,7 @@
   height: 100vh;
   backdrop-filter: blur(2px);
   background-color: #f9f9f9a0;
+  transition: right 0.25s ease-out;
   box-shadow: 1px 1px 1px #0006;
   overflow-x: hidden;
   overflow-y: hidden;
@@ -24,7 +25,7 @@
     width: 100%;
     height: v.$navWidth;
     justify-content: space-between;
-    background-color: #9993;
+    background-color: #bbb3;
     .Element {
       display: flex;
       flex-direction: row;
