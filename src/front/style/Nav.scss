@@ -12,6 +12,12 @@
   overflow-y: hidden;
   display: flex;
   flex-direction: column;
+  &.Grow {
+    right: calc(100% - #{v.$navGrowWidth});
+    .Head .Element .Menu .MenuButton {
+      transform: rotate(180deg);
+    }
+  }
   .Head {
     display: flex;
     flex-direction: row;
@@ -55,6 +61,7 @@
         stroke: black;
         margin-left: auto;
         .MenuButton {
+          padding: 6px;
           background-color: unset;
           border: none;
           &:hover {
@@ -93,7 +100,4 @@
     flex-direction: column;
     align-items: center;
   }
-}
-.Grow {
-  right: calc(100% - #{v.$navGrowWidth});
 }
