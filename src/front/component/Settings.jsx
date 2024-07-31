@@ -1,6 +1,8 @@
 import {useEffect, useState} from 'react';
 import Blind from './Blind';
+import SettingsIcon from '../icons/Settings.svg?react';
 import style from '../style/Settings.module.scss';
+import ThemeButton from './ThemeButton';
 
 /*
   Settings could have been inside Nav component because Settings is positioned fixed,
@@ -53,6 +55,7 @@ function Settings ({setShowSettings}) {
       <Blind />
       <div className={style.Settings}>
         <div className={style.SettingsHead}>
+          <SettingsIcon />
           Settings
         </div>
         <div className={style.SettingsBody}>
@@ -91,10 +94,14 @@ function Settings ({setShowSettings}) {
           </div>
         </div>
         <div className={style.SettingsFoot}>
-          <button onClick={() => {
+          <button className={style.Negative} onClick={() => {
             setShowSettings(false);
-          }}> Cancel</button>
-          <button onClick={save}>Save</button>
+          }}>
+            Cancel
+          </button>
+          <ThemeButton onClick={save}>
+            Save
+          </ThemeButton>
         </div>
       </div>
     </>

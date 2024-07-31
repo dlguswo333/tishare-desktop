@@ -47,18 +47,28 @@
       .Item {
         padding: 5px 10px;
         font-size: 1.05rem;
+        display: flex;
+        align-items: center;
         & > * {
           margin-right: 5px;
         }
         .NetworkRefreshButton {
-          padding: 5px 10px;
+          width: 30px;
+          height: 30px;
+          padding: 4px;
           border-radius: 3px;
-          font-size: 1.05rem;
-          background-color: #fff;
-          border: 1px solid #999;
+          border: 1px solid #fff9;
+          outline: none;
+          background-color: #fff2;
           transition: v.$fastTransition;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
           &:hover {
-            background-color: #ddd;
+            background-color: #fff6;
+          }
+          &:active {
+            background-color: #0b0d;
           }
         }
       }
@@ -115,6 +125,7 @@
       overflow-y: hidden;
       display: grid;
       grid-template-columns: 6fr 4fr;
+      gap: 6px;
       padding: 5px;
       .ItemGrid {
         width: 100%;

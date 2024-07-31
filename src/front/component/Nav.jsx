@@ -2,14 +2,12 @@ import {useEffect, useState} from 'react';
 import JobView from './JobView';
 import MenuIcon from '../icons/Menu.svg?react';
 import SettingsIcon from '../icons/Settings.svg?react';
-import PinIcon from '../icons/Pin.svg?react';
 import * as DEFS from '../../defs';
 import '../style/Nav.scss';
 
 const {MAX_NUM_JOBS} = DEFS.default;
 const ipcRenderer = window.ipcRenderer;
 
-let hover = false;
 /**
  * @param {object} props
  * @param {Function} props.toggleSettings
@@ -17,7 +15,6 @@ let hover = false;
  */
 function Nav ({toggleSettings, items}) {
   const [grow, setGrow] = useState(false);
-  const [pin, setPin] = useState(false);
   const [noti, setNoti] = useState(false);
   const [numJobs, setNumJobs] = useState(0);
   const [jobs, setJobs] = useState({});
@@ -69,30 +66,11 @@ function Nav ({toggleSettings, items}) {
   }, []);
 
   return (
-    <nav className={(pin || grow) ? 'Nav Grow' : 'Nav'}
-      onMouseEnter={() => {
-        hover = true;
-        setGrow(true);
-      }}
-      onMouseLeave={() => {
-        hover = false;
-        setTimeout(() => {
-          if (!hover)
-            setGrow(false);
-        }, 300);
-      }}
-    >
+    <nav className={grow ? 'Nav Grow' : 'Nav'}>
       <div className='Head'>
         <div className='Element'>
-          <div className='Settings'
-            onClick={toggleSettings}
-          >
+          <div className='Settings' onClick={toggleSettings}>
             <SettingsIcon />
-          </div>
-          <div className={pin ? 'Pin Active' : 'Pin'}
-            onClick={() => { setPin((value) => !value); }}
-          >
-            <PinIcon />
           </div>
         </div>
         <div className='Element'>
@@ -100,7 +78,9 @@ function Nav ({toggleSettings, items}) {
         </div>
         <div className='Element'>
           <div className='Menu'>
-            <MenuIcon />
+            <button className='Icon MenuButton' onClick={() => setGrow(!grow)}>
+              <MenuIcon />
+            </button>
             {noti && <div className='Circle' />}
           </div>
         </div>

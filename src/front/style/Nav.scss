@@ -6,20 +6,26 @@
   width: v.$navGrowWidth;
   height: 100vh;
   backdrop-filter: blur(2px);
-  background-color: #eff5;
-  transition: 0.6s;
-  box-shadow: 1px 1px 3px black;
+  background-color: #f9f9f9a0;
+  transition: right 0.25s ease-out;
+  box-shadow: 1px 1px 1px #0006;
   overflow-x: hidden;
   overflow-y: hidden;
   display: flex;
   flex-direction: column;
+  &.Grow {
+    right: calc(100% - #{v.$navGrowWidth});
+    .Head .Element .Menu .MenuButton {
+      transform: rotate(180deg);
+    }
+  }
   .Head {
     display: flex;
     flex-direction: row;
     width: 100%;
     height: v.$navWidth;
     justify-content: space-between;
-    background-color: #9992;
+    background-color: #bbb3;
     .Element {
       display: flex;
       flex-direction: row;
@@ -35,6 +41,7 @@
         fill: black;
         cursor: pointer;
         &:hover {
+          background-color: #1166ff60;
           stroke: red;
           fill: red;
         }
@@ -44,6 +51,7 @@
         margin-right: auto;
         cursor: pointer;
         &:hover {
+          background-color: #1166ff60;
           stroke: red;
           fill: red;
         }
@@ -55,6 +63,15 @@
       .Menu {
         stroke: black;
         margin-left: auto;
+        .MenuButton {
+          padding: 6px;
+          background-color: unset;
+          border: none;
+          &:hover {
+            background-color: #1166ff60;
+            stroke: white;
+          }
+        }
         .Circle {
           position: absolute;
           top: 2px;
@@ -86,7 +103,4 @@
     flex-direction: column;
     align-items: center;
   }
-}
-.Grow {
-  right: calc(100% - #{v.$navGrowWidth});
 }

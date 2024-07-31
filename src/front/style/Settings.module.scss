@@ -6,23 +6,29 @@
   transform: translate(-50%, -50%);
   min-width: 600px;
   min-height: 400px;
-  border-radius: 6px;
-  background-color: #28f;
-  box-shadow: 0px 2px 4px black;
+  border-radius: 12px;
+  box-shadow: 0px 0px 4px #666;
+  background-color: white;
+  border: 1px solid #888;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  animation: showUp $slowTransition linear 0s;
+  animation: showUp $fastTransition linear 0s;
   .SettingsHead {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    margin-left: 10px;
     font-size: 1.1rem;
     font-weight: bold;
-    background-color: #28f;
-    box-shadow: 0px 1px 3px #888;
-    color: white;
-    padding: 15px 5px;
+    color: black;
+    padding: 15px 0;
+    :global .Icon {
+      width: 24px;
+      height: 24px;
+      stroke: black;
+      margin-right: 6px;
+    }
   }
   .SettingsBody {
     display: flex;
@@ -36,9 +42,17 @@
     background-color: #fff;
     .SettingsElement {
       width: 100%;
-      padding-bottom: 15px;
+      padding: 10px 4px;
+      border-radius: 2px;
+      &:not(:last-child) {
+        margin-bottom: 15px;
+      }
+      &:hover {
+        background-color: #f9f9f9;
+      }
       .Head {
         font-weight: bold;
+        margin-bottom: 8px;
         .Warn {
           display: inline-flex;
           align-items: center;
@@ -58,8 +72,8 @@
         line-height: 1.02rem;
         padding: 5px;
         margin-bottom: 5px;
-        border: 1px solid #333;
-        border-radius: 8px;
+        border: 1px solid #888;
+        border-radius: 2px;
         &:focus {
           border: 1px solid #25f;
         }
@@ -85,19 +99,23 @@
   .SettingsFoot {
     display: flex;
     flex-direction: row;
-    border-top: 1px solid #999;
+    margin: 10px;
+    align-items: center;
+    justify-content: flex-end;
     background-color: #fff;
     button {
-      flex: 1;
-      padding: 10px 10px;
+      padding: 8px 10px;
       font-size: 1.02rem;
-      background-color: #0000;
-      border: none;
-      &:hover {
-        background-color: #eee;
-      }
+      border: 1px solid #ddd;
+      border-radius: 4px;
       &:not(:last-child) {
-        border-right: 1px solid #999;
+        margin-right: 14px;
+      }
+      &.Negative {
+        background-color: #f2f2f2;
+        &:hover {
+          background-color: #e0e0e0;
+        }
       }
     }
   }
@@ -105,7 +123,7 @@
 @keyframes showUp {
   from {
     opacity: 0;
-    top: 55%;
+    top: 52%;
   }
   to {
     opacity: 1;
