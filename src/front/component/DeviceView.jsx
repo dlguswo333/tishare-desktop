@@ -1,8 +1,6 @@
 import {useEffect, useState} from 'react';
 import ThemeButton from './ThemeButton';
-import WindowsIcon from '../icons/Windows.svg?react';
-import AndroidIcon from '../icons/Android.svg?react';
-import LinuxIcon from '../icons/Linux.svg?react';
+import Device from './Device';
 import Spinner from '@dlguswo333/react-simple-spinner';
 import * as DEFS from '../../defs';
 const {SCANTIMEOUT} = DEFS.default;
@@ -24,52 +22,6 @@ function DeviceView ({items, myIp, myNetmask, myId}) {
   const [selectedIp, setSelectedIp] = useState(null);
   const [noDeviceWarn, setNoDeviceWarn] = useState(false);
   const [scanning, setScanning] = useState(false);
-
-
-  /** @param {string} _os */
-  const showOs = (_os) => {
-    const os = String(_os).toLowerCase();
-    if (os.includes('win'))
-      return (
-        <WindowsIcon />
-      );
-    if (os.includes('and'))
-      return (
-        <AndroidIcon />
-      );
-    if (os.includes('linux'))
-      return (
-        <LinuxIcon />
-      );
-    return os;
-  };
-
-  const showDevices = () => {
-    const ret = [];
-    for (let ip in devices) {
-      const device = devices[ip];
-      ret.push(
-        <div className={'DeviceElement' + (selectedIp === ip ? ' Selected' : '')} key={ip}
-          onClick={() => {
-            setSelectedIp(ip);
-          }}
-        >
-          <div className='DeviceOs'>
-            {showOs(device.os)}
-          </div>
-          <div className='DeviceProperty'>
-            <div className='DeviceId'>
-              {device.id}
-            </div>
-            <div className='DeviceInfo'>
-              {`IP: ${device.ip} Version: ${device.version}`}
-            </div>
-          </div>
-        </div>
-      );
-    }
-    return ret;
-  };
 
   const scan = () => {
     setScanning(true);
@@ -141,7 +93,14 @@ function DeviceView ({items, myIp, myNetmask, myId}) {
           Devices
           {noDeviceWarn && <span>Select a device first.</span>}
         </div>
-        {showDevices()}
+        {Object.values(devices).map(device => (
+          <Device
+            key={device.ip}
+            device={device}
+            isSelected={selectedIp === device.ip}
+            setSelectedIp={setSelectedIp}
+          />
+        ))}
       </div>
     </div>
   );
