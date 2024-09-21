@@ -19,16 +19,6 @@ function Nav ({toggleSettings, items}) {
   const [numJobs, setNumJobs] = useState(0);
   const [jobs, setJobs] = useState({});
 
-  const showJobs = () => {
-    let ret = [];
-    for (const ind in jobs) {
-      ret.push(
-        <JobView state={jobs[ind]} ind={ind} items={items} key={ind} />
-      );
-    }
-    return ret;
-  };
-
   useEffect(() => {
     if (grow)
       setNoti(false);
@@ -91,7 +81,9 @@ function Nav ({toggleSettings, items}) {
         <JobView state={{ state: STATE.RQR_RECV_REQUEST, speed: 110203, progress: 100, id: 'mason', itemName: 'files_that_has_too_long_file_name.jpg' }} />
         <JobView state={{ state: STATE.SENDING, speed: 11033403, progress: 60, id: 'july', itemName: 'report about theme ui.docx', totalProgress: '1/2' }} /> */}
 
-        {showJobs()}
+        {Object.entries(jobs).map(([ind, job]) => (
+          <JobView state={job} ind={ind} items={items} key={ind} />
+        ))}
       </div>
     </nav>
   );
