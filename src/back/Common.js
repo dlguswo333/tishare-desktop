@@ -4,13 +4,13 @@ const fs = require('fs').promises;
 const MAX_HEADER_LEN = 10000;
 const HEADER_END = '\n\n';
 /**
- * @typedef {{dir:string, path:string, type:string, size:number}} item
+ * @typedef {{dir:string, path:string, type:string, size:number}} Item
  */
 
 /**
  * split and separate a header from buf and return the header as string and sliced buf.
  * Return undefined if HEADER_END is not found.
- * @param {Buffer} buf 
+ * @param {Buffer} buf
  * @returns {{header:String, buf:Buffer}|undefined}
  */
 function splitHeader (buf) {
@@ -25,7 +25,7 @@ function splitHeader (buf) {
 /**
  * Normalize tree structure items into serialized item array.
  * Before calling the function, be sure that this._itemArray is an empty array.
- * @param {Object.<string, item>} items
+ * @param {Object.<string, Item>} items
  */
 async function createItemArray (items) {
   let ret = [];
@@ -34,7 +34,7 @@ async function createItemArray (items) {
 }
 
 /**
- * @param {Object.<string, item>} items
+ * @param {Object.<string, Item>} items
  * @param {any[]} ret
  */
 async function _createItemArray (items, ret) {
@@ -63,7 +63,7 @@ async function _createItemArray (items, ret) {
  * @param {string} name Name of the item.
  * @param {string} dir Directory of the item.
  * @param {number} size Size of the item.
- * @returns {{name:string, type: string, size: number}} 
+ * @returns {{name:string, type: string, size: number}}
  */
 function _createFileHeader (path, name, dir, size) {
   const header = {path: path, name: name, dir: dir.split('\\').join('/'), type: 'file', size: size};
@@ -74,7 +74,7 @@ function _createFileHeader (path, name, dir, size) {
  * @param {string} path Path of the item.
  * @param {string} name name of the item.
  * @param {string} dir Directory of the item.
- * @returns {{name:string, type: string}} 
+ * @returns {{name:string, type: string}}
  */
 function _createDirectoryHeader (path, name, dir) {
   const header = {path: path, name: name, dir: dir.split('\\').join('/'), type: 'directory'};
