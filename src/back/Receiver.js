@@ -408,7 +408,7 @@ class Receiver {
   /**
    * Handle on corrupted data from receiver.
    */
-  _handleNetworkEr () {
+  _handleNetworkErr () {
     this._setState(STATE.ERR_NETWORK);
     this._socket.destroy();
   }
