@@ -1,9 +1,102 @@
+// @ts-check
+// [TODO] Make methods start with '#'
 const fs = require('fs').promises;
 const path = require('path');
 const {HEADER_END, splitHeader} = require('./Common');
 const {STATE, SOCKET_TIMEOUT, STATE_INTERVAL} = require('../defs');
 
 class Receiver {
+  /** @type {number} */
+  #ind;
+  /** @type {STATE[keyof STATE]} */
+  #state;
+  /** @type {import('net').Socket} */
+  #socket;
+  /** @type {string} */
+  #senderId;
+  /** @type {string} */
+  #recvPath;
+  /** @type {number} */
+  #numItems;
+  /** @type {Function} */
+  #deleteCallback;
+  /** @type {Function} */
+  #sendState;
+  /** @type {Buffer} */
+  #recvBuf;
+  /** @type {Buffer[]} */
+  #recvBufArray;
+  /** @type {number} */
+  #recvBufArrayLen;
+  /** @type {boolean} Whether Receiver have parsed header. */
+  #haveParsedHeader;
+  /**
+   * Send Request header.
+   * @type {{app: string, version:string, class:string, id:string, itemArray: import('./Common').Item[]} | null}
+   */
+  #sendRequestHeader;
+  /** @type {Object} */
+  #recvHeader;
+  /**
+   * @type {'ok'|'next'}
+   */
+  #itemFlag;
+  /**
+   * @type {boolean}
+   */
+  #endFlag;
+  /** @type {boolean} */
+  #haveWrittenEndHeader;
+  /**
+  * File handle for receiving.
+  * @type {fs.FileHandle | null}
+  */
+  #itemHandle;
+  /**
+   * Name of the current item excluding download path.
+   * @type {string | null}
+   */
+  #itemName;
+  /**
+   * Size of the current item.
+   * @type {number}
+   */
+  #itemSize;
+  /**
+   * Size of received bytes for this item.
+   */
+  #itemWrittenBytes;
+  /**
+   * Number of received items so far.
+   * @type {number}
+   */
+  #numRecvItem;
+  /**
+   * The number of bytes after the previous speed measure.
+   * @type {number}
+   */
+  #speedBytes;
+  /**
+   * The number of previous bytes after the previous speed measure.
+   * @type {number}
+   */
+  #prevSpeedBytes;
+  /**
+   * Previous speed measure time in millisecond.
+   * @type {number}
+   */
+  #prevSpeedTime;
+  /**
+   * More previous speed measure time in millisecond.
+   * @type {number | null}
+   */
+  #prevPrevSpeedTime;
+  /**
+   * Handle of send state time interval.
+   * @type {ReturnType<setTimeout>?}
+   */
+  #sendStateHandle;
+
   /**
    * @param {number} ind
    * @param {import('net').Socket} socket
@@ -14,156 +107,97 @@ class Receiver {
    * @param {Function} sendState
    */
   constructor (ind, socket, senderId, recvDir, numItems, deleteCallback, sendState) {
-    /** @type {number} */
-    this._ind = ind;
-    this._state = STATE.RECVING;
-    /** @type {import('net').Socket} */
-    this._socket = socket;
-    /** @type {string} */
-    this._senderId = senderId;
-    /** @type {String} */
-    this._recvPath = recvDir;
-    /** @type {number} */
-    this._numItems = numItems;
-    /** @type {Function} */
-    this._deleteCallback = deleteCallback;
-    /** @type {Function} */
-    this._sendState = sendState;
-    /** @type {Buffer} */
-    this._recvBuf = Buffer.from([]);
-    /** @type {Array.<Buffer>} */
-    this._recvBufArray = [];
-    /** @type {number} */
-    this._recvBufArrayLen = 0;
-    /** @type {boolean} Whether Receiver have parsed header. */
-    this._haveParsedHeader = false;
-    /**
-     * Send Request header.
-     * @type {{app: string, version:string, class:string, id:string, itemArray:Array.<>}}
-     */
-    this._sendRequestHeader = null;
-    /** @type {Object} */
-    this._recvHeader = null;
-    /**
-     * @type {'ok'|'next'}
-     */
-    this._itemFlag = 'ok';
-    /**
-     * @type {boolean}
-     */
-    this._endFlag = false;
-    /** @type {boolean} */
-    this._haveWrittenEndHeader = false;
-    /**
-    * File handle for receiving.
-    * @type {fs.FileHandle}
-    */
-    this._itemHandle = null;
-    /**
-     * Name of the current item excluding download path.
-     * @type {String}
-     */
-    this._itemName = null;
-    /**
-     * Size of the current item.
-     * @type {number}
-     */
-    this._itemSize = 0;
-    /**
-     * Size of received bytes for this item.
-     */
-    this._itemWrittenBytes = 0;
-    /**
-     * Number of received items so far.
-     * @type {number}
-     */
-    this._numRecvItem = 0;
-    /**
-     * The number of bytes after the previous speed measure.
-     * @type {number}
-     */
-    this._speedBytes = 0;
-    /**
-     * The number of previous bytes after the previous speed measure.
-     * @type {number}
-     */
-    this._prevSpeedBytes = 0;
-    /**
-     * Previous speed measure time in millisecond.
-     * @type {number}
-     */
-    this._prevSpeedTime = Date.now();
-    /**
-     * More previous speed measure time in millisecond.
-     * @type {number}
-     */
-    this._prevPrevSpeedTime = null;
-    /**
-     * Handle of send state time interval.
-     * @type {number}
-     */
-    this._sendStateHandle = this._prevSpeedTime;
+    this.#ind = ind;
+    this.#state = STATE.RECVING;
+    this.#socket = socket;
+    this.#senderId = senderId;
+    this.#recvPath = recvDir;
+    this.#numItems = numItems;
+    this.#deleteCallback = deleteCallback;
+    this.#sendState = sendState;
+    this.#recvBuf = Buffer.from([]);
+    this.#recvBufArray = [];
+    this.#recvBufArrayLen = 0;
+    this.#haveParsedHeader = false;
+    this.#sendRequestHeader = null;
+    this.#recvHeader = null;
+    this.#itemFlag = 'ok';
+    this.#endFlag = false;
+    this.#haveWrittenEndHeader = false;
+    this.#itemHandle = null;
+    this.#itemName = null;
+    this.#itemSize = 0;
+    this.#itemWrittenBytes = 0;
+    this.#numRecvItem = 0;
+    this.#speedBytes = 0;
+    this.#prevSpeedBytes = 0;
+    this.#prevSpeedTime = Date.now();
+    this.#prevPrevSpeedTime = null;
+    this.#sendStateHandle = null;
 
-    this._init();
+    this.#init();
   }
 
   /**
    * Initialize Receiver by adding event listeners.
    * Call it inside contructor.
    */
-  _init () {
-    this._socket.removeAllListeners('data');
-    this._socket.removeAllListeners('close');
-    this._socket.removeAllListeners('error');
-    this._sendState(this.getState());
-    this._sendStateHandle = setInterval(() => {
-      this._sendState(this.getState());
+  #init () {
+    this.#socket.removeAllListeners('data');
+    this.#socket.removeAllListeners('close');
+    this.#socket.removeAllListeners('error');
+    this.#sendState(this.getState());
+    this.#sendStateHandle = setInterval(() => {
+      this.#sendState(this.getState());
     }, STATE_INTERVAL);
 
-    this._socket.on('data', async (data) => {
-      if (this._haveWrittenEndHeader) {
+    this.#socket.on('data', async (data) => {
+      if (this.#haveWrittenEndHeader) {
         // Have written end header but received data.
         // Consider it as an error.
-        this._handleNetworkErr();
+        this.#handleNetworkErr();
         return;
       }
       let ret = null;
-      if (!this._haveParsedHeader) {
+      if (!this.#haveParsedHeader) {
         // Concatenate and try to parse header and save into header.
-        this._recvBuf = Buffer.concat([this._recvBuf, data]);
-        ret = splitHeader(this._recvBuf);
+        this.#recvBuf = Buffer.concat([this.#recvBuf, data]);
+        ret = splitHeader(this.#recvBuf);
         if (!ret) {
           // The header is still splitted. Wait for more data by return.
           return;
         }
         try {
-          this._recvHeader = JSON.parse(ret.header);
+          this.#recvHeader = JSON.parse(ret.header);
         } catch (err) {
-          this._setState(STATE.ERR_NETWORK);
+          this.#setState(STATE.ERR_NETWORK);
           console.error('Header parsing error. Not JSON format.');
-          this._socket.destroy();
+          this.#socket.destroy();
           return;
         }
-        this._haveParsedHeader = true;
-        this._recvBufArray = [ret.buf];
-        this._recvBuf = Buffer.from([]);
-        this._recvBufArrayLen = ret.buf.length;
+        this.#haveParsedHeader = true;
+        this.#recvBufArray = [ret.buf];
+        this.#recvBuf = Buffer.from([]);
+        this.#recvBufArrayLen = ret.buf.length;
       }
       else {
-        this._recvBufArray.push(data);
-        this._recvBufArrayLen += data.length;
+        this.#recvBufArray.push(data);
+        this.#recvBufArrayLen += data.length;
       }
 
       // Reaching here means we now have header or already have header.
-      switch (this._state) {
+      switch (this.#state) {
       case STATE.RECVING:
-        switch (this._recvHeader.class) {
+        switch (this.#recvHeader.class) {
         case 'ok':
-          if (this._recvBufArrayLen === this._recvHeader.size) {
-            // One whole chunk received.
-            // Write chunk on disk.
+          if (this.#recvBufArrayLen === this.#recvHeader.size) {
             try {
-              await this._itemHandle.appendFile(Buffer.concat(this._recvBufArray));
+              // One whole chunk has been received.
+              // Write the chunk on disk.
+              if (!this.#itemHandle) {
+                throw new Error('#itemHandle is null and this should not be occur.');
+              }
+              await this.#itemHandle.appendFile(Buffer.concat(this.#recvBufArray));
             } catch (err) {
               // Appending to file error.
               // In this error, there is nothing tiShare can do about it.
@@ -171,115 +205,126 @@ class Receiver {
               // mark it failed, and go to next item.
               // TODO mark the item failed.
               try {
-                await this._itemHandle.close();
-                await fs.rm(path.join(this._recvPath, this._itemName), {force: true});
+
+                if (this.#itemHandle) {
+                  await this.#itemHandle.close();
+                }
+                if (this.#itemName) {
+                  await fs.rm(path.join(this.#recvPath, this.#itemName), {force: true});
+                }
               } finally {
-                this._itemHandle = null;
-                this._itemFlag = 'next';
-                this._numRecvItem++;
-                this._writeOnSocket();
+                this.#itemHandle = null;
+                this.#itemFlag = 'next';
+                this.#numRecvItem++;
+                this.sendHeader();
               }
               return;
             }
-            this._speedBytes += this._recvBufArrayLen;
-            this._itemWrittenBytes += this._recvBufArrayLen;
-            this._recvBuf = Buffer.from([]);
-            this._itemFlag = 'ok';
-            this._writeOnSocket();
+            this.#speedBytes += this.#recvBufArrayLen;
+            this.#itemWrittenBytes += this.#recvBufArrayLen;
+            this.#recvBuf = Buffer.from([]);
+            this.#itemFlag = 'ok';
+            this.sendHeader();
           }
           break;
+
         case 'new':
-          this._itemName = path.join(this._recvHeader.dir, this._recvHeader.name);
-          if (this._recvHeader.type === 'directory') {
-            this._haveParsedHeader = false;
-            this._itemSize = 0;
-            this._numRecvItem++;
+          this.#itemName = path.join(this.#recvHeader.dir, this.#recvHeader.name);
+          if (this.#recvHeader.type === 'directory') {
+            this.#haveParsedHeader = false;
+            this.#itemSize = 0;
+            this.#numRecvItem++;
             try {
-              await fs.mkdir(path.join(this._recvPath, this._itemName));
+              await fs.mkdir(path.join(this.#recvPath, this.#itemName));
             } catch (err) {
               if (err.code !== 'EEXIST') {
                 // Making directory failed.
                 // Even making directory failed means there are serious issues.
-                this._setState(STATE.ERR_FILE_SYSTEM);
-                this._socket.destroy();
+                this.#setState(STATE.ERR_FILE_SYSTEM);
+                this.#socket.destroy();
                 return;
               }
             }
-            this._itemFlag = 'ok';
-            this._writeOnSocket();
+            this.#itemFlag = 'ok';
+            this.sendHeader();
           }
-          else if (this._recvHeader.type === 'file') {
+          else if (this.#recvHeader.type === 'file') {
             try {
-              if (this._itemHandle) {
-                this._numRecvItem++;
+              if (this.#itemHandle) {
+                this.#numRecvItem++;
                 // Close previous item handle.
-                await this._itemHandle.close();
+                await this.#itemHandle.close();
               }
-              this._itemHandle = await fs.open(path.join(this._recvPath, this._itemName), 'wx');
+              this.#itemHandle = await fs.open(path.join(this.#recvPath, this.#itemName), 'wx');
             } catch (err) {
               // File already exists.
               // TODO Implement handling.
               // 1. Ignore the file.
               // 2. Create the file with another name.
-              this._itemHandle = null;
-              this._itemFlag = 'next';
-              this._numRecvItem++;
-              this._writeOnSocket();
+              this.#itemHandle = null;
+              this.#itemFlag = 'next';
+              this.#numRecvItem++;
+              this.sendHeader();
               return;
             }
-            this._itemWrittenBytes = 0;
-            this._itemSize = this._recvHeader.size;
-            this._recvBuf = Buffer.from([]);
-            this._itemFlag = 'ok';
-            this._writeOnSocket();
+            this.#itemWrittenBytes = 0;
+            this.#itemSize = this.#recvHeader.size;
+            this.#recvBuf = Buffer.from([]);
+            this.#itemFlag = 'ok';
+            this.sendHeader();
           }
           break;
+
         case 'done':
-          if (this._itemHandle) {
+          if (this.#itemHandle) {
             // Close previous item handle.
-            await this._itemHandle.close();
-            this._itemHandle = null;
+            await this.#itemHandle.close();
+            this.#itemHandle = null;
           }
-          this._setState(STATE.RECV_COMPLETE);
-          this._socket.end();
+          this.#setState(STATE.RECV_COMPLETE);
+          this.#socket.end();
           break;
+
         case 'end':
-          this._setState(STATE.OTHER_END);
-          if (this._itemHandle) {
-            // Close previous item handle.
-            await this._itemHandle.close();
-            await fs.rm(path.join(this._recvPath, this._itemName), {force: true});
+          this.#setState(STATE.OTHER_END);
+          // Close previous item handle and delete.
+          if (this.#itemHandle) {
+            await this.#itemHandle.close();
           }
-          this._socket.end();
+          if (this.#itemName) {
+            await fs.rm(path.join(this.#recvPath, this.#itemName), {force: true});
+          }
+          this.#socket.end();
           break;
         default:
-          this._setState(STATE.ERR_NETWORK);
-          this._socket.destroy();
+          this.#setState(STATE.ERR_NETWORK);
+          this.#socket.destroy();
           return;
         }
         break;
+
       default:
         // What the hell?
         // Unhandled Receiver state case.
-        this._handleNetworkErr();
+        this.#handleNetworkErr();
         return;
       }
     });
 
-    this._socket.on('close', () => {
-      if (!(this._state === STATE.RECV_COMPLETE || this._state === STATE.OTHER_END || this._haveWrittenEndHeader))
+    this.#socket.on('close', () => {
+      if (!(this.#state === STATE.RECV_COMPLETE || this.#state === STATE.OTHER_END || this.#haveWrittenEndHeader))
         // Unexpected close event.
-        this._handleNetworkErr();
-      else if (this._haveWrittenEndHeader)
-        this._deleteCallback(this._ind);
+        this.#handleNetworkErr();
+      else if (this.#haveWrittenEndHeader)
+        this.#deleteCallback(this.#ind);
     });
 
-    this._socket.on('error', (err) => {
+    this.#socket.on('error', (err) => {
       console.error(err.message);
     });
 
-    this._socket.setTimeout(SOCKET_TIMEOUT, () => {
-      this._handleNetworkErr();
+    this.#socket.setTimeout(SOCKET_TIMEOUT, () => {
+      this.#handleNetworkErr();
     });
   }
 
@@ -291,16 +336,16 @@ class Receiver {
   getSpeed () {
     const now = Date.now();
     let ret = 0;
-    if (now === this._prevSpeedTime || this._speedBytes === 0) {
-      if (this._prevPrevSpeedTime === null)
+    if (now === this.#prevSpeedTime || this.#speedBytes === 0) {
+      if (this.#prevPrevSpeedTime === null)
         return 0;
-      return this._prevSpeedBytes / (now - this._prevPrevSpeedTime);
+      return this.#prevSpeedBytes / (now - this.#prevPrevSpeedTime);
     }
-    ret = this._speedBytes / ((now - this._prevSpeedTime) / 1000);
-    this._prevSpeedBytes = this._speedBytes;
-    this._speedBytes = 0;
-    this._prevPrevSpeedTime = this._prevSpeedTime;
-    this._prevSpeedTime = now;
+    ret = this.#speedBytes / ((now - this.#prevSpeedTime) / 1000);
+    this.#prevSpeedBytes = this.#speedBytes;
+    this.#speedBytes = 0;
+    this.#prevPrevSpeedTime = this.#prevSpeedTime;
+    this.#prevSpeedTime = now;
     return ret;
   }
   /**
@@ -310,34 +355,34 @@ class Receiver {
   getItemProgress () {
     // If item type is directory, set this._itemSize to 0.
     // In case of empty file whose size is 0, progress is 100%.
-    return (this._itemSize === 0 ? 100 : Math.floor(this._itemWrittenBytes / this._itemSize * 100));
+    return (this.#itemSize === 0 ? 100 : Math.floor(this.#itemWrittenBytes / this.#itemSize * 100));
   }
   /**
    * Return a string representing the total progress.
    */
   getTotalProgress () {
-    return this._numRecvItem + '/' + this._numItems;
+    return this.#numRecvItem + '/' + this.#numItems;
   }
 
   /**
    * Return the current state
    */
   getState () {
-    if (this._state === STATE.RECVING) {
+    if (this.#state === STATE.RECVING) {
       return {
-        ind: this._ind,
-        state: this._state,
+        ind: this.#ind,
+        state: this.#state,
         speed: this.getSpeed(),
         progress: this.getItemProgress(),
         totalProgress: this.getTotalProgress(),
-        id: this._senderId,
-        itemName: this._itemName,
+        id: this.#senderId,
+        itemName: this.#itemName,
       };
     }
     return {
-      ind: this._ind,
-      state: this._state,
-      id: this._senderId
+      ind: this.#ind,
+      state: this.#state,
+      id: this.#senderId
     };
   }
 
@@ -345,48 +390,52 @@ class Receiver {
      * @param {string} state
      * Sets the state and call sendState.
      */
-  _setState (state) {
-    clearInterval(this._sendStateHandle);
-    this._state = state;
-    this._sendState(this.getState());
+  #setState (state) {
+    if (this.#sendStateHandle) {
+      clearInterval(this.#sendStateHandle);
+    }
+    this.#state = state;
+    this.#sendState(this.getState());
   }
 
   /**
    * End receiving.
-   * @returns {boolean}
+   * @returns {Promise<boolean>}
    */
   async end () {
-    if (this._state === STATE.RECVING) {
-      if (this._itemHandle) {
+    if (this.#state === STATE.RECVING) {
+      if (this.#itemHandle && this.#itemName) {
         // Delete currently receiving file.
-        await this._itemHandle.close();
-        this._itemHandle = null;
-        await fs.rm(path.join(this._recvPath, this._itemName), {force: true});
+        await this.#itemHandle.close();
+        this.#itemHandle = null;
+        await fs.rm(path.join(this.#recvPath, this.#itemName), {force: true});
       }
-      this._endFlag = true;
+      this.#endFlag = true;
       return true;
     }
     return false;
   }
 
   /**
-   * Special method for writing to socket while receiving.
+   * Send header to the opponent, in accordance to the current state.
    */
-  _writeOnSocket () {
+  sendHeader () {
     let header = null;
-    this._haveParsedHeader = false;
-    if (this._endFlag) {
-      this._haveWrittenEndHeader = true;
+    this.#haveParsedHeader = false;
+    if (this.#endFlag) {
+      this.#haveWrittenEndHeader = true;
       header = {class: 'end'};
-      this._socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this._onWriteError);
-      this._deleteCallback(this._ind);
-      clearInterval(this._sendStateHandle);
+      this.#socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this.#onSendError);
+      this.#deleteCallback(this.#ind);
+      if (this.#sendStateHandle) {
+        clearInterval(this.#sendStateHandle);
+      }
       return;
     }
-    switch (this._state) {
+    switch (this.#state) {
     case STATE.RECVING:
-      header = {class: this._itemFlag};
-      this._socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this._onWriteError);
+      header = {class: this.#itemFlag};
+      this.#socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this.#onSendError);
       break;
     default:
       // TODO Handle edge case.
@@ -395,22 +444,22 @@ class Receiver {
   }
 
   /**
-   * @param {Error} err
+   * @param {Error | undefined} err
    */
-  _onWriteError (err) {
+  #onSendError (err) {
     if (err) {
-      console.error('Sender: Error Occurred during writing to Socket.');
+      console.error('Sender: Error Occurred during sending data.');
       console.error(err);
-      this._handleNetworkErr();
+      this.#handleNetworkErr();
     }
   }
 
   /**
    * Handle on corrupted data from receiver.
    */
-  _handleNetworkErr () {
-    this._setState(STATE.ERR_NETWORK);
-    this._socket.destroy();
+  #handleNetworkErr () {
+    this.#setState(STATE.ERR_NETWORK);
+    this.#socket.destroy();
   }
 }
 

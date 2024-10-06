@@ -190,12 +190,14 @@ class Client {
         return;
       }
       switch (recvHeader.class) {
-      case 'ok':
+      case 'ok': {
         // Transform Requester into Sender.
-        this.jobs[ind] = new Receiver(ind, socket, senderId, recvDir, recvHeader.numItems, this.deleteJob, this._sendState);
+        const receiver = new Receiver(ind, socket, senderId, recvDir, recvHeader.numItems, this.deleteJob, this._sendState);
         // Send ok header explictly to notify it is ready to receive.
-        this.jobs[ind]._writeOnSocket();
+        this.jobs[ind] = receiver;
+        receiver.sendHeader();
         break;
+      }
       case 'no':
         this.jobs[ind].setState(STATE.RQR_RECV_REJECT);
         socket.end();

@@ -255,7 +255,7 @@ class Server {
     if (this.jobs[ind]) {
       const receiver = new Receiver(ind, this.jobs[ind]._socket, this.jobs[ind].getId(), recvDir, this.jobs[ind].getNumItems(), this.deleteJob, this._sendState);
       this.jobs[ind] = receiver;
-      receiver._writeOnSocket();
+      receiver.sendHeader();
     }
   }
 
