@@ -11,19 +11,20 @@ class Sender {
   #state;
   /** @type {import('net').Socket} */
   #socket;
-  /** @type {string} _receiver ID. */
+  /** @type {string} receiver ID. */
   #receiverId;
   /**
      * Normalized item array.
      * @type {Array.<{path:string, dir:string, name:string, type:string, size:number}>}
      */
   #itemArray;
-  /** @type {Function} */
+  /**
+   * A callback that is called upon the end.
+   * @type {Function}
+   */
   #onEnd;
   /** @type {Function} */
   #sendState;
-  /** @type {boolean} */
-  #stopFlag;
   /** @type {boolean} */
   #endFlag;
   /** @type {boolean} */
@@ -81,18 +82,17 @@ class Sender {
    * @param {import('net').Socket} socket
    * @param {string!} receiverId
    * @param {Array.<{path:string, dir:string, name:string, type:string, size:number}>} itemArray
-   * @param {Function} deleteCallback
+   * @param {Function} onExitCallback
    * @param {Function} sendState
    */
-  constructor (ind, socket, receiverId, itemArray, deleteCallback, sendState) {
+  constructor (ind, socket, receiverId, itemArray, onExitCallback, sendState) {
     this.#ind = ind;
     this.#state = STATE.SENDING;
     this.#socket = socket;
     this.#receiverId = receiverId;
     this.#itemArray = itemArray;
-    this.#onEnd = deleteCallback;
+    this.#onEnd = onExitCallback;
     this.#sendState = sendState;
-    this.#stopFlag = false;
     this.#endFlag = false;
     this.#haveWrittenEndHeader = false;
     this.#itemSentBytes = 0;
@@ -181,8 +181,8 @@ class Sender {
           break;
         case 'next':
           if (this.#itemHandle) {
-            // _itemHandle is not null only when sending the current item is not finished.
-            // Thus checking it will prevent any unexpected skip.
+            // If itemHandle is not null there is a possibility that the handle has not been closed.
+            // Thus checking it prevents any unexpected behavior.
             await this.#itemHandle.close();
             this.#goToNextItem();
           }
@@ -218,9 +218,7 @@ class Sender {
       console.error(err.message);
     });
 
-    this.#socket.setTimeout(SOCKET_TIMEOUT, () => {
-      this.#handleNetworkErr();
-    });
+    this.#socket.setTimeout(SOCKET_TIMEOUT, this.#handleNetworkErr);
   }
 
   /**
@@ -229,20 +227,6 @@ class Sender {
    */
   getTotalNumItems () {
     return this.#itemArray.length;
-  }
-  /**
-   * Return the number of nested items.
-   * @param {Item} item
-   * @returns {number}
-   */
-  #getNumItems (item) {
-    let ret = 0;
-    for (let subItem in item.items) {
-      ++ret;
-      if (item.type === 'directory')
-        ret += this.#getNumItems(subItem);
-    }
-    return ret;
   }
 
   /**
@@ -265,6 +249,7 @@ class Sender {
     this.#prevSpeedTime = now;
     return ret;
   }
+
   /**
    * Return the current item progress out of 100.
    * @returns {number}
@@ -274,6 +259,7 @@ class Sender {
     // In case of empty file whose size is 0, progress is 100%.
     return (this.#itemSize === 0 ? 100 : Math.floor(this.#itemSentBytes / this.#itemSize * 100));
   }
+
   /**
    * Return a string representing the total progress.
    */
@@ -327,7 +313,7 @@ class Sender {
     if (this.#endFlag) {
       this.#haveWrittenEndHeader = true;
       header = {class: 'end'};
-      this.#socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this.#onWriteError);
+      this.#socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this.#onSendError);
       this.#onEnd(this.#ind);
       if (this.#sendStateHandle) {
         clearInterval(this.#sendStateHandle);
@@ -338,7 +324,7 @@ class Sender {
       // End of send.
       this.#setState(STATE.SEND_COMPLETE);
       header = {class: 'done'};
-      this.#socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this.#onWriteError);
+      this.#socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this.#onSendError);
       return;
     }
     if (!this.#itemHandle) {
@@ -371,20 +357,20 @@ class Sender {
       } catch (err) {
         // Go to next item.
         this.#goToNextItem();
-        setTimeout(() => { this.#send(); }, 0);
+        setTimeout(this.#send, 0);
         return;
       }
       header = JSON.stringify(header);
-      this.#socket.write(Buffer.from(header + HEADER_END, 'utf-8'), this.#onWriteError);
+      this.#socket.write(Buffer.from(header + HEADER_END, 'utf-8'), this.#onSendError);
     }
     else {
-      // itemHandle is null.
+      // itemHandle is not null.
       // Send a chunk with header.
       try {
         let chunk = Buffer.alloc(CHUNKSIZE);
         let ret = await this.#itemHandle.read(chunk, 0, CHUNKSIZE, null);
         this.#itemSentBytes += ret.bytesRead;
-        chunk = chunk.slice(0, ret.bytesRead);
+        chunk = chunk.subarray(0, ret.bytesRead);
         if (this.#itemSentBytes === this.#itemSize) {
           // EOF reached. Done reading this item.
           await this.#itemHandle.close();
@@ -399,12 +385,12 @@ class Sender {
         header = JSON.stringify(header);
         this.#socket.write(Buffer.concat([Buffer.from(header + HEADER_END, 'utf-8'), chunk]), (err) => {
           this.#speedBytes += chunk.byteLength;
-          this.#onWriteError(err);
+          this.#onSendError(err);
         });
       } catch (err) {
         // Go to next item.
         this.#goToNextItem();
-        setTimeout(() => { this.#send(); }, 0);
+        setTimeout(this.#send, 0);
         return;
       }
     }
@@ -418,7 +404,10 @@ class Sender {
     this.#itemHandle = null;
   }
 
-  #onWriteError (err) {
+  /**
+   * @param {Error | undefined} err
+   */
+  #onSendError (err) {
     if (err) {
       console.error('Sender: Error Occurred during writing to Socket.');
       console.error(err);
