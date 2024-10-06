@@ -18,8 +18,11 @@ class Receiver {
   #recvPath;
   /** @type {number} */
   #numItems;
-  /** @type {Function} */
-  #deleteCallback;
+  /**
+   * A callback that is called upon the end.
+   * @type {Function}
+   */
+  #onEnd;
   /** @type {Function} */
   #sendState;
   /** @type {Buffer} */
@@ -103,17 +106,17 @@ class Receiver {
    * @param {string!} senderId
    * @param {string!} recvDir
    * @param {number!} numItems
-   * @param {Function} deleteCallback
+   * @param {Function} onExitCallback
    * @param {Function} sendState
    */
-  constructor (ind, socket, senderId, recvDir, numItems, deleteCallback, sendState) {
+  constructor (ind, socket, senderId, recvDir, numItems, onExitCallback, sendState) {
     this.#ind = ind;
     this.#state = STATE.RECVING;
     this.#socket = socket;
     this.#senderId = senderId;
     this.#recvPath = recvDir;
     this.#numItems = numItems;
-    this.#deleteCallback = deleteCallback;
+    this.#onEnd = onExitCallback;
     this.#sendState = sendState;
     this.#recvBuf = Buffer.from([]);
     this.#recvBufArray = [];
@@ -155,7 +158,7 @@ class Receiver {
       if (this.#haveWrittenEndHeader) {
         // Have written end header but received data.
         // Consider it as an error.
-        this.#handleNetworkErr();
+        this.#onNetworkError();
         return;
       }
       let ret = null;
@@ -306,7 +309,7 @@ class Receiver {
       default:
         // What the hell?
         // Unhandled Receiver state case.
-        this.#handleNetworkErr();
+        this.#onNetworkError();
         return;
       }
     });
@@ -314,18 +317,16 @@ class Receiver {
     this.#socket.on('close', () => {
       if (!(this.#state === STATE.RECV_COMPLETE || this.#state === STATE.OTHER_END || this.#haveWrittenEndHeader))
         // Unexpected close event.
-        this.#handleNetworkErr();
+        this.#onNetworkError();
       else if (this.#haveWrittenEndHeader)
-        this.#deleteCallback(this.#ind);
+        this.#onEnd(this.#ind);
     });
 
     this.#socket.on('error', (err) => {
       console.error(err.message);
     });
 
-    this.#socket.setTimeout(SOCKET_TIMEOUT, () => {
-      this.#handleNetworkErr();
-    });
+    this.#socket.setTimeout(SOCKET_TIMEOUT, this.#onNetworkError);
   }
 
   /**
@@ -426,7 +427,7 @@ class Receiver {
       this.#haveWrittenEndHeader = true;
       header = {class: 'end'};
       this.#socket.write(JSON.stringify(header) + HEADER_END, 'utf-8', this.#onSendError);
-      this.#deleteCallback(this.#ind);
+      this.#onEnd(this.#ind);
       if (this.#sendStateHandle) {
         clearInterval(this.#sendStateHandle);
       }
@@ -450,14 +451,14 @@ class Receiver {
     if (err) {
       console.error('Sender: Error Occurred during sending data.');
       console.error(err);
-      this.#handleNetworkErr();
+      this.#onNetworkError();
     }
   }
 
   /**
    * Handle on corrupted data from receiver.
    */
-  #handleNetworkErr () {
+  #onNetworkError () {
     this.#setState(STATE.ERR_NETWORK);
     this.#socket.destroy();
   }
