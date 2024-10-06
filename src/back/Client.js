@@ -158,7 +158,7 @@ class Client {
     /** @type {Buffer} */
     let _recvBuf = Buffer.from([]);
     const senderIp = this.jobs[ind].opponentIp;
-    const senderId = this.jobs[ind]._opponentId;
+    const senderId = this.jobs[ind].opponentId;
     const socket = net.createConnection(PORT, senderIp);
 
     this.jobs[ind] = new Requester(ind, STATE.RQR_RECV_REQUEST, socket, senderIp, senderId, this._sendState);
