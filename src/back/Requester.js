@@ -5,15 +5,17 @@ class Requester {
   /**
    * @param {number} ind
    * @param {string} state
-   * @param {import('net').Socket|string} socket it will be used for saving sender IP.
+   * @param {import('net').Socket} socket
+   * @param {string} opponentIp
    * @param {string} opponentId
    * @param {Function} sendState
    */
-  constructor (ind, state, socket, opponentId, sendState) {
+  constructor (ind, state, socket, opponentIp, opponentId, sendState) {
     /** @type {number} */
     this._ind = ind;
     this._state = state;
     this._socket = socket;
+    this.opponentIp = opponentIp;
     this._opponentId = opponentId;
     this._haveWrittenEndFlag = false;
     /** @type {Function} */

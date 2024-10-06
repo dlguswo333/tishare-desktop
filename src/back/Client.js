@@ -66,12 +66,12 @@ class Client {
     const ind = this._getNextInd();
     if (!this._myId || ind < 0)
       return false;
-    /** @type {Buffser} */
+    /** @type {Buffer} */
     let _recvBuf = Buffer.from([]);
     const itemArray = await createItemArray(items);
     const socket = net.createConnection(PORT, receiverIp);
 
-    this.jobs[ind] = new Requester(ind, STATE.RQR_SEND_REQUEST, socket, receiverId, this._sendState);
+    this.jobs[ind] = new Requester(ind, STATE.RQR_SEND_REQUEST, socket, receiverIp, receiverId, this._sendState);
 
     socket.once('connect', async () => {
       console.log('sendRequest: connected to ' + socket.remoteAddress);
@@ -138,14 +138,14 @@ class Client {
 
   /**
    * Prepare to request to receive from the opponent.
-   * @param {number} ind
-   * @returns {boolean}
+   * @param {string} senderIp
+   * @param {string} senderId
    */
   preRecvRequest (senderIp, senderId) {
     const ind = this._getNextInd();
     if (!this._myId || ind < 0)
-      return false;
-    this.jobs[ind] = new Requester(ind, STATE.RQR_PRE_RECV_REQUEST, senderIp, senderId, this._sendState);
+      return;
+    this.jobs[ind] = new Requester(ind, STATE.RQR_PRE_RECV_REQUEST, null, senderIp, senderId, this._sendState);
   }
 
   /**
@@ -157,11 +157,11 @@ class Client {
   recvRequest (ind, recvDir) {
     /** @type {Buffer} */
     let _recvBuf = Buffer.from([]);
-    const senderIp = this.jobs[ind]._socket;
+    const senderIp = this.jobs[ind].opponentIp;
     const senderId = this.jobs[ind]._opponentId;
     const socket = net.createConnection(PORT, senderIp);
 
-    this.jobs[ind] = new Requester(ind, STATE.RQR_RECV_REQUEST, socket, senderId, this._sendState);
+    this.jobs[ind] = new Requester(ind, STATE.RQR_RECV_REQUEST, socket, senderIp, senderId, this._sendState);
 
     socket.once('connect', async () => {
       console.log('recvRequest: connected to ' + socket.remoteAddress);
