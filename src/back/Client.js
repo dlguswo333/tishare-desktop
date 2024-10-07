@@ -86,6 +86,7 @@ class Client {
       if (!ret) {
         if (_recvBuf.length > MAX_HEADER_LEN) {
           // Abort this suspicious connection.
+          socket.destroy();
           this._handleNetworkErr(ind);
         }
         // Has not received header yet. just exit the function here for more data by return.
@@ -96,6 +97,7 @@ class Client {
       } catch (err) {
         // HEADER_END is met but is not JSON format.
         // Abort this suspicious connection.
+        socket.destroy();
         this._handleNetworkErr(ind);
         return;
       }
@@ -110,6 +112,7 @@ class Client {
         socket.end();
         break;
       default:
+        socket.destroy();
         this._handleNetworkErr(ind);
       }
     });
@@ -186,6 +189,7 @@ class Client {
       } catch (err) {
         // HEADER_END is met but is not JSON format.
         // Abort this suspicious connection.
+        socket.destroy();
         this._handleNetworkErr(ind);
         return;
       }
@@ -203,6 +207,7 @@ class Client {
         socket.end();
         break;
       default:
+        socket.destroy();
         this._handleNetworkErr(ind);
       }
     });
@@ -284,7 +289,6 @@ class Client {
    */
   _handleNetworkErr (ind) {
     if (this.jobs[ind]) {
-      this.jobs[ind]._socket.destroy();
       this.jobs[ind].setState(STATE.ERR_NETWORK);
     }
   }

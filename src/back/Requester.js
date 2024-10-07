@@ -71,12 +71,11 @@ class Requester {
     };
   }
 
-  #onSendError (err) {
-    if (err) {
-      console.error(err.message);
-      this.setState(STATE.ERR_NETWORK);
-    }
-  }
+  #onSendError = () => {
+    // Silently ignore error because the only case that the requester sends data to the other is
+    // when it wants to cancel the request.
+    this.#socket.destroy();
+  };
 }
 
 module.exports = Requester;
