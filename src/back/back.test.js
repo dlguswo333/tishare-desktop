@@ -109,7 +109,7 @@ describe('Server and client', () => {
     });
     it('set ID', () => {
       client.setMyId(clientId);
-      assert.strictEqual(client._myId, clientId);
+      assert.strictEqual(client.myId, clientId);
     });
 
     after(async () => {
