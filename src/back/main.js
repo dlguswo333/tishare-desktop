@@ -236,8 +236,8 @@ ipcMain.handle('recvRequest', (_, ind, recvDir) => {
   client.recvRequest(ind, recvDir);
 });
 
-ipcMain.handle('endJob', (_, ind) => {
-  let ret = server.endJob(ind);
+ipcMain.handle('endJob', async (_, ind) => {
+  let ret = await server.endJob(ind);
   if (ret)
     return ret;
   ret = client.endJob(ind);
