@@ -252,26 +252,30 @@ class Server {
    * @param {string} recvDir
    */
   acceptSendRequest (ind, recvDir) {
-    if (this.jobs[ind]) {
-      const receiver = new Receiver(ind, this.jobs[ind]._socket, this.jobs[ind].getId(), recvDir, this.jobs[ind].getNumItems(), this.deleteJob, this._sendState);
-      this.jobs[ind] = receiver;
-      receiver.sendHeader();
+    const requestee = this.jobs[ind];
+    if (!(requestee instanceof Requestee)) {
+      throw new Error(`Requestee expected but got ${this.jobs[ind]}`);
     }
+    const receiver = new Receiver(ind, requestee.socket, requestee.getId(), recvDir, requestee.getNumItems(), this.deleteJob, this._sendState);
+    this.jobs[ind] = receiver;
+    receiver.sendHeader();
   }
 
   /**
    * Accept receive request.
    * @param {number} ind
-   * @param {import('./Common').item} items
+   * @param {Object.<string, import('./Common').Item>} items
    */
   async acceptRecvRequest (ind, items) {
-    if (this.jobs[ind]) {
-      const socket = this.jobs[ind]._socket;
-      const itemArray = await createItemArray(items);
-      const sender = new Sender(ind, this.jobs[ind]._socket, this.jobs[ind].getId(), itemArray, this.deleteJob, this._sendState);
-      this.jobs[ind] = sender;
-      socket.write(JSON.stringify({class: 'ok', numItems: itemArray.length}) + HEADER_END, 'utf-8');
+    const requestee = this.jobs[ind];
+    if (!(requestee instanceof Requestee)) {
+      throw new Error(`Requestee expected but got ${this.jobs[ind]}`);
     }
+    const socket = requestee.socket;
+    const itemArray = await createItemArray(items);
+    const sender = new Sender(ind, requestee.socket, requestee.getId(), itemArray, this.deleteJob, this._sendState);
+    this.jobs[ind] = sender;
+    socket.write(JSON.stringify({class: 'ok', numItems: itemArray.length}) + HEADER_END, 'utf-8');
   }
 
   /**
@@ -295,6 +299,7 @@ class Server {
     }
     return false;
   }
+
   /**
    * Delete a Job from jobs.
    * This function must be preceded by endJob.
@@ -315,7 +320,6 @@ class Server {
    */
   _handleNetworkErr (ind) {
     if (this.jobs[ind]) {
-      this.jobs[ind]._socket.destroy();
       this.jobs[ind].setState(STATE.ERR_NETWORK);
     }
   }

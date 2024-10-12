@@ -2,6 +2,17 @@ const {STATE} = require('../defs');
 const {HEADER_END} = require('./Common');
 
 class Requestee {
+  /** @type {number} */
+  #ind;
+  /** @type {STATE[keyof STATE]} */
+  #state;
+  socket;
+  /** @type {import('./Common').SendRequestHeader} */
+  #requestHeader;
+  #haveRejectedFlag;
+  /** @type {Function} */
+  #sendState;
+
   /**
    * @param {number} ind
    * @param {string} state
@@ -10,27 +21,25 @@ class Requestee {
    * @param {Function} sendState
    */
   constructor (ind, state, socket, requestHeader, sendState) {
-    /** @type {number} */
-    this._ind = ind;
-    this._state = state;
-    this._socket = socket;
-    this._requestHeader = requestHeader;
-    this._haveRejectedFlag = false;
-    /** @type {Function} */
-    this._sendState = sendState;
-    this._sendState(this.getState());
+    this.#ind = ind;
+    this.#state = state;
+    this.socket = socket;
+    this.#requestHeader = requestHeader;
+    this.#haveRejectedFlag = false;
+    this.#sendState = sendState;
+    this.#sendState(this.getState());
   }
 
   /**
    * Reject Request.
    */
   reject () {
-    this._haveRejectedFlag = true;
-    if (this._state === STATE.RQE_SEND_REQUEST) {
-      this._socket.write(JSON.stringify({class: 'no'}) + HEADER_END, 'utf-8', this._onWriteError);
+    this.#haveRejectedFlag = true;
+    if (this.#state === STATE.RQE_SEND_REQUEST) {
+      this.socket.write(JSON.stringify({class: 'no'}) + HEADER_END, 'utf-8', this.#onSendError);
     }
-    if (this._state === STATE.RQE_RECV_REQUEST) {
-      this._socket.write(JSON.stringify({class: 'no'}) + HEADER_END, 'utf-8', this._onWriteError);
+    if (this.#state === STATE.RQE_RECV_REQUEST) {
+      this.socket.write(JSON.stringify({class: 'no'}) + HEADER_END, 'utf-8', this.#onSendError);
     }
   }
 
@@ -39,7 +48,7 @@ class Requestee {
    * @returns {boolean}
    */
   getRejectFlag () {
-    return this._haveRejectedFlag;
+    return this.#haveRejectedFlag;
   }
 
   /**
@@ -47,16 +56,16 @@ class Requestee {
    * @param {string} state
    */
   setState (state) {
-    this._state = state;
-    this._sendState(this.getState());
+    this.#state = state;
+    this.#sendState(this.getState());
   }
 
   getId () {
-    return this._requestHeader.id;
+    return this.#requestHeader.id;
   }
 
   getNumItems () {
-    return (this._requestHeader.numItems ? this._requestHeader.numItems : 0);
+    return (this.#requestHeader.numItems ? this.#requestHeader.numItems : 0);
   }
 
   /**
@@ -64,13 +73,13 @@ class Requestee {
    */
   getState () {
     return {
-      ind: this._ind,
-      state: this._state,
-      id: this._requestHeader.id
+      ind: this.#ind,
+      state: this.#state,
+      id: this.#requestHeader.id
     };
   }
 
-  _onWriteError (err) {
+  #onSendError (err) {
     if (err) {
       console.error(err.message);
       this.setState(STATE.ERR_NETWORK);

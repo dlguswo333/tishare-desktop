@@ -5,6 +5,8 @@ const MAX_HEADER_LEN = 10000;
 const HEADER_END = '\n\n';
 /**
  * @typedef {{dir:string, path:string, type:string, size:number}} Item
+ * @typedef {{app: string; version: string; class: string; id: string; numItems: number;}} SendRequestHeader
+ * @typedef {{app: string; version: string; class: string; id: string;}} RecvRequestHeader
  */
 
 /**

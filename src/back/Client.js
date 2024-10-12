@@ -220,19 +220,19 @@ class Client {
   /**
    * Create and return send request header.
    * @param {number} numItems
-   * @returns {{app:string, version: string, class: string, id: string}}
+   * @returns {import('./Common').SendRequestHeader}
    */
   #createSendRequestHeader (numItems) {
-    let header = {app: 'tiShare', version: VERSION, class: 'send-request', id: this.myId, numItems: numItems};
+    const header = {app: 'tiShare', version: VERSION, class: 'send-request', id: this.myId, numItems: numItems};
     return header;
   }
 
   /**
    * Create and return recv request header.
-   * @returns {{app:string, version: string, class: string, id: string}}
+   * @returns {import('./Common').RecvRequestHeader}
    */
   #createRecvRequestHeader () {
-    let header = {app: 'tiShare', version: VERSION, class: 'recv-request', id: this.myId};
+    const header = {app: 'tiShare', version: VERSION, class: 'recv-request', id: this.myId};
     return header;
   }
 
