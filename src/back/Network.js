@@ -21,12 +21,12 @@ function getNetworks () {
 }
 
 /**
- * Returns boolean value whether a given IP string is local(private) or not. 
+ * Returns boolean value whether a given IP string is local(private) or not.
  * @param {string} ip
  * @returns {boolean}
  */
 function isLocalIp (ip) {
-  const ipAsNum = _ipStringToNumber(ip);
+  const ipAsNum = ipStringToNumber(ip);
   if ((167772160 <= ipAsNum && ipAsNum <= 184549375) || (2886729728 <= ipAsNum && ipAsNum <= 2887778303) || (3232235520 <= ipAsNum && ipAsNum <= 3232301055)) {
     return true;
   }
@@ -35,20 +35,20 @@ function isLocalIp (ip) {
 
 /**
  * @callback scanCallback
- * @param {String} deviceIp 
- * @param {String} deviceVersion Version of tiShare 
- * @param {String} deviceId 
- * @param {String} deviceOs 
+ * @param {String} deviceIp
+ * @param {String} deviceVersion Version of tiShare
+ * @param {String} deviceId
+ * @param {String} deviceOs
  */
 /**
- * 
- * @param {String} ip 
- * @param {String} netmask 
- * @param {String} myId 
+ *
+ * @param {String} ip
+ * @param {String} netmask
+ * @param {String} myId
  * @param {scanCallback} callback Callback function to call when found a device.
  */
 function scan (ip, netmask, myId, callback) {
-  const broadcastIp = _getBroadcastIp(ip, netmask);
+  const broadcastIp = getBroadcastIp(ip, netmask);
   const socket = dgram.createSocket('udp4');
 
   // Bind socket.
@@ -89,7 +89,7 @@ function scan (ip, netmask, myId, callback) {
  * @param {String} ip String representation of IPv4.
  * @returns {number} Number representation of IPv4.
  */
-function _ipStringToNumber (ip) {
+function ipStringToNumber (ip) {
   let tmp = ip.split('.');
   let ret = 0;
   for (let i = 0; i < 4; ++i) {
@@ -104,7 +104,7 @@ function _ipStringToNumber (ip) {
  * @param {number} ip Number representation of IPv4.
  * @returns {String} String representation of IPv4.
  */
-function _ipNumberToString (ip) {
+function ipNumberToString (ip) {
   let ret = '';
   for (let i = 0; i < 4; ++i) {
     let tmp = 255 & ip;
@@ -118,12 +118,12 @@ function _ipNumberToString (ip) {
 
 /**
  * Return broadcast ip address.
- * @param {String} ip 
- * @param {String} netmask 
+ * @param {String} ip
+ * @param {String} netmask
  * @returns {String}
  */
-function _getBroadcastIp (ip, netmask) {
-  return _ipNumberToString((_ipStringToNumber(ip) | (2 ** 32 - 1 - _ipStringToNumber(netmask))) >>> 0);
+function getBroadcastIp (ip, netmask) {
+  return ipNumberToString((ipStringToNumber(ip) | (2 ** 32 - 1 - ipStringToNumber(netmask))) >>> 0);
 }
 
-module.exports = {getNetworks, isLocalIp, scan, _getBroadcastIp};
+module.exports = {getNetworks, isLocalIp, scan, getBroadcastIp};

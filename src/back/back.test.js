@@ -36,23 +36,23 @@ describe('Indexer', () => {
 });
 
 describe('Network', () => {
-  const {_getBroadcastIp, isLocalIp} = require('./Network');
+  const {getBroadcastIp, isLocalIp} = require('./Network');
   describe('Get Broadcast IP', () => {
     const ip = '192.168.0.1';
     it('Test 1', () => {
       const netmask = '255.255.255.0';
       const expected = '192.168.0.255';
-      assert.strictEqual(_getBroadcastIp(ip, netmask), expected);
+      assert.strictEqual(getBroadcastIp(ip, netmask), expected);
     });
     it('Test 2', () => {
       const netmask = '255.255.0.0';
       const expected = '192.168.255.255';
-      assert.strictEqual(_getBroadcastIp(ip, netmask), expected);
+      assert.strictEqual(getBroadcastIp(ip, netmask), expected);
     });
     it('Test 3', () => {
       const netmask = '255.255.255.128';
       const expected = '192.168.0.127';
-      assert.strictEqual(_getBroadcastIp(ip, netmask), expected);
+      assert.strictEqual(getBroadcastIp(ip, netmask), expected);
     });
   });
   describe('Determine is IP local', () => {

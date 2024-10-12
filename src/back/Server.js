@@ -6,7 +6,7 @@ const Sender = require('./Sender');
 const Receiver = require('./Receiver');
 const {PORT, VERSION, STATE} = require('../defs');
 const {OS} = require('./defs');
-const {_getBroadcastIp} = require('./Network');
+const {getBroadcastIp} = require('./Network');
 const {splitHeader, MAX_HEADER_LEN, createItemArray, HEADER_END} = require('./Common');
 
 class Server {
@@ -66,7 +66,7 @@ class Server {
       this.#state = STATE.ERR_IP;
       return false;
     }
-    this.#initScannee(ip, _getBroadcastIp(ip, netmask));
+    this.#initScannee(ip, getBroadcastIp(ip, netmask));
     if (this.#serverSocket)
       return true;
     this.#serverSocket = net.createServer();
