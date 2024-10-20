@@ -7,7 +7,6 @@ const Server = require('./Server');
 const Client = require('./Client');
 const {MAX_NUM_JOBS} = require('../defs');
 const {after, before} = require('mocha');
-/** @typedef {{dir:string, path:string, type:string, size:number}} Item */
 
 describe('Indexer', () => {
   const indexer = new Indexer(() => { }, () => { });
@@ -95,7 +94,7 @@ describe('Server and client', () => {
     });
   });
   describe('Client', () => {
-    /** @type {Object.<string, Item>} */
+    /** @type {Object.<string, import('./Common').Item>} */
     let items = null;
     before(async () => {
       items = await createItems();
@@ -131,7 +130,7 @@ async function createItems () {
 }
 
 /**
- * @param {Object.<string, Item} items
+ * @param {Object.<string, import('./Common').Item} items
  */
 async function deleteItems (items) {
   for (let itemName in items) {

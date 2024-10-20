@@ -354,7 +354,7 @@ class Receiver {
    * @returns {number}
    */
   getItemProgress () {
-    // If item type is directory, set this._itemSize to 0.
+    // If item type is directory, set this.#itemSize to 0.
     // In case of empty file whose size is 0, progress is 100%.
     return (this.#itemSize === 0 ? 100 : Math.floor(this.#itemWrittenBytes / this.#itemSize * 100));
   }
