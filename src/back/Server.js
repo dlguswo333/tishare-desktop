@@ -1,3 +1,4 @@
+// @ts-check
 const dgram = require('dgram');
 const net = require('net');
 const Requestee = require('./Requestee');
@@ -5,27 +6,34 @@ const Sender = require('./Sender');
 const Receiver = require('./Receiver');
 const {PORT, VERSION, STATE} = require('../defs');
 const {OS} = require('./defs');
-const {_getBroadcastIp} = require('./Network');
+const {getBroadcastIp} = require('./Network');
 const {splitHeader, MAX_HEADER_LEN, createItemArray, HEADER_END} = require('./Common');
 
 class Server {
+  /** @type {import('./Indexer')} */
+  #indexer;
+  /** @type {Function} */
+  #sendState;
+  /** @type {STATE[keyof STATE]} */
+  #state;
+  /** @type {dgram.Socket | null} */
+  #scannee = null;
+  /** @type {net.Server | null} */
+  #serverSocket;
+  /** @type {Object.<number, (Sender|Receiver|Requestee)>} */
+  jobs;
+
   /**
    * @param {import('./Indexer')} indexer
    * @param {Function} sendState
    */
   constructor (indexer, sendState) {
-    /** @type {import('./Indexer')} */
-    this._indexer = indexer;
-    /** @type {Function} */
-    this._sendState = sendState;
-    this._state = STATE.IDLE;
-    /** @type {string} */
+    this.#indexer = indexer;
+    this.#sendState = sendState;
+    this.#state = STATE.IDLE;
     this.myId = '';
-    /** @type {dgram.Socket} */
-    this._scannee = null;
-    /** @type {net.Server} */
-    this._serverSocket = null;
-    /** @type {Object.<number, (Sender|Receiver|Requestee)>} */
+    this.#scannee = null;
+    this.#serverSocket = null;
     this.jobs = {};
     this.deleteJob = this.deleteJob.bind(this);
   }
@@ -51,33 +59,35 @@ class Server {
    */
   open (ip, netmask) {
     if (!this.myId) {
-      this._state = STATE.ERR_ID;
+      this.#state = STATE.ERR_ID;
       return false;
     }
     if (!ip) {
-      this._state = STATE.ERR_IP;
+      this.#state = STATE.ERR_IP;
       return false;
     }
-    this._initScannee(ip, _getBroadcastIp(ip, netmask));
-    if (this._serverSocket)
+    this.#initScannee(ip, getBroadcastIp(ip, netmask));
+    if (this.#serverSocket)
       return true;
-    this._serverSocket = net.createServer();
-    this._serverSocket.on('connection', async (socket) => {
-      const ind = this._getNextInd();
-      if (ind < 0 || this._state.startsWith('ERR')) {
+    this.#serverSocket = net.createServer();
+
+    this.#serverSocket.on('connection', async (socket) => {
+      const ind = this.#getNextInd();
+      if (ind < 0 || this.#state.startsWith('ERR')) {
         // Do not accept more than limit or Server is in error state.
         socket.destroy();
         return;
       }
-      let _recvBuf = Buffer.from([]);
+      let recvBuf = Buffer.from([]);
+
       socket.on('data', (data) => {
         let recvHeader = null;
-        _recvBuf = Buffer.concat([_recvBuf, data]);
-        const ret = splitHeader(_recvBuf);
+        recvBuf = Buffer.concat([recvBuf, data]);
+        const ret = splitHeader(recvBuf);
         if (!ret) {
-          if (_recvBuf.length > MAX_HEADER_LEN) {
+          if (recvBuf.length > MAX_HEADER_LEN) {
             // Abort this suspicious connection.
-            this._handleNetworkErr(ind);
+            this.#handleNetworkErr(ind);
           }
           // Has not received header yet. just exit the function here for more data by return.
           return;
@@ -87,60 +97,61 @@ class Server {
         } catch (err) {
           // HEADER_END is met but is not JSON format.
           // Abort and ignore this suspicious connection.
-          this._handleNetworkErr(ind);
+          this.#handleNetworkErr(ind);
           return;
         }
-        _recvBuf = ret.buf;
+        recvBuf = ret.buf;
         switch (recvHeader.class) {
         case 'send-request':
-          if (!this._validateRequestHeader(recvHeader)) {
+          if (!this.#validateRequestHeader(recvHeader)) {
             // Abort and ignore this suspicious connection.
-            this._handleNetworkErr(ind);
+            this.#handleNetworkErr(ind);
             return;
           }
-          this.jobs[ind] = new Requestee(ind, STATE.RQE_SEND_REQUEST, socket, recvHeader, this._sendState);
+          this.jobs[ind] = new Requestee(ind, STATE.RQE_SEND_REQUEST, socket, recvHeader, this.#sendState);
           break;
         case 'recv-request':
-          if (!this._validateRequestHeader(recvHeader)) {
+          if (!this.#validateRequestHeader(recvHeader)) {
             // Abort and ignore this suspicious connection.
-            this._handleNetworkErr(ind);
+            this.#handleNetworkErr(ind);
             return;
           }
-          this.jobs[ind] = new Requestee(ind, STATE.RQE_RECV_REQUEST, socket, recvHeader, this._sendState);
+          this.jobs[ind] = new Requestee(ind, STATE.RQE_RECV_REQUEST, socket, recvHeader, this.#sendState);
           break;
         case 'end':
-          if (this.jobs[ind])
+          if (this.jobs[ind] instanceof Requestee)
             this.jobs[ind].setState(STATE.RQE_CANCEL);
           socket.end();
           break;
         default:
           // Abort and ignore this suspicious connection.
-          this._handleNetworkErr(ind);
+          this.#handleNetworkErr(ind);
         }
       });
       socket.on('close', () => {
-        if (this.jobs[ind]) {
+        if (this.jobs[ind] instanceof Requestee) {
           if (this.jobs[ind].getState().state === STATE.RQE_CANCEL || this.jobs[ind].getRejectFlag()) {
             if (this.jobs[ind].getRejectFlag())
               this.deleteJob(ind);
             else
               this.jobs[ind].setState(STATE.RQE_CANCEL);
           }
-          else
-            this._handleNetworkErr(ind);
+          else {
+            this.#handleNetworkErr(ind);
+          }
         }
         // If this socket was not registered, do nothing.
       });
     });
 
-    this._serverSocket.on('error', (err) => {
+    this.#serverSocket.on('error', (err) => {
       console.error(err.message);
-      this._state = STATE.ERR_NETWORK;
+      this.#state = STATE.ERR_NETWORK;
       this.close();
     });
 
-    this._serverSocket.listen(PORT, ip);
-    this._state = STATE.IDLE;
+    this.#serverSocket.listen(PORT, ip);
+    this.#state = STATE.IDLE;
     return true;
   }
 
@@ -149,16 +160,16 @@ class Server {
    * @returns {boolean} Always true.
    */
   close () {
-    if (this._serverSocket) {
-      this._serverSocket.close((err) => {
+    if (this.#serverSocket) {
+      this.#serverSocket.close((err) => {
         if (err)
           console.error(err);
       });
-      this._serverSocket = null;
+      this.#serverSocket = null;
     }
-    if (this._scannee) {
-      this._scannee.close();
-      this._scannee = null;
+    if (this.#scannee) {
+      this.#scannee.close();
+      this.#scannee = null;
     }
     return true;
   }
@@ -186,11 +197,12 @@ class Server {
    * @param {string} ip
    * @param {string} broadcastIp
    */
-  _initScannee (ip, broadcastIp) {
-    this._scannee = dgram.createSocket('udp4');
+  #initScannee (ip, broadcastIp) {
+    const scanneeSocket = dgram.createSocket('udp4');
+    this.#scannee = scanneeSocket;
     // If OS is linux, bind to broadcast IP address.
-    this._scannee.bind(PORT, (OS === 'linux' ? broadcastIp : ip), () => {
-      this._scannee.on('message', (msg, rinfo) => {
+    scanneeSocket.bind(PORT, (OS === 'linux' ? broadcastIp : ip), () => {
+      scanneeSocket.on('message', (msg, rinfo) => {
         let recvHeader = null;
         try {
           recvHeader = JSON.parse(msg.toString('utf-8'));
@@ -208,7 +220,7 @@ class Server {
           id: this.myId,
           os: OS
         };
-        this._scannee.send(JSON.stringify(sendHeader), rinfo.port, rinfo.address);
+        scanneeSocket.send(JSON.stringify(sendHeader), rinfo.port, rinfo.address);
       });
     });
   }
@@ -218,21 +230,14 @@ class Server {
    * @returns {boolean}
    */
   isOpen () {
-    return this._serverSocket && this._serverSocket.listening;
+    return this.#serverSocket?.listening ?? false;
   }
 
-  _destoryScannee () {
-    if (this._scannee) {
-      this._scannee.close();
-      this._scannee = null;
-    }
+  #getNextInd () {
+    return this.#indexer.getInd();
   }
 
-  _getNextInd () {
-    return this._indexer.getInd();
-  }
-
-  _validateRequestHeader (header) {
+  #validateRequestHeader (header) {
     if (!header)
       return false;
     if (header.app !== 'tiShare')
@@ -252,26 +257,30 @@ class Server {
    * @param {string} recvDir
    */
   acceptSendRequest (ind, recvDir) {
-    if (this.jobs[ind]) {
-      const receiver = new Receiver(ind, this.jobs[ind]._socket, this.jobs[ind].getId(), recvDir, this.jobs[ind].getNumItems(), this.deleteJob, this._sendState);
-      this.jobs[ind] = receiver;
-      receiver._writeOnSocket();
+    const requestee = this.jobs[ind];
+    if (!(requestee instanceof Requestee)) {
+      throw new Error(`Requestee expected but got ${this.jobs[ind]}`);
     }
+    const receiver = new Receiver(ind, requestee.socket, requestee.getId(), recvDir, requestee.getNumItems(), this.deleteJob, this.#sendState);
+    this.jobs[ind] = receiver;
+    receiver.sendHeader();
   }
 
   /**
    * Accept receive request.
    * @param {number} ind
-   * @param {import('./Common').item} items
+   * @param {Object.<string, import('./Common').Item>} items
    */
   async acceptRecvRequest (ind, items) {
-    if (this.jobs[ind]) {
-      const socket = this.jobs[ind]._socket;
-      const itemArray = await createItemArray(items);
-      const sender = new Sender(ind, this.jobs[ind]._socket, this.jobs[ind].getId(), itemArray, this.deleteJob, this._sendState);
-      this.jobs[ind] = sender;
-      socket.write(JSON.stringify({class: 'ok', numItems: itemArray.length}) + HEADER_END, 'utf-8');
+    const requestee = this.jobs[ind];
+    if (!(requestee instanceof Requestee)) {
+      throw new Error(`Requestee expected but got ${this.jobs[ind]}`);
     }
+    const socket = requestee.socket;
+    const itemArray = await createItemArray(items);
+    const sender = new Sender(ind, requestee.socket, requestee.getId(), itemArray, this.deleteJob, this.#sendState);
+    this.jobs[ind] = sender;
+    socket.write(JSON.stringify({class: 'ok', numItems: itemArray.length}) + HEADER_END, 'utf-8');
   }
 
   /**
@@ -279,7 +288,7 @@ class Server {
    * @param {number} ind
    */
   rejectRequest (ind) {
-    if (this.jobs[ind]) {
+    if (this.jobs[ind] && 'reject' in this.jobs[ind]) {
       this.jobs[ind].reject();
     }
   }
@@ -287,14 +296,15 @@ class Server {
   /**
    * End a Job.
    * @param {number} ind
-   * @returns {boolean} Whether the execution has been successful.
+   * @returns {boolean | Promise<boolean>} Whether the execution has been successful.
    */
   endJob (ind) {
-    if (this.jobs[ind]) {
+    if (this.jobs[ind] && 'end' in this.jobs[ind]) {
       return this.jobs[ind].end();
     }
     return false;
   }
+
   /**
    * Delete a Job from jobs.
    * This function must be preceded by endJob.
@@ -304,7 +314,7 @@ class Server {
   deleteJob (ind) {
     if (this.jobs[ind]) {
       delete this.jobs[ind];
-      this._indexer.returnInd(ind);
+      this.#indexer.returnInd(ind);
       return true;
     }
     return false;
@@ -312,10 +322,10 @@ class Server {
 
   /**
    * Handle network error on Requestee.
+   * @param {number} ind
    */
-  _handleNetworkErr (ind) {
-    if (this.jobs[ind]) {
-      this.jobs[ind]._socket.destroy();
+  #handleNetworkErr (ind) {
+    if (this.jobs[ind] && ('setState' in this.jobs[ind])) {
       this.jobs[ind].setState(STATE.ERR_NETWORK);
     }
   }

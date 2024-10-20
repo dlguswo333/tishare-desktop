@@ -7,7 +7,6 @@ const Server = require('./Server');
 const Client = require('./Client');
 const {MAX_NUM_JOBS} = require('../defs');
 const {after, before} = require('mocha');
-/** @typedef {{dir:string, path:string, type:string, size:number}} Item */
 
 describe('Indexer', () => {
   const indexer = new Indexer(() => { }, () => { });
@@ -36,23 +35,23 @@ describe('Indexer', () => {
 });
 
 describe('Network', () => {
-  const {_getBroadcastIp, isLocalIp} = require('./Network');
+  const {getBroadcastIp, isLocalIp} = require('./Network');
   describe('Get Broadcast IP', () => {
     const ip = '192.168.0.1';
     it('Test 1', () => {
       const netmask = '255.255.255.0';
       const expected = '192.168.0.255';
-      assert.strictEqual(_getBroadcastIp(ip, netmask), expected);
+      assert.strictEqual(getBroadcastIp(ip, netmask), expected);
     });
     it('Test 2', () => {
       const netmask = '255.255.0.0';
       const expected = '192.168.255.255';
-      assert.strictEqual(_getBroadcastIp(ip, netmask), expected);
+      assert.strictEqual(getBroadcastIp(ip, netmask), expected);
     });
     it('Test 3', () => {
       const netmask = '255.255.255.128';
       const expected = '192.168.0.127';
-      assert.strictEqual(_getBroadcastIp(ip, netmask), expected);
+      assert.strictEqual(getBroadcastIp(ip, netmask), expected);
     });
   });
   describe('Determine is IP local', () => {
@@ -95,7 +94,7 @@ describe('Server and client', () => {
     });
   });
   describe('Client', () => {
-    /** @type {Object.<string, Item>} */
+    /** @type {Object.<string, import('./Common').Item>} */
     let items = null;
     before(async () => {
       items = await createItems();
@@ -109,7 +108,7 @@ describe('Server and client', () => {
     });
     it('set ID', () => {
       client.setMyId(clientId);
-      assert.strictEqual(client._myId, clientId);
+      assert.strictEqual(client.myId, clientId);
     });
 
     after(async () => {
@@ -131,7 +130,7 @@ async function createItems () {
 }
 
 /**
- * @param {Object.<string, Item} items
+ * @param {Object.<string, import('./Common').Item} items
  */
 async function deleteItems (items) {
   for (let itemName in items) {

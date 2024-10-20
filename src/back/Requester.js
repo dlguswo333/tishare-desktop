@@ -2,32 +2,44 @@ const {STATE} = require('../defs');
 const {HEADER_END} = require('./Common');
 
 class Requester {
+  /** @type {number} */
+  #ind;
+  /** @type {STATE[keyof STATE]} */
+  #state;
+  /** @param {import('net').Socket | null} */
+  #socket;
+  /** @type {boolean} */
+  #haveWrittenEndFlag;
+  /** @type {Function} */
+  #sendState;
+
   /**
    * @param {number} ind
    * @param {string} state
-   * @param {import('net').Socket|string} socket it will be used for saving sender IP.
+   * @param {import('net').Socket | null} socket Can be `null` if it is pre-receive request.
+   * @param {string} opponentIp
    * @param {string} opponentId
    * @param {Function} sendState
    */
-  constructor (ind, state, socket, opponentId, sendState) {
+  constructor (ind, state, socket, opponentIp, opponentId, sendState) {
     /** @type {number} */
-    this._ind = ind;
-    this._state = state;
-    this._socket = socket;
-    this._opponentId = opponentId;
-    this._haveWrittenEndFlag = false;
-    /** @type {Function} */
-    this._sendState = sendState;
-    this._sendState(this.getState());
+    this.#ind = ind;
+    this.#state = state;
+    this.#socket = socket;
+    this.opponentIp = opponentIp;
+    this.opponentId = opponentId;
+    this.#haveWrittenEndFlag = false;
+    this.#sendState = sendState;
+    this.#sendState(this.getState());
   }
 
   /**
    * Cancel Request.
    */
   end () {
-    this._haveWrittenEndFlag = true;
-    if (this._state === STATE.RQR_SEND_REQUEST || this._state === STATE.RQR_RECV_REQUEST) {
-      this._socket.write(JSON.stringify({class: 'end'}) + HEADER_END, 'utf-8', this._onWriteError);
+    this.#haveWrittenEndFlag = true;
+    if (this.#state === STATE.RQR_SEND_REQUEST || this.#state === STATE.RQR_RECV_REQUEST) {
+      this.#socket.write(JSON.stringify({class: 'end'}) + HEADER_END, 'utf-8', this.#onSendError);
     }
   }
 
@@ -36,7 +48,7 @@ class Requester {
    * @returns {boolean}
    */
   getHaveWrittenEndFlag () {
-    return this._haveWrittenEndFlag;
+    return this.#haveWrittenEndFlag;
   }
 
   /**
@@ -44,8 +56,8 @@ class Requester {
    * @param {string} state
    */
   setState (state) {
-    this._state = state;
-    this._sendState(this.getState());
+    this.#state = state;
+    this.#sendState(this.getState());
   }
 
   /**
@@ -53,18 +65,17 @@ class Requester {
    */
   getState () {
     return {
-      ind: this._ind,
-      state: this._state,
-      id: this._opponentId
+      ind: this.#ind,
+      state: this.#state,
+      id: this.opponentId
     };
   }
 
-  _onWriteError (err) {
-    if (err) {
-      console.error(err.message);
-      this.setState(STATE.ERR_NETWORK);
-    }
-  }
+  #onSendError = () => {
+    // Silently ignore error because the only case that the requester sends data to the other is
+    // when it wants to cancel the request.
+    this.#socket.destroy();
+  };
 }
 
 module.exports = Requester;

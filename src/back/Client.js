@@ -1,3 +1,4 @@
+// @ts-check
 const {PORT, VERSION, STATE} = require('../defs');
 const {HEADER_END, splitHeader, MAX_HEADER_LEN, createItemArray} = require('./Common');
 const net = require('net');
@@ -6,21 +7,25 @@ const Requester = require('./Requester');
 const Receiver = require('./Receiver');
 
 class Client {
+  /** @type {import('./Indexer')} */
+  #indexer;
+  /** @type {Function} */
+  #sendState;
+  /** @type {string} */
+  myId;
+  /** @type {Object.<number, (Sender|Receiver|Requester)>} */
+  jobs;
+
   /**
    * @param {import('./Indexer')} indexer
    * @param {Function} sendState
    */
   constructor (indexer, sendState) {
-    /** @type {import('./Indexer')} */
-    this._indexer = indexer;
-    /** @type {Function} */
-    this._sendState = sendState;
-    /** @type {string} */
-    this._myId = '';
-    /** @type {Object.<number, (Sender|Receiver|Requester)>} */
+    this.#indexer = indexer;
+    this.#sendState = sendState;
+    this.myId = '';
     this.jobs = {};
-    /** @type {number} */
-    this._nextInd = 1;
+    // Other objects may call this method so bind the function.
     this.deleteJob = this.deleteJob.bind(this);
   }
 
@@ -31,29 +36,12 @@ class Client {
    */
   setMyId (id) {
     if (id) {
-      this._myId = id;
+      this.myId = id;
       return true;
     }
     return false;
   }
 
-  /**
-   * Return State of Senders or a Sender with the index.
-   * @param {number} ind
-   */
-  getState (ind) {
-    if (ind === undefined) {
-      let ret = {};
-      for (const sender in this.jobs) {
-        ret[sender] = this.jobs[sender].getState();
-      }
-      return ret;
-    }
-    if (this.jobs[ind]) {
-      return this.jobs[ind].getState();
-    }
-    return undefined;
-  }
   /**
    * Request to send to opponent Server.
    * NOTE that it does not embed itemArray.
@@ -63,30 +51,32 @@ class Client {
    * @returns {Promise.<number|boolean>} Index value of the Sender or false.
    */
   async sendRequest (items, receiverIp, receiverId) {
-    const ind = this._getNextInd();
-    if (!this._myId || ind < 0)
+    const ind = this.#getNextInd();
+    if (!this.myId || ind < 0)
       return false;
-    /** @type {Buffser} */
-    let _recvBuf = Buffer.from([]);
+    /** @type {Buffer} */
+    let recvBuf = Buffer.from([]);
     const itemArray = await createItemArray(items);
     const socket = net.createConnection(PORT, receiverIp);
 
-    this.jobs[ind] = new Requester(ind, STATE.RQR_SEND_REQUEST, socket, receiverId, this._sendState);
+
+    const requester = new Requester(ind, STATE.RQR_SEND_REQUEST, socket, receiverIp, receiverId, this.#sendState);
+    this.jobs[ind] = requester;
 
     socket.once('connect', async () => {
       console.log('sendRequest: connected to ' + socket.remoteAddress);
-      const requestHeader = this._createSendRequestHeader(itemArray.length);
-      socket.write(JSON.stringify(requestHeader) + HEADER_END, 'utf-8', (err) => { if (err) this._handleNetworkErr(ind); });
+      const requestHeader = this.#createSendRequestHeader(itemArray.length);
+      socket.write(JSON.stringify(requestHeader) + HEADER_END, 'utf-8', (err) => { if (err) this.#handleNetworkErr(ind); });
     });
 
     socket.on('data', async (data) => {
       let recvHeader = null;
-      _recvBuf = Buffer.concat([_recvBuf, data]);
-      const ret = splitHeader(_recvBuf);
+      recvBuf = Buffer.concat([recvBuf, data]);
+      const ret = splitHeader(recvBuf);
       if (!ret) {
-        if (_recvBuf.length > MAX_HEADER_LEN) {
+        if (recvBuf.length > MAX_HEADER_LEN) {
           // Abort this suspicious connection.
-          this._handleNetworkErr(ind);
+          this.#handleNetworkErr(ind);
         }
         // Has not received header yet. just exit the function here for more data by return.
         return;
@@ -96,40 +86,38 @@ class Client {
       } catch (err) {
         // HEADER_END is met but is not JSON format.
         // Abort this suspicious connection.
-        this._handleNetworkErr(ind);
+        this.#handleNetworkErr(ind);
         return;
       }
       switch (recvHeader.class) {
       case 'ok':
         // Transform Requester into Sender.
-        this.jobs[ind] = new Sender(ind, socket, receiverId, itemArray, this.deleteJob, this._sendState);
+        this.jobs[ind] = new Sender(ind, socket, receiverId, itemArray, this.deleteJob, this.#sendState);
         this.jobs[ind].send();
         break;
       case 'no':
-        this.jobs[ind].setState(STATE.RQR_SEND_REJECT);
+        requester.setState(STATE.RQR_SEND_REJECT);
         socket.end();
         break;
       default:
-        this._handleNetworkErr(ind);
+        this.#handleNetworkErr(ind);
       }
     });
 
     socket.on('close', () => {
-      if (this.jobs[ind]) {
-        const state = this.jobs[ind].getState().state;
-        if (state === STATE.RQR_SEND_REJECT || this.jobs[ind].getHaveWrittenEndFlag()) {
-          if (this.jobs[ind].getHaveWrittenEndFlag())
-            this.deleteJob(ind);
-          return;
-        }
+      const state = requester.getState().state;
+      if (state === STATE.RQR_SEND_REJECT || requester.getHaveWrittenEndFlag()) {
+        if (requester.getHaveWrittenEndFlag())
+          this.deleteJob(ind);
+        return;
       }
-      this._handleNetworkErr(ind);
+      this.#handleNetworkErr(ind);
     });
 
     socket.on('error', (err) => {
       if (err) {
         socket.destroy();
-        this._handleNetworkErr(ind);
+        this.#handleNetworkErr(ind);
       }
     });
 
@@ -138,45 +126,49 @@ class Client {
 
   /**
    * Prepare to request to receive from the opponent.
-   * @param {number} ind
-   * @returns {boolean}
+   * @param {string} senderIp
+   * @param {string} senderId
    */
   preRecvRequest (senderIp, senderId) {
-    const ind = this._getNextInd();
-    if (!this._myId || ind < 0)
-      return false;
-    this.jobs[ind] = new Requester(ind, STATE.RQR_PRE_RECV_REQUEST, senderIp, senderId, this._sendState);
+    const ind = this.#getNextInd();
+    if (!this.myId || ind < 0)
+      return;
+    this.jobs[ind] = new Requester(ind, STATE.RQR_PRE_RECV_REQUEST, null, senderIp, senderId, this.#sendState);
   }
 
   /**
    * Send Receive request to receive from the opponent.
    * @param {number} ind
    * @param {string} recvDir
-   * @returns {number|boolean} Index value of the Receiver or false.
    */
   recvRequest (ind, recvDir) {
+    const preRequester = this.jobs[ind];
+    if (!(preRequester instanceof Requester)) {
+      throw new Error(`Requester expected but got ${this.jobs[ind]}`);
+    }
     /** @type {Buffer} */
-    let _recvBuf = Buffer.from([]);
-    const senderIp = this.jobs[ind]._socket;
-    const senderId = this.jobs[ind]._opponentId;
+    let recvBuf = Buffer.from([]);
+    const senderIp = preRequester.opponentIp;
+    const senderId = preRequester.opponentId;
     const socket = net.createConnection(PORT, senderIp);
 
-    this.jobs[ind] = new Requester(ind, STATE.RQR_RECV_REQUEST, socket, senderId, this._sendState);
+    const requester = new Requester(ind, STATE.RQR_RECV_REQUEST, socket, senderIp, senderId, this.#sendState);
+    this.jobs[ind] = requester;
 
     socket.once('connect', async () => {
       console.log('recvRequest: connected to ' + socket.remoteAddress);
-      const requestHeader = this._createRecvRequestHeader();
-      socket.write(JSON.stringify(requestHeader) + HEADER_END, 'utf-8', (err) => { if (err) this._handleNetworkErr(ind); });
+      const requestHeader = this.#createRecvRequestHeader();
+      socket.write(JSON.stringify(requestHeader) + HEADER_END, 'utf-8', (err) => { if (err) this.#handleNetworkErr(ind); });
     });
 
     socket.on('data', async (data) => {
       let recvHeader = null;
-      _recvBuf = Buffer.concat([_recvBuf, data]);
-      const ret = splitHeader(_recvBuf);
+      recvBuf = Buffer.concat([recvBuf, data]);
+      const ret = splitHeader(recvBuf);
       if (!ret) {
-        if (_recvBuf.length > MAX_HEADER_LEN) {
+        if (recvBuf.length > MAX_HEADER_LEN) {
           // Abort this suspicious connection.
-          this._handleNetworkErr(ind);
+          this.#handleNetworkErr(ind);
         }
         // Has not received header yet. just exit the function here for more data by return.
         return;
@@ -186,31 +178,33 @@ class Client {
       } catch (err) {
         // HEADER_END is met but is not JSON format.
         // Abort this suspicious connection.
-        this._handleNetworkErr(ind);
+        this.#handleNetworkErr(ind);
         return;
       }
       switch (recvHeader.class) {
-      case 'ok':
+      case 'ok': {
         // Transform Requester into Sender.
-        this.jobs[ind] = new Receiver(ind, socket, senderId, recvDir, recvHeader.numItems, this.deleteJob, this._sendState);
+        const receiver = new Receiver(ind, socket, senderId, recvDir, recvHeader.numItems, this.deleteJob, this.#sendState);
         // Send ok header explictly to notify it is ready to receive.
-        this.jobs[ind]._writeOnSocket();
+        this.jobs[ind] = receiver;
+        receiver.sendHeader();
         break;
+      }
       case 'no':
-        this.jobs[ind].setState(STATE.RQR_RECV_REJECT);
+        requester.setState(STATE.RQR_RECV_REJECT);
         socket.end();
         break;
       default:
-        this._handleNetworkErr(ind);
+        this.#handleNetworkErr(ind);
       }
     });
 
     socket.on('close', () => {
-      const state = this.jobs[ind].getState().state;
-      if (!(state === STATE.RQR_RECV_REJECT || this.jobs[ind].getHaveWrittenEndFlag())) {
-        this._handleNetworkErr(ind);
+      const state = requester.getState().state;
+      if (!(state === STATE.RQR_RECV_REJECT || requester.getHaveWrittenEndFlag())) {
+        this.#handleNetworkErr(ind);
       }
-      else if (this.jobs[ind].getHaveWrittenEndFlag()) {
+      else if (requester.getHaveWrittenEndFlag()) {
         this.deleteJob(ind);
       }
     });
@@ -218,27 +212,27 @@ class Client {
     socket.on('error', (err) => {
       if (err) {
         socket.destroy();
-        this._handleNetworkErr(ind);
+        this.#handleNetworkErr(ind);
       }
     });
   }
 
   /**
    * Create and return send request header.
-   * @param {number} _numItems
-   * @returns {{app:string, version: string, class: string, id: string}}
+   * @param {number} numItems
+   * @returns {import('./Common').SendRequestHeader}
    */
-  _createSendRequestHeader (_numItems) {
-    let header = {app: 'tiShare', version: VERSION, class: 'send-request', id: this._myId, numItems: _numItems};
+  #createSendRequestHeader (numItems) {
+    const header = {app: 'tiShare', version: VERSION, class: 'send-request', id: this.myId, numItems: numItems};
     return header;
   }
 
   /**
    * Create and return recv request header.
-   * @returns {{app:string, version: string, class: string, id: string}}
+   * @returns {import('./Common').RecvRequestHeader}
    */
-  _createRecvRequestHeader () {
-    let header = {app: 'tiShare', version: VERSION, class: 'recv-request', id: this._myId};
+  #createRecvRequestHeader () {
+    const header = {app: 'tiShare', version: VERSION, class: 'recv-request', id: this.myId};
     return header;
   }
 
@@ -267,22 +261,22 @@ class Client {
   deleteJob (ind) {
     if (this.jobs[ind]) {
       delete this.jobs[ind];
-      this._indexer.returnInd(ind);
+      this.#indexer.returnInd(ind);
       return true;
     }
     return false;
   }
 
-  _getNextInd () {
-    return this._indexer.getInd();
+  #getNextInd () {
+    return this.#indexer.getInd();
   }
 
   /**
    * Handle network error on Requester.
+   * @param {number} ind
    */
-  _handleNetworkErr (ind) {
-    if (this.jobs[ind]) {
-      this.jobs[ind]._socket.destroy();
+  #handleNetworkErr (ind) {
+    if (this.jobs[ind] && ('setState' in this.jobs[ind])) {
       this.jobs[ind].setState(STATE.ERR_NETWORK);
     }
   }
