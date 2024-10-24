@@ -1,5 +1,4 @@
 // @ts-check
-// [TODO] Make methods start with '#'
 const fs = require('fs').promises;
 const path = require('path');
 const {HEADER_END, splitHeader} = require('./Common');
