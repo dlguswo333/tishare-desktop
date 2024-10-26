@@ -46,9 +46,10 @@ const useDragDrop = ({setItems}) => {
       setIsDragging(false);
       if (!e.dataTransfer?.files)
         return;
-      let paths = [];
-      for (let f of e.dataTransfer.files) {
-        paths.push(f.path);
+      // e.dataTransfer.files is different from normal Array; convert it into one.
+      let paths = ipcRenderer.getFilePaths([...e.dataTransfer.files]);
+      if (!paths) {
+        ipcRenderer.showMessage('Unknown error occured. Could not retrieve files\' paths.');
       }
       ipcRenderer.dragAndDrop(paths).then((ret) => {
         setItems((items) => Object.assign({}, ret, items));
