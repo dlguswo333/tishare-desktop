@@ -10,7 +10,7 @@
     "@dlguswo333/react-simple-spinner": "^0.6.0",
     "@types/eslint": "^8.44.7",
     "@vitejs/plugin-react": "^4.3.3",
-    "electron": "^26.2.2",
+    "electron": "^33.0.2",
     "electron-builder": "^23.6.0",
     "eslint": "^8.57.1",
     "eslint-plugin-react": "^7.37.2",

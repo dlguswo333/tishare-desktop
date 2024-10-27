@@ -1,4 +1,4 @@
-const {contextBridge, ipcRenderer} = require('electron');
+const {contextBridge, ipcRenderer, webUtils} = require('electron');
 
 contextBridge.exposeInMainWorld('ipcRenderer',
   {
@@ -82,6 +82,19 @@ contextBridge.exposeInMainWorld('ipcRenderer',
     },
     removeDeleteJobStateCallback: () => {
       ipcRenderer.removeAllListeners('deleteJobState');
-    }
+    },
+    getFilePaths: (files) => {
+      try {
+        const paths = [];
+        for (const file of files) {
+          const path = webUtils.getPathForFile(file);
+          paths.push(path);
+        }
+        return paths;
+      } catch (e) {
+        console.error(e);
+        return undefined;
+      }
+    },
   }
 );
