@@ -1,3 +1,5 @@
+// Sandboxed preload scripts can't use ESM imports.
+// https://www.electronjs.org/docs/latest/tutorial/esm#sandboxed-preload-scripts-cant-use-esm-imports
 const {contextBridge, ipcRenderer, webUtils} = require('electron');
 
 contextBridge.exposeInMainWorld('ipcRenderer',

@@ -1,5 +1,5 @@
-const {STATE} = require('../defs');
-const {HEADER_END} = require('./Common');
+import {STATE} from '../defs.js';
+import {HEADER_END} from './Common.js';
 
 class Requestee {
   /** @type {number} */
@@ -87,4 +87,4 @@ class Requestee {
   }
 }
 
-module.exports = Requestee;
+export default Requestee;

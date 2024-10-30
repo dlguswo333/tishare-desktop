@@ -1,8 +1,8 @@
 // @ts-check
-const fs = require('fs').promises;
-const path = require('path');
-const {HEADER_END, splitHeader} = require('./Common');
-const {STATE, SOCKET_TIMEOUT, STATE_INTERVAL} = require('../defs');
+import fs from 'fs/promises';
+import path from 'path';
+import {HEADER_END, splitHeader} from './Common.js';
+import {STATE, SOCKET_TIMEOUT, STATE_INTERVAL} from '../defs.js';
 
 class Receiver {
   /** @type {number} */
@@ -463,4 +463,4 @@ class Receiver {
   }
 }
 
-module.exports = Receiver;
+export default Receiver;

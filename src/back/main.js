@@ -1,11 +1,11 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow, ipcMain, dialog, protocol, net} = require('electron');
-const fs = require('fs').promises;
-const path = require('path');
-const network = require('./Network');
-const Server = require('./Server');
-const Client = require('./Client');
-const Indexer = require('./Indexer');
+import {app, BrowserWindow, ipcMain, dialog, protocol, net} from 'electron';
+import fs from 'fs/promises';
+import path from 'path';
+import * as network from './Network.js';
+import Server from './Server.js';
+import Client from './Client.js';
+import Indexer from './Indexer.js';
 
 const isDev = !app.isPackaged;
 
@@ -42,7 +42,7 @@ function createMainWindow () {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(import.meta.dirname, 'preload.js'),
       enableRemoteModule: false,
       nodeIntegration: false,
       contextIsolation: true
@@ -54,7 +54,7 @@ function createMainWindow () {
     console.log('Running in development');
     // When in development, run react start first.
     // The main electron window will load the react webpage like below.
-    mainWindow.setIcon(path.join(__dirname, '../../public/icon.ico'));
+    mainWindow.setIcon(path.join(import.meta.dirname, '../../public/icon.ico'));
     mainWindow.loadURL('http://localhost:3000');
     mainWindow.maximize();
   }
@@ -63,7 +63,7 @@ function createMainWindow () {
     mainWindow.removeMenu();
     // When in production, run react build first.
     // The main electron window will load the react built packs like below.
-    mainWindow.loadFile(path.join(__dirname, '../../build/index.html')).catch(() => {
+    mainWindow.loadFile(path.join(import.meta.dirname, '../../build/index.html')).catch(() => {
       console.log('Loading index.html failed');
     });
   }

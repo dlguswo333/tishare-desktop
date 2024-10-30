@@ -1,13 +1,13 @@
 // @ts-check
-const {PORT, VERSION, STATE} = require('../defs');
-const {HEADER_END, splitHeader, MAX_HEADER_LEN, createItemArray} = require('./Common');
-const net = require('net');
-const Sender = require('./Sender');
-const Requester = require('./Requester');
-const Receiver = require('./Receiver');
+import {PORT, VERSION, STATE} from '../defs.js';
+import {HEADER_END, splitHeader, MAX_HEADER_LEN, createItemArray} from './Common.js';
+import net from 'net';
+import Sender from './Sender.js';
+import Requester from './Requester.js';
+import Receiver from './Receiver.js';
 
 class Client {
-  /** @type {import('./Indexer')} */
+  /** @type {import('./Indexer').default} */
   #indexer;
   /** @type {Function} */
   #sendState;
@@ -17,7 +17,7 @@ class Client {
   jobs;
 
   /**
-   * @param {import('./Indexer')} indexer
+   * @param {import('./Indexer').default} indexer
    * @param {Function} sendState
    */
   constructor (indexer, sendState) {
@@ -45,7 +45,7 @@ class Client {
   /**
    * Request to send to opponent Server.
    * NOTE that it does not embed itemArray.
-   * @param {Object.<string, {dir:string, path:string, type:string, size:number}>} items
+   * @param {Object.<string, import('./Common.js').Item>} items
    * @param {string} receiverIp
    * @param {string} receiverId
    * @returns {Promise.<number|boolean>} Index value of the Sender or false.
@@ -282,4 +282,4 @@ class Client {
   }
 }
 
-module.exports = Client;
+export default Client;

@@ -1,6 +1,10 @@
+// import attributes 'with' works over chromium 123 and node 20.10.0 .
+// So with electron 33 this should be fine, but eslint still does not understand it.
+// https://github.com/eslint/eslint/issues/19014
+import packageJson from '../package.json' with {type: 'json'};
 const PORT = 9238;
 const CHUNKSIZE = 2097152;
-const {version: VERSION} = require('../package.json');
+const {version: VERSION} = packageJson;
 const SCANTIMEOUT = 3000;
 const SOCKET_TIMEOUT = 5000;
 const STATE_INTERVAL = 1000;
@@ -64,4 +68,4 @@ const printSize = (size) => {
   return size.toFixed(2) + ' B';
 };
 
-module.exports = {PORT, CHUNKSIZE, STATE, VERSION, SCANTIMEOUT, SOCKET_TIMEOUT, STATE_INTERVAL, MAX_NUM_JOBS, printSize, WELL_KNOWN_IMAGE_EXTENSIONS};
+export {PORT, CHUNKSIZE, STATE, VERSION, SCANTIMEOUT, SOCKET_TIMEOUT, STATE_INTERVAL, MAX_NUM_JOBS, printSize, WELL_KNOWN_IMAGE_EXTENSIONS};

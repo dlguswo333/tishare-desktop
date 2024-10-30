@@ -1,8 +1,6 @@
 import {useState} from 'react';
-import * as DEFS from '../../defs';
+import {printSize, WELL_KNOWN_IMAGE_EXTENSIONS} from '../../defs';
 import useFormattedDate from '../hook/useFormattedDate';
-
-const {printSize, WELL_KNOWN_IMAGE_EXTENSIONS} = DEFS.default;
 
 /**
  * @param {object} props

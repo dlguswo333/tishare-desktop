@@ -1,5 +1,5 @@
-const path = require('path');
-const fs = require('fs').promises;
+import path from 'path';
+import fs from 'fs/promises';
 /** Header must not and cannot exceed this length. @type {number} */
 const MAX_HEADER_LEN = 10000;
 const HEADER_END = '\n\n';
@@ -84,4 +84,4 @@ function createDirectoryHeader (path, name, dir) {
   return header;
 }
 
-module.exports = {MAX_HEADER_LEN, HEADER_END, createItemArray, splitHeader};
+export {MAX_HEADER_LEN, HEADER_END, createItemArray, splitHeader};

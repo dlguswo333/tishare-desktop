@@ -3,7 +3,11 @@ module.exports = {
   root: true,
   ignorePatterns: ['*.cjs', '*.d.ts', 'build/**/*'],
   env: {
-    es2021: true
+    es2022: true
+  },
+  parserOptions: {
+    ecmaVersion: 2022,
+    sourceType: 'module',
   },
   rules: {
     'indent': ['error', 2],
