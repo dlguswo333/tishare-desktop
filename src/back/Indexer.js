@@ -1,4 +1,4 @@
-const {MAX_NUM_JOBS} = require('../defs');
+import {MAX_NUM_JOBS} from '../defs.js';
 
 /**
  * @callback NumJobsCallback
@@ -68,4 +68,4 @@ class Indexer {
   }
 }
 
-module.exports = Indexer;
+export default Indexer;

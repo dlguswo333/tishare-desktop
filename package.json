@@ -1,5 +1,6 @@
 {
   "name": "tishare-desktop",
+  "type": "module",
   "author": {
     "name": "dlguswo333"
   },

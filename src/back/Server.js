@@ -1,16 +1,16 @@
 // @ts-check
-const dgram = require('dgram');
-const net = require('net');
-const Requestee = require('./Requestee');
-const Sender = require('./Sender');
-const Receiver = require('./Receiver');
-const {PORT, VERSION, STATE} = require('../defs');
-const {OS} = require('./defs');
-const {getBroadcastIp} = require('./Network');
-const {splitHeader, MAX_HEADER_LEN, createItemArray, HEADER_END} = require('./Common');
+import dgram from 'dgram';
+import net from 'net';
+import Requestee from './Requestee.js';
+import Sender from './Sender.js';
+import Receiver from './Receiver.js';
+import {PORT, VERSION, STATE} from '../defs.js';
+import {OS} from './defs.js';
+import {getBroadcastIp} from './Network.js';
+import {splitHeader, MAX_HEADER_LEN, createItemArray, HEADER_END} from './Common.js';
 
 class Server {
-  /** @type {import('./Indexer')} */
+  /** @type {import('./Indexer').default} */
   #indexer;
   /** @type {Function} */
   #sendState;
@@ -24,7 +24,7 @@ class Server {
   jobs;
 
   /**
-   * @param {import('./Indexer')} indexer
+   * @param {import('./Indexer').default} indexer
    * @param {Function} sendState
    */
   constructor (indexer, sendState) {
@@ -331,4 +331,4 @@ class Server {
   }
 }
 
-module.exports = Server;
+export default Server;

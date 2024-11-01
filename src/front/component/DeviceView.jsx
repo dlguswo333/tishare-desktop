@@ -2,8 +2,7 @@ import {useEffect, useState} from 'react';
 import ThemeButton from './ThemeButton';
 import Device from './Device';
 import Spinner from '@dlguswo333/react-simple-spinner';
-import * as DEFS from '../../defs';
-const {SCANTIMEOUT} = DEFS.default;
+import {SCANTIMEOUT} from '../../defs';
 import '../style/DeviceView.scss';
 const ipcRenderer = window.ipcRenderer;
 

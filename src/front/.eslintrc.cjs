@@ -5,9 +5,6 @@ module.exports = {
     browser: true,
     es2021: true,
   },
-  parserOptions: {
-    sourceType: 'module',
-  },
   settings: {
     react: {
       version: 'detect'

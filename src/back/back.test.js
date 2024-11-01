@@ -1,12 +1,13 @@
-const assert = require('assert');
-const fs = require('fs').promises;
-const path = require('path');
-const crypto = require('crypto');
-const Indexer = require('./Indexer');
-const Server = require('./Server');
-const Client = require('./Client');
-const {MAX_NUM_JOBS} = require('../defs');
-const {after, before} = require('mocha');
+import {notStrictEqual, strictEqual, ok} from 'assert';
+import fs from 'fs/promises';
+import path from 'path';
+import {randomBytes} from 'crypto';
+import Indexer from './Indexer.js';
+import Server from './Server.js';
+import Client from './Client.js';
+import {MAX_NUM_JOBS} from '../defs.js';
+import {getBroadcastIp, isLocalIp} from './Network.js';
+import {after, before} from 'mocha';
 
 describe('Indexer', () => {
   const indexer = new Indexer(() => { }, () => { });
@@ -14,55 +15,54 @@ describe('Indexer', () => {
   it('Unique index', () => {
     for (let i = 0; i < MAX_NUM_JOBS; ++i) {
       const ind = indexer.getInd();
-      assert.notStrictEqual(ind, -1);
-      assert.strictEqual(indices.includes(ind), false);
+      notStrictEqual(ind, -1);
+      strictEqual(indices.includes(ind), false);
       indices.push(ind);
     }
   });
   it('Return -1 if no rooms available', () => {
-    assert.strictEqual(indexer.getInd(), -1);
+    strictEqual(indexer.getInd(), -1);
   });
   it('Get valid indices after return', () => {
-    assert.ok(indexer.returnInd(indices[0]));
+    ok(indexer.returnInd(indices[0]));
     let ind = indexer.getInd();
-    assert.notStrictEqual(ind, -1);
-    assert.strictEqual(indices.includes(ind), false);
+    notStrictEqual(ind, -1);
+    strictEqual(indices.includes(ind), false);
     indices.push(ind);
   });
   it('Return -1 if no rooms available again', () => {
-    assert.ok(indexer.getInd() === -1);
+    ok(indexer.getInd() === -1);
   });
 });
 
 describe('Network', () => {
-  const {getBroadcastIp, isLocalIp} = require('./Network');
   describe('Get Broadcast IP', () => {
     const ip = '192.168.0.1';
     it('Test 1', () => {
       const netmask = '255.255.255.0';
       const expected = '192.168.0.255';
-      assert.strictEqual(getBroadcastIp(ip, netmask), expected);
+      strictEqual(getBroadcastIp(ip, netmask), expected);
     });
     it('Test 2', () => {
       const netmask = '255.255.0.0';
       const expected = '192.168.255.255';
-      assert.strictEqual(getBroadcastIp(ip, netmask), expected);
+      strictEqual(getBroadcastIp(ip, netmask), expected);
     });
     it('Test 3', () => {
       const netmask = '255.255.255.128';
       const expected = '192.168.0.127';
-      assert.strictEqual(getBroadcastIp(ip, netmask), expected);
+      strictEqual(getBroadcastIp(ip, netmask), expected);
     });
   });
   describe('Determine is IP local', () => {
     it('Test 1', () => {
-      assert.strictEqual(isLocalIp('192.168.0.1'), true);
+      strictEqual(isLocalIp('192.168.0.1'), true);
     });
     it('Test 2', () => {
-      assert.strictEqual(isLocalIp('11.111.0.1'), false);
+      strictEqual(isLocalIp('11.111.0.1'), false);
     });
     it('Test 3', () => {
-      assert.strictEqual(isLocalIp('10.11.101.200'), true);
+      strictEqual(isLocalIp('10.11.101.200'), true);
     });
   });
 });
@@ -77,20 +77,20 @@ describe('Server and client', () => {
   const clientId = 'client';
   describe('Server', () => {
     it('not null', () => {
-      assert.ok(server);
+      ok(server);
     });
     it('reject open if ID is empty', () => {
-      assert.strictEqual(server.open(ip, netmask), false);
+      strictEqual(server.open(ip, netmask), false);
     });
     it('set ID', () => {
       server.setMyId(serverId);
-      assert.strictEqual(server.myId, serverId);
+      strictEqual(server.myId, serverId);
     });
     it('open', () => {
-      assert.strictEqual(server.open(ip, netmask), true);
+      strictEqual(server.open(ip, netmask), true);
     });
     it('close', () => {
-      assert.strictEqual(server.close(), true);
+      strictEqual(server.close(), true);
     });
   });
   describe('Client', () => {
@@ -101,14 +101,14 @@ describe('Server and client', () => {
     });
 
     it('not null', () => {
-      assert.ok(client);
+      ok(client);
     });
     it('reject initiating if ID is empty', async () => {
-      assert.strictEqual(await client.sendRequest(items, ip, serverId), false);
+      strictEqual(await client.sendRequest(items, ip, serverId), false);
     });
     it('set ID', () => {
       client.setMyId(clientId);
-      assert.strictEqual(client.myId, clientId);
+      strictEqual(client.myId, clientId);
     });
 
     after(async () => {
@@ -122,9 +122,9 @@ async function createItems () {
   const n1 = 'file1';
   const n1size = 100;
 
-  items[n1] = {dir: 'ddd', path: path.join(__dirname, n1), type: 'file', size: n1size};
+  items[n1] = {dir: 'ddd', path: path.join(import.meta.dirname, n1), type: 'file', size: n1size};
   const n1handle = await fs.open(items[n1].path, 'w');
-  await n1handle.write(crypto.randomBytes(n1size));
+  await n1handle.write(randomBytes(n1size));
   await n1handle.close();
   return items;
 }

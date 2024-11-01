@@ -1,13 +1,15 @@
-const os = require('os');
-const dgram = require('dgram');
-const {PORT, OS, VERSION, SCANTIMEOUT} = require('../defs');
+import {networkInterfaces} from 'os';
+import dgram from 'dgram';
+import {PORT, VERSION, SCANTIMEOUT} from '../defs.js';
+import {OS} from './defs.js';
+
 /**
  * Return an array of dictionary each looks like: { name, ip, netmask }.
  * @returns {Array.<{name:String, ip:String, netmask:String}>} Array of networks.
  */
 function getNetworks () {
   var array = [];
-  const interfaces = os.networkInterfaces();
+  const interfaces = networkInterfaces();
   for (const network in interfaces) {
     const one = interfaces[network];
     for (const ip of one) {
@@ -126,4 +128,4 @@ function getBroadcastIp (ip, netmask) {
   return ipNumberToString((ipStringToNumber(ip) | (2 ** 32 - 1 - ipStringToNumber(netmask))) >>> 0);
 }
 
-module.exports = {getNetworks, isLocalIp, scan, getBroadcastIp};
+export {getNetworks, isLocalIp, scan, getBroadcastIp};

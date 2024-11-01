@@ -1,9 +1,7 @@
 import {useState} from 'react';
-import * as DEFS from '../../defs';
+import {STATE, printSize} from '../../defs';
 import style from '../style/JobView.module.scss';
 const ipcRenderer = window.ipcRenderer;
-
-const {STATE, printSize} = DEFS.default;
 
 /**
  * @typedef {object} State

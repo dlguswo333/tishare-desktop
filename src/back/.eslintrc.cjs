@@ -9,10 +9,6 @@ module.exports = {
     es2022: true,
     mocha: true,
   },
-  parserOptions: {
-    ecmaVersion: 2022,
-    sourceType: 'script',
-  },
   root: false,
   ignorePatterns: ['*.cjs', '*.d.ts'],
   overrides: [{

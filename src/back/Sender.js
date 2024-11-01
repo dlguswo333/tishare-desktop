@@ -1,7 +1,7 @@
 // @ts-check
-const fs = require('fs').promises;
-const {STATE, CHUNKSIZE, SOCKET_TIMEOUT, STATE_INTERVAL} = require('../defs');
-const {HEADER_END, splitHeader} = require('./Common');
+import fs from 'fs/promises';
+import {STATE, CHUNKSIZE, SOCKET_TIMEOUT, STATE_INTERVAL} from '../defs.js';
+import {HEADER_END, splitHeader} from './Common.js';
 
 class Sender {
   /** @type {number} */
@@ -422,4 +422,4 @@ class Sender {
   }
 }
 
-module.exports = Sender;
+export default Sender;

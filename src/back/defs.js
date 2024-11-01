@@ -1,3 +1,3 @@
-const OS = require('os').platform();
-
-module.exports = {OS};
+import os from 'os';
+const OS = os.platform();
+export {OS};
