@@ -29,7 +29,7 @@ const useFormattedDate = (date) => {
     };
 
     const formattedDate =
-      `${padStartZero(month, 2)}-${padStartZero(day, 2)}-${year} ${amOrPm} ${hour}:${minute}`;
+      `${padStartZero(month, 2)}-${padStartZero(day, 2)}-${year} ${amOrPm} ${hour}:${padStartZero(minute, 2)}`;
     return formattedDate;
   }, [date]);
 };
