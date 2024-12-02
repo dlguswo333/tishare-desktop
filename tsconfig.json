@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "moduleResolution": "bundler",
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "allowJs": true,
+    "lib": ["ES2022"],
+    "module": "ES2022",
+    "outDir": "dist",
+    "target": "ES2022"
+  },
+  "include": ["src"]
+}
