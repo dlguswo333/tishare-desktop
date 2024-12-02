@@ -15,7 +15,7 @@ import useFormattedDate from '../hook/useFormattedDate';
  * @param {string} props.item.type
  * @param {string} props.item.path
  * @param {Date | undefined} props.item.mtime
- * @param {size} props.item.number
+ * @param {number} props.item.size
  */
 const Item = ({item, items, checkAll, lastClick, setLastClick, checked, setChecked}) => {
   const [isThumbnailVisible, setIsThumbnailVisible] = useState(

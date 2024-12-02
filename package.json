@@ -11,6 +11,7 @@
     "@dlguswo333/react-simple-spinner": "^0.6.0",
     "@types/eslint": "^8.44.7",
     "@types/mocha": "^10.0.10",
+    "@types/node": "^22.10.1",
     "@types/react": "^18.3.12",
     "@vitejs/plugin-react": "^4.3.3",
     "electron": "^33.0.2",

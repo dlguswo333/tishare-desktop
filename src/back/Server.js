@@ -180,6 +180,7 @@ class Server {
    */
   getState (ind) {
     if (ind === undefined) {
+      /** @type {{[x: number]: ReturnType<((Sender|Receiver|Requestee)['getState'])>}} */
       let ret = {};
       for (const job in this.jobs) {
         ret[job] = this.jobs[job].getState();
@@ -237,6 +238,7 @@ class Server {
     return this.#indexer.getInd();
   }
 
+  /** @param {import('./Common').SendRequestHeader | import('./Common').RecvRequestHeader} header */
   #validateRequestHeader (header) {
     if (!header)
       return false;
