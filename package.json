@@ -35,7 +35,8 @@
     "build": "vite build --config src/front/vite.config.js",
     "test": "mocha ./src/back/back.test.js",
     "electron": "electron --trace-warnings .",
-    "builder": "npm run build && electron-builder"
+    "builder": "npm run build && electron-builder",
+    "typecheck": "tsc --noEmit"
   },
   "build": {
     "productName": "tiShare",
