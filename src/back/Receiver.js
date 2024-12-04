@@ -37,7 +37,7 @@ class Receiver {
    * @type {{app: string, version:string, class:string, id:string, itemArray: import('./Common').Item[]} | null}
    */
   #sendRequestHeader;
-  /** @type {Object} */
+  /** @type {{class: string} & import('./Common').Item | null} */
   #recvHeader;
   /**
    * @type {'ok'|'next'}
@@ -190,7 +190,7 @@ class Receiver {
       // Reaching here means we now have header or already have header.
       switch (this.#state) {
       case STATE.RECVING:
-        switch (this.#recvHeader.class) {
+        switch (this.#recvHeader?.class) {
         case 'ok':
           if (this.#recvBufArrayLen === this.#recvHeader.size) {
             try {
@@ -239,7 +239,7 @@ class Receiver {
             try {
               await fs.mkdir(path.join(this.#recvPath, this.#itemName));
             } catch (err) {
-              if (err.code !== 'EEXIST') {
+              if (err instanceof Error && 'code' in err && err.code !== 'EEXIST') {
                 // Making directory failed.
                 // Even making directory failed means there are serious issues.
                 this.#setState(STATE.ERR_FILE_SYSTEM);
