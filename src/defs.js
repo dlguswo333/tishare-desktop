@@ -1,6 +1,5 @@
 // import attributes 'with' works over chromium 123 and node 20.10.0 .
-// So with electron 33 this should be fine, but eslint still does not understand it.
-// https://github.com/eslint/eslint/issues/19014
+// So with electron 33 this should be fine.
 import packageJson from '../package.json' with {type: 'json'};
 const PORT = 9238;
 const CHUNKSIZE = 2097152;
