@@ -36,7 +36,8 @@
     "test": "mocha ./src/back/back.test.js",
     "electron": "electron --trace-warnings .",
     "builder": "npm run build && electron-builder",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint"
   },
   "build": {
     "productName": "tiShare",
