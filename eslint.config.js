@@ -32,7 +32,7 @@ export default [
     files: ['src/**/*'],
     ignores: ['**/*.d.ts', 'build/**/*', 'dist/**/*', 'node_modules/**/*'],
     languageOptions: {
-      ecmaVersion: 2024,
+      ecmaVersion: 2025,
       sourceType: 'module',
       parserOptions: {
         ecmaFeatures: {
