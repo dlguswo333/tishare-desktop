@@ -13,7 +13,7 @@
     "@types/mocha": "^10.0.10",
     "@types/node": "^22.10.1",
     "@types/react": "^18.3.12",
-    "@vitejs/plugin-react": "^4.3.3",
+    "@vitejs/plugin-react": "^4.3.4",
     "electron": "^33.0.2",
     "electron-builder": "^23.6.0",
     "eslint": "^8.57.1",
@@ -24,9 +24,9 @@
     "react-dom": "^18.3.1",
     "sass": "^1.59.3",
     "typescript": "^5.7.2",
-    "vite": "^4.5.5",
+    "vite": "^6.0.2",
     "vite-plugin-commonjs": "^0.9.0",
-    "vite-plugin-svgr": "^4.2.0"
+    "vite-plugin-svgr": "^4.3.0"
   },
   "homepage": "./",
   "main": "src/back/main.js",
