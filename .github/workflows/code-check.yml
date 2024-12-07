@@ -4,6 +4,10 @@ on:
   # Runs on pull requests.
   pull_request:
 
+  # Runs on main branch updates.
+  push:
+    branches: [main]
+
   # Allows you to run this workflow manually from the Actions tab
   # This event will only trigger a workflow run if the workflow file is on the default branch.
   workflow_dispatch:
