@@ -7,5 +7,6 @@
     "types": ["./index.d.ts"],
     "noEmit": true
   },
-  "include": ["**/*"]
+  "include": ["**/*"],
+  "exclude": []
 }
