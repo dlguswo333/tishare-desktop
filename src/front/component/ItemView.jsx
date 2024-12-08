@@ -9,8 +9,9 @@ import '../style/ItemView.scss';
  * @param {function} props.openFile
  * @param {function} props.openDirectory
  * @param {function} props.deleteChecked
+ * @param {function} props.setItemDetail
  */
-function ItemView ({items, openFile, openDirectory, deleteChecked}) {
+function ItemView ({items, openFile, openDirectory, deleteChecked, setItemDetail}) {
   const [scrollable, setScrollable] = useState(false);
   const [checked, setChecked] = useState({});
   const [lastClick, setLastClick] = useState(null);
@@ -92,6 +93,7 @@ function ItemView ({items, openFile, openDirectory, deleteChecked}) {
               setLastClick={setLastClick}
               checked={checked}
               setChecked={setChecked}
+              setItemDetail={setItemDetail}
             />)}
         </div>
       </div>

@@ -11,6 +11,7 @@ import useServer from '../hook/useServer';
 import useNetworks from '../hook/useNetworks';
 import useItems from '../hook/useItems';
 import RefreshIcon from '../icons/Refresh.svg?react';
+import ItemDetail from './ItemDetail';
 
 /**
  * @typedef {{name:string, ip:string, netmask:string}} Network
@@ -30,6 +31,7 @@ function App () {
 
   const {items, setItems, deleteChecked} = useItems();
   const {isDragging} = useDragDrop({setItems});
+  const [itemDetail, setItemDetail] = useState(null);
   const {openServer, closeServer} = useServer({myIp, myNetmask});
   const {getNetworks} = useNetworks({isServerOpen, closeServer, setNetworks});
 
@@ -153,6 +155,7 @@ function App () {
               openFile={openFile}
               openDirectory={openDirectory}
               deleteChecked={deleteChecked}
+              setItemDetail={setItemDetail}
             />
           </div>
           <div className='DeviceGrid'>
@@ -171,6 +174,12 @@ function App () {
         <>
           <Blind>
             {'Drag and drop here!'}
+          </Blind>
+        </>}
+      {!!itemDetail &&
+        <>
+          <Blind>
+            <ItemDetail item={itemDetail} setItemDetail={setItemDetail} />
           </Blind>
         </>}
     </div>

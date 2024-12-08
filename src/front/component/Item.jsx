@@ -8,6 +8,7 @@ import useFormattedDate from '../hook/useFormattedDate';
  * @param {string} props.lastClick
  * @param {Function} props.setLastClick
  * @param {Function} props.setChecked
+ * @param {Function} props.setItemDetail
  * @param {Record<string, boolean>} props.checked
  * @param {object} props.items
  * @param {object} props.item
@@ -17,7 +18,7 @@ import useFormattedDate from '../hook/useFormattedDate';
  * @param {Date | undefined} props.item.mtime
  * @param {number} props.item.size
  */
-const Item = ({item, items, checkAll, lastClick, setLastClick, checked, setChecked}) => {
+const Item = ({item, items, checkAll, lastClick, setLastClick, checked, setChecked, setItemDetail}) => {
   const [isThumbnailVisible, setIsThumbnailVisible] = useState(
     item.type !== 'directory' &&
     WELL_KNOWN_IMAGE_EXTENSIONS.some(ext => item.path.toLowerCase().endsWith(`.${ext}`))
@@ -67,7 +68,7 @@ const Item = ({item, items, checkAll, lastClick, setLastClick, checked, setCheck
   };
 
   return <div className='ItemElement' key={item.name}>
-    <span className='ItemThumbnailHolder'>
+    <button className='ItemThumbnailHolder' onClick={() => setItemDetail(item)}>
       {isThumbnailVisible && <img
         onError={onThumbnailError}
         src={'app:' + item.path.replace(/\\/g, '/')}
@@ -75,7 +76,7 @@ const Item = ({item, items, checkAll, lastClick, setLastClick, checked, setCheck
         alt={item.type === 'directory' ? '📁 ' : '📄 '}
       />}
       {!isThumbnailVisible && (item.type === 'directory' ? '📁 ' : '📄 ')}
-    </span>
+    </button>
     <div className='ItemInfo' title={item.name}>
       <div className='ItemName'>
         {item.name}
