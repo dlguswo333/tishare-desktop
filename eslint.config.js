@@ -1,6 +1,7 @@
 import globals from 'globals';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import reactPlugin from 'eslint-plugin-react';
+import tsParser from "@typescript-eslint/parser";
 
 /** @type {import('eslint').Linter.Config.RulesRecord} */
 const globalRules = {
@@ -44,13 +45,14 @@ export default [
   },
   {
     name: 'front',
-    files: ['src/front/**/*.{js,jsx}'],
+    files: ['src/front/**/*.{js,jsx,ts,tsx}'],
     languageOptions: {
       parserOptions: {
         ecmaFeatures: {
           jsx: true,
         },
       },
+      parser: tsParser,
       globals: {
         ...globals.browser,
       },
