@@ -20,7 +20,7 @@ export default defineConfig({
     minify: true,
   },
   resolve: {
-    extensions: ['.js', '.jsx'],
+    extensions: ['.js', '.jsx', '.ts', '.tsx'],
   },
   plugins: [commonjs(), svgr(), react()],
 });

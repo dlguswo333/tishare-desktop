@@ -13,6 +13,7 @@
     "@types/mocha": "^10.0.10",
     "@types/node": "^22.10.1",
     "@types/react": "^18.3.12",
+    "@typescript-eslint/parser": "^8.17.0",
     "@vitejs/plugin-react": "^4.3.4",
     "electron": "^33.0.2",
     "electron-builder": "^23.6.0",
@@ -37,7 +38,7 @@
     "test": "mocha ./src/back/back.test.js",
     "electron": "electron --trace-warnings .",
     "builder": "npm run build && electron-builder",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p src/front/tsconfig.json && tsc --noEmit -p src/back/tsconfig.json",
     "lint": "eslint"
   },
   "build": {
