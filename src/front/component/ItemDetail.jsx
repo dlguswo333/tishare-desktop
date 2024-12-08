@@ -34,6 +34,7 @@ const ItemDetail = ({item, setItemDetail}) => {
         loading='lazy'
         alt={itemTypeText}
       />}
+      {!isThumbnailVisible && (item.type === 'directory' ? '📁 ' : '📄 ')}
     </span>
     <span className='ItemInfo'>
       <div className='Buttons'>

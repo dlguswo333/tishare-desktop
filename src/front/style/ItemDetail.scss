@@ -20,6 +20,9 @@
   overflow: hidden;
   column-gap: 10px;
   .ItemThumbnailHolder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     img {
       width: 100%;
       height: 100%;
