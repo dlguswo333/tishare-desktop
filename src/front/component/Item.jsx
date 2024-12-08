@@ -1,6 +1,7 @@
 import {useState} from 'react';
 import {printSize, WELL_KNOWN_IMAGE_EXTENSIONS} from '../../defs';
 import useFormattedDate from '../hook/useFormattedDate';
+import Thumbnail from './Thumbnail';
 
 /**
  * @param {object} props
@@ -69,13 +70,12 @@ const Item = ({item, items, checkAll, lastClick, setLastClick, checked, setCheck
 
   return <div className='ItemElement' key={item.name}>
     <button className='ItemThumbnailHolder' onClick={() => setItemDetail(item)}>
-      {isThumbnailVisible && <img
+      <Thumbnail
+        isThumbnailVisible={isThumbnailVisible}
         onError={onThumbnailError}
-        src={'app:' + item.path.replace(/\\/g, '/')}
         loading='lazy'
-        alt={item.type === 'directory' ? '📁 ' : '📄 '}
-      />}
-      {!isThumbnailVisible && (item.type === 'directory' ? '📁 ' : '📄 ')}
+        item={item}
+      />
     </button>
     <div className='ItemInfo' title={item.name}>
       <div className='ItemName'>

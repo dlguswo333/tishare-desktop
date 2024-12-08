@@ -4,16 +4,12 @@ import {useState} from 'react';
 import {printSize, WELL_KNOWN_IMAGE_EXTENSIONS} from '../../defs';
 import useFormattedDate from '../hook/useFormattedDate';
 import '../style/ItemDetail.scss';
+import Thumbnail from './Thumbnail';
 
 /**
  * @param {object} props
  * @param {Function} props.setItemDetail
- * @param {object} props.item
- * @param {string} props.item.name
- * @param {string} props.item.type
- * @param {string} props.item.path
- * @param {Date | undefined} props.item.mtime
- * @param {number} props.item.size
+ * @param {Item} props.item
  */
 const ItemDetail = ({item, setItemDetail}) => {
   const [isThumbnailVisible, setIsThumbnailVisible] = useState(
@@ -27,14 +23,11 @@ const ItemDetail = ({item, setItemDetail}) => {
 
   return <div className='ItemDetail'>
     <span className='ItemThumbnailHolder'>
-      {/* [TODO] Extract as Thumbnail component */}
-      {isThumbnailVisible && <img
-        onError={onThumbnailError}
-        src={'app:' + item.path.replace(/\\/g, '/')}
-        loading='lazy'
-        alt={itemTypeText}
-      />}
-      {!isThumbnailVisible && (item.type === 'directory' ? '📁 ' : '📄 ')}
+      <Thumbnail
+        isThumbnailVisible={isThumbnailVisible}
+        onThumbnailError={onThumbnailError}
+        item={item}
+      />
     </span>
     <span className='ItemInfo'>
       <div className='Buttons'>

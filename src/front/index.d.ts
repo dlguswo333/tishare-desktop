@@ -4,3 +4,11 @@
 interface Window {
   ipcRenderer: any
 }
+
+type Item = {
+  name: string;
+  type: 'directory' | 'file';
+  path: string;
+  mtime?: Date;
+  size: number;
+}
