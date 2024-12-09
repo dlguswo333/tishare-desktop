@@ -16,10 +16,15 @@ Checkout for more [Documentaiton](https://dlguswo333.github.io/tishare-docs) for
 
 ## How to Run in Development Mode
 ```bash
-# Run react in localhost.
-npm start
+# Option 1.
+# Run front dev server in localhost.
+npm run start:front
 # Electron will load the web page above.
-npm run electron
+npm run start:back
+
+# Option 2.
+# Execute above with one npm script.
+npm start
 ```
 
 ## How to Build in Production

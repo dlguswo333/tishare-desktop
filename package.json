@@ -15,6 +15,7 @@
     "@types/react": "^18.3.12",
     "@typescript-eslint/parser": "^8.17.0",
     "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.1.0",
     "electron": "^33.0.2",
     "electron-builder": "^23.6.0",
     "eslint": "^9.16.0",
@@ -33,12 +34,13 @@
   "homepage": "./",
   "main": "src/back/main.js",
   "scripts": {
-    "start": "vite --config src/front/vite.config.js",
+    "start": "concurrently --kill-others \"npm run start:front\" \"npm run start:back\"",
+    "start:front": "vite --config src/front/vite.config.js",
+    "start:back": "electron --trace-warnings .",
     "build": "npm run build:front && npm run build:back",
     "build:front": "vite build --config src/front/vite.config.js",
     "build:back": "electron-builder",
     "test": "mocha ./src/back/back.test.js",
-    "electron": "electron --trace-warnings .",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p src/front/tsconfig.json && tsc --noEmit -p src/back/tsconfig.json",
     "lint": "eslint"
   },
