@@ -25,14 +25,14 @@ npm run electron
 ## How to Build in Production
 ```bash
 # Option 1.
-# Run react build
-npm build
+# Run front build.
+npm run build:front
 # electron-builder will build into executables or installers. Refer to its document for detail.
-npx electron-builder --win --x64
+npm run build:back
 
 # Option 2.
 # Execute above with one npm script.
-npm run builder
+npm run build
 ```
 
 ## Implementation

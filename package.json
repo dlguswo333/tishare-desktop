@@ -34,10 +34,11 @@
   "main": "src/back/main.js",
   "scripts": {
     "start": "vite --config src/front/vite.config.js",
-    "build": "vite build --config src/front/vite.config.js",
+    "build": "npm run build:front && npm run build:back",
+    "build:front": "vite build --config src/front/vite.config.js",
+    "build:back": "electron-builder",
     "test": "mocha ./src/back/back.test.js",
     "electron": "electron --trace-warnings .",
-    "builder": "npm run build && electron-builder",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p src/front/tsconfig.json && tsc --noEmit -p src/back/tsconfig.json",
     "lint": "eslint"
   },
