@@ -4,7 +4,7 @@
   "author": {
     "name": "dlguswo333"
   },
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Share files and folders across devices easily with cross-platform support.",
   "private": false,
   "devDependencies": {
