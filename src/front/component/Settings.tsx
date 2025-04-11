@@ -4,6 +4,10 @@ import SettingsIcon from '../icons/Settings.svg?react';
 import style from '../style/Settings.module.scss';
 import ThemeButton from './ThemeButton';
 
+type Props = {
+  setShowSettings: Function;
+};
+
 /*
   Settings could have been inside Nav component because Settings is positioned fixed,
   but because of backdrop-filter properties on Nav, Settings is positioned to Nav component, not root component.
@@ -11,13 +15,9 @@ import ThemeButton from './ThemeButton';
   https://stackoverflow.com/questions/52937708/why-does-applying-a-css-filter-on-the-parent-break-the-child-positioning
 */
 
-/**
- * @param {object} props
- * @param {Function} props.setShowSettings
- */
-function Settings ({setShowSettings}) {
-  const [tmpRecvDir, setTmpRecvDir] = useState(null);
-  const [tmpMyId, setTmpMyId] = useState(null);
+function Settings ({setShowSettings}: Props) {
+  const [tmpRecvDir, setTmpRecvDir] = useState<string | null>(null);
+  const [tmpMyId, setTmpMyId] = useState<string | null>(null);
   const [IdEmptyWarn, setIdEmptyWarn] = useState(false);
   const [recvDirEmptyWarn, setRecvDirEmptyWarn] = useState(false);
 
@@ -66,7 +66,7 @@ function Settings ({setShowSettings}) {
             </div>
             <input type='text'
               className={style.Body}
-              placeholder={tmpMyId}
+              placeholder={tmpMyId ?? undefined}
               maxLength={10}
               onChange={(e) => { setTmpMyId(e.target.value); }}
             />

@@ -1,13 +1,14 @@
+import {MouseEventHandler, ReactNode} from 'react';
 import style from '../style/ThemeButton.module.scss';
 
-/**
- * @param {Object} props
- * @param {React.ReactNode} props.children
- * @param {Function} props.onClick
- * @param {boolean} props.opaqueText
- * @param {boolean} [props.disabled]
- */
-function ThemeButton ({children, onClick, opaqueText, disabled}) {
+type Props = {
+  children: ReactNode;
+  onClick: MouseEventHandler;
+  opaqueText?: boolean;
+  disabled?: boolean;
+}
+
+function ThemeButton ({children, onClick, opaqueText, disabled}: Props) {
   return (
     <button
       className={style.ThemeButton + (opaqueText ? ' ' + style.OpaqueText : '')}

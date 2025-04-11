@@ -10,8 +10,8 @@ const ipcRenderer = window.ipcRenderer;
  *
  * @param {Object} props
  * @param {Object} props.items
- * @param {string} props.myIp
- * @param {string} props.myNetmask
+ * @param {string | null} props.myIp
+ * @param {string | null} props.myNetmask
  * @param {string} props.myId
  * @returns
  */

@@ -3,23 +3,18 @@ import {printSize, WELL_KNOWN_IMAGE_EXTENSIONS} from '../../defs';
 import useFormattedDate from '../hook/useFormattedDate';
 import Thumbnail from './Thumbnail';
 
-/**
- * @param {object} props
- * @param {boolean} props.checkAll
- * @param {string} props.lastClick
- * @param {Function} props.setLastClick
- * @param {Function} props.setChecked
- * @param {Function} props.setItemDetail
- * @param {Record<string, boolean>} props.checked
- * @param {object} props.items
- * @param {object} props.item
- * @param {string} props.item.name
- * @param {string} props.item.type
- * @param {string} props.item.path
- * @param {Date | undefined} props.item.mtime
- * @param {number} props.item.size
- */
-const Item = ({item, items, checkAll, lastClick, setLastClick, checked, setChecked, setItemDetail}) => {
+type Props = {
+  checkAll: boolean;
+  lastClick: string;
+  setLastClick: Function;
+  setChecked: Function;
+  setItemDetail: Function;
+  checked: Record<string, boolean>;
+  items: object;
+  item: Item;
+}
+
+const Item = ({item, items, checkAll, lastClick, setLastClick, checked, setChecked, setItemDetail}: Props) => {
   const [isThumbnailVisible, setIsThumbnailVisible] = useState(
     item.type !== 'directory' &&
     WELL_KNOWN_IMAGE_EXTENSIONS.some(ext => item.path.toLowerCase().endsWith(`.${ext}`))
@@ -27,8 +22,7 @@ const Item = ({item, items, checkAll, lastClick, setLastClick, checked, setCheck
   const onThumbnailError = () => setIsThumbnailVisible(false);
   const formattedMtime = useFormattedDate(item.mtime);
 
-  /** @type React.MouseEventHandler<HTMLInputElement> */
-  const onCheckboxClick = (e) => {
+  const onCheckboxClick: React.MouseEventHandler<HTMLInputElement> = (e) => {
     setLastClick(item.name);
     if (e.shiftKey) {
       const itemKeys = Object.keys(items);
@@ -72,8 +66,7 @@ const Item = ({item, items, checkAll, lastClick, setLastClick, checked, setCheck
     <button className='ItemThumbnailHolder' onClick={() => setItemDetail(item)}>
       <Thumbnail
         isThumbnailVisible={isThumbnailVisible}
-        onError={onThumbnailError}
-        loading='lazy'
+        onThumbnailError={onThumbnailError}
         item={item}
       />
     </button>

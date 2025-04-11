@@ -3,7 +3,11 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './component/App';
 
-const reactRoot = ReactDOM.createRoot(document.getElementById('root'));
+const container = document.getElementById('root');
+if (!container) {
+  throw new Error('Cannot render react: Container not found');
+}
+const reactRoot = ReactDOM.createRoot(container);
 reactRoot.render(
   <React.StrictMode>
     <App />

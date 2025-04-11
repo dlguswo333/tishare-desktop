@@ -6,12 +6,12 @@ import useFormattedDate from '../hook/useFormattedDate';
 import '../style/ItemDetail.scss';
 import Thumbnail from './Thumbnail';
 
-/**
- * @param {object} props
- * @param {Function} props.setItemDetail
- * @param {Item} props.item
- */
-const ItemDetail = ({item, setItemDetail}) => {
+type Props = {
+  setItemDetail: Function;
+  item: Item;
+};
+
+const ItemDetail = ({item, setItemDetail}: Props) => {
   const [isThumbnailVisible, setIsThumbnailVisible] = useState(
     item.type !== 'directory' &&
     WELL_KNOWN_IMAGE_EXTENSIONS.some(ext => item.path.toLowerCase().endsWith(`.${ext}`))

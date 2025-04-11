@@ -4,8 +4,8 @@ const ipcRenderer = window.ipcRenderer;
 
 /**
  * @param {Object} props
- * @param {string} props.myIp
- * @param {string} props.myNetmask
+ * @param {string | null} props.myIp
+ * @param {string | null} props.myNetmask
  *
  */
 const useServer = ({myIp, myNetmask}) => {
