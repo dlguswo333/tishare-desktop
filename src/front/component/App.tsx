@@ -13,9 +13,7 @@ import useItems from '../hook/useItems';
 import RefreshIcon from '../icons/Refresh.svg?react';
 import ItemDetail from './ItemDetail';
 
-/**
- * @typedef {{name:string, ip:string, netmask:string}} Network
-*/
+export type Network = {name: string; ip: string; netmask: string;};
 
 // Below lines are importing modules from window object.
 // Look at 'preload.js' for more understanding.
@@ -24,9 +22,9 @@ const ipcRenderer = window.ipcRenderer;
 function App () {
   const [showSettings, setShowSettings] = useState(false);
   const [myId, _setMyId] = useState('');
-  const [myIp, setMyIp] = useState('');
-  const [myNetmask, setMyNetmask] = useState('');
-  const [networks, setNetworks] = useState(/** @type {Network[]} */([]));
+  const [myIp, setMyIp] = useState<string | null>('');
+  const [myNetmask, setMyNetmask] = useState<string | null>('');
+  const [networks, setNetworks] = useState<Network[]>([]);
   const [isServerOpen, setIsServerOpen] = useState(false);
 
   const {items, setItems, deleteChecked} = useItems();
@@ -37,23 +35,20 @@ function App () {
 
   // Select local files.
   const openFile = async () => {
-    /** @type {Object.<string, any>} */
-    var ret = await ipcRenderer.openFile();
+    const ret: Record<string, any> = await ipcRenderer.openFile();
     setItems(Object.assign({}, ret, items));
   };
 
   // Select local directories.
   const openDirectory = async () => {
-    /** @type {Object.<string, any>} */
-    var ret = await ipcRenderer.openDirectory();
+    const ret: Record<string, any> = await ipcRenderer.openDirectory();
     setItems(Object.assign({}, ret, items));
   };
 
   /**
    * Change ID in state and also server ID.
-   * @param {string} id
    */
-  const setMyId = (id) => {
+  const setMyId = (id: string) => {
     if (id) {
       _setMyId(id);
       ipcRenderer.setMyId(id);

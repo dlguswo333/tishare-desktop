@@ -12,3 +12,10 @@ type Item = {
   mtime?: Date;
   size: number;
 }
+
+type Device = {
+  id: string;
+  os: string;
+  ip: string;
+  version: string;
+}

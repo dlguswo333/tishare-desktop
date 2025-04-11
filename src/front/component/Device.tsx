@@ -2,11 +2,11 @@ import WindowsIcon from '../icons/Windows.svg?react';
 import AndroidIcon from '../icons/Android.svg?react';
 import LinuxIcon from '../icons/Linux.svg?react';
 
-/**
- * @param {Object} props
- * @param {string} props.os
- */
-const OsIcon = ({os}) => {
+type OsIconProps = {
+  os: string;
+};
+
+const OsIcon = ({os}: OsIconProps) => {
   os = String(os).toLowerCase();
   if (os.includes('win'))
     return (
@@ -23,14 +23,13 @@ const OsIcon = ({os}) => {
   return os;
 };
 
-/**
- *
- * @param {Object} props
- * @param {{os: string; ip: string; version: string;}} props.device
- * @param {boolean} props.isSelected
- * @param {Function} props.setSelectedIp
- */
-const Device = ({device, isSelected, setSelectedIp}) => {
+type Props = {
+  device: Device;
+  isSelected: boolean;
+  setSelectedIp: Function;
+};
+
+const Device = ({device, isSelected, setSelectedIp}: Props) => {
   return <div
     key={device.ip}
     className={'DeviceElement' + (isSelected ? ' Selected' : '')}

@@ -1,6 +1,11 @@
+import {ReactNode} from 'react';
 import '../style/Blind.scss';
 
-function Blind ({children}) {
+type Props = {
+  children?: ReactNode;
+}
+
+function Blind ({children}: Props) {
   return (
     <div className='Blind'>
       {children}
