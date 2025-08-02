@@ -128,6 +128,7 @@ class Server {
           this.#handleNetworkErr(ind);
         }
       });
+
       socket.on('close', () => {
         if (this.jobs[ind] instanceof Requestee) {
           if (this.jobs[ind].getState().state === STATE.RQE_CANCEL || this.jobs[ind].getRejectFlag()) {
@@ -141,6 +142,13 @@ class Server {
           }
         }
         // If this socket was not registered, do nothing.
+      });
+
+      socket.on('error', (err) => {
+        if (err) {
+          socket.destroy();
+          this.#handleNetworkErr(ind);
+        }
       });
     });
 
