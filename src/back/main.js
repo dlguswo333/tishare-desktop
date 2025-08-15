@@ -1,11 +1,12 @@
 // Modules to control application life and create native browser window
-import {app, BrowserWindow, ipcMain, dialog, protocol, net} from 'electron';
+import {app, BrowserWindow, ipcMain, dialog, protocol, net, nativeImage} from 'electron';
 import fs from 'fs/promises';
 import path from 'path';
 import * as network from './Network.js';
 import Server from './Server.js';
 import Client from './Client.js';
 import Indexer from './Indexer.js';
+import {OS} from './defs.js';
 
 const isDev = !app.isPackaged;
 
@@ -51,10 +52,15 @@ function createMainWindow () {
   });
 
   if (isDev) {
-    console.log('Running in development');
     // When in development, run react start first.
-    // The main electron window will load the react webpage like below.
-    mainWindow.setIcon(path.join(import.meta.dirname, '../../public/icon.ico'));
+    // Then load the url from the main electron window.
+    console.log('Running in development');
+    // It seems like .icon is not supported in linux; it can't load image from the path.
+    // Use .icon file on win32 only.
+    const iconPath = nativeImage.createFromPath(path.join(
+      import.meta.dirname, OS === 'win32' ? '../../public/icon.ico' : '../../public/icon.png'
+    ));
+    mainWindow.setIcon(iconPath);
     mainWindow.loadURL('http://localhost:3000');
     mainWindow.maximize();
   }
