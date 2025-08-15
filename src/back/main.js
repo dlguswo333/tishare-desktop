@@ -1,3 +1,4 @@
+// @ts-check
 // Modules to control application life and create native browser window
 import {app, BrowserWindow, ipcMain, dialog, protocol, net, nativeImage} from 'electron';
 import fs from 'fs/promises';
@@ -10,21 +11,23 @@ import {OS} from './defs.js';
 
 const isDev = !app.isPackaged;
 
-/** @type {BrowserWindow} */
-var mainWindow = null;
+/** @type {null | BrowserWindow} */
+let mainWindow = null;
 
 /**
  * Send state to renderer process.
+ * @param {Object} state
  */
 const sendState = (state) => {
-  mainWindow.webContents.send('jobState', state);
+  mainWindow?.webContents.send('jobState', state);
 };
 
 /**
  * Tell front to delete the job with ind.
+ * @param {number} ind
  */
 const deleteJobState = (ind) => {
-  mainWindow.webContents.send('deleteJobState', ind);
+  mainWindow?.webContents.send('deleteJobState', ind);
 };
 
 const indexer = new Indexer((numJobs) => {
@@ -83,7 +86,7 @@ app.whenReady().then(() => {
   mainWindow = createMainWindow();
   mainWindow.once('ready-to-show', () => {
     // Show the window only after fully loaded.
-    mainWindow.show();
+    mainWindow?.show();
   });
 
   app.on('activate', function () {
@@ -113,7 +116,8 @@ app.on('window-all-closed', function () {
 });
 
 /**
- * @param {Object} ret
+ * @param {string} itemPath
+ * @param {Object<string, Object>} ret
  */
 async function addDirectory (itemPath, ret) {
   try {
@@ -133,6 +137,10 @@ async function addDirectory (itemPath, ret) {
   return;
 }
 
+/**
+ * @param {string} itemPath
+ * @param {Object<string, Object>} ret
+ */
 async function addFile (itemPath, ret) {
   try {
     const {size, mtime} = await fs.stat(itemPath);
@@ -152,10 +160,14 @@ async function addFile (itemPath, ret) {
 
 // Handle inter process communications with renderer processes.
 ipcMain.handle('openFile', async () => {
+  if (!mainWindow) {
+    return;
+  }
   let tmp = dialog.showOpenDialogSync(mainWindow, {
     title: 'Open File(s)',
     properties: ['openFile', 'multiSelections']
   });
+  /** @type {Object<string, any>} */
   let ret = {};
   if (!tmp)
     return ret;
@@ -166,10 +178,14 @@ ipcMain.handle('openFile', async () => {
 });
 
 ipcMain.handle('openDirectory', async () => {
+  if (!mainWindow) {
+    return;
+  }
   let tmp = dialog.showOpenDialogSync(mainWindow, {
     title: 'Open Directory(s)',
     properties: ['openDirectory', 'multiSelections']
   });
+  /** @type {Object<string, any>} */
   let ret = {};
   if (!tmp)
     return ret;
@@ -180,6 +196,7 @@ ipcMain.handle('openDirectory', async () => {
 });
 
 ipcMain.handle('dragAndDrop', async (_, paths) => {
+  /** @type {Object<string, any>} */
   let ret = {};
   for (let itemPath of paths) {
     const stat = await fs.stat(itemPath);
@@ -197,7 +214,7 @@ ipcMain.handle('getNetworks', () => {
   return network.getNetworks();
 });
 
-ipcMain.handle('openServer', (event, myIp, netmask) => {
+ipcMain.handle('openServer', (_, myIp, netmask) => {
   if (server.isOpen()) {
     return true;
   }
@@ -217,11 +234,11 @@ ipcMain.handle('isServerOpen', () => {
 
 ipcMain.handle('scan', (_, myIp, netmask, myId) => {
   network.scan(myIp, netmask, myId, (deviceIp, deviceVersion, deviceId, deviceOs) => {
-    mainWindow.webContents.send('scannedDevice', deviceIp, deviceVersion, deviceId, deviceOs);
+    mainWindow?.webContents.send('scannedDevice', deviceIp, deviceVersion, deviceId, deviceOs);
   });
 });
 
-ipcMain.handle('setMyId', (event, myId) => {
+ipcMain.handle('setMyId', (_, myId) => {
   if (myId) {
     server.setMyId(myId);
     client.setMyId(myId);
@@ -276,6 +293,9 @@ ipcMain.handle('rejectRequest', (_, ind) => {
 });
 
 ipcMain.handle('setRecvDir', () => {
+  if (!mainWindow) {
+    return;
+  }
   let ret = dialog.showOpenDialogSync(mainWindow, {
     title: 'Set Receive Directory',
     properties: ['openDirectory']
@@ -286,5 +306,8 @@ ipcMain.handle('setRecvDir', () => {
 });
 
 ipcMain.handle('showMessage', (_, message) => {
+  if (!mainWindow) {
+    return;
+  }
   dialog.showMessageBox(mainWindow, {title: 'tiShare', message: message});
 });
