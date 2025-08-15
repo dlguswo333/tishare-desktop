@@ -47,7 +47,6 @@ function createMainWindow () {
     height: 600,
     webPreferences: {
       preload: path.join(import.meta.dirname, 'preload.js'),
-      enableRemoteModule: false,
       nodeIntegration: false,
       contextIsolation: true
     },
@@ -65,7 +64,6 @@ function createMainWindow () {
     ));
     mainWindow.setIcon(iconPath);
     mainWindow.loadURL('http://localhost:3000');
-    mainWindow.maximize();
   }
   else {
     // removeMenu will remove debugger menu too. Comment the below line if not wanted.
