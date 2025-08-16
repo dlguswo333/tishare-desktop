@@ -2,6 +2,7 @@ import {useState} from 'react';
 import {printSize, WELL_KNOWN_IMAGE_EXTENSIONS} from '../../defs';
 import useFormattedDate from '../hook/useFormattedDate';
 import Thumbnail from './Thumbnail';
+import {TiItem} from '../../types';
 
 type Props = {
   checkAll: boolean;
@@ -11,7 +12,7 @@ type Props = {
   setItemDetail: Function;
   checked: Record<string, boolean>;
   items: object;
-  item: Item;
+  item: TiItem;
 }
 
 const Item = ({item, items, checkAll, lastClick, setLastClick, checked, setChecked, setItemDetail}: Props) => {
