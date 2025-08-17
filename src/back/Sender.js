@@ -13,7 +13,7 @@ class Sender {
   #receiverId;
   /**
      * Normalized item array.
-     * @type {import('./Common').Item[]}
+     * @type {import('../types').TiItem[]}
      */
   #itemArray;
   /**
@@ -79,7 +79,7 @@ class Sender {
    * @param {number} ind
    * @param {import('net').Socket} socket
    * @param {string!} receiverId
-   * @param {Array.<{path:string, dir:string, name:string, type:string, size:number}>} itemArray
+   * @param {import('../types').TiItem[]} itemArray
    * @param {Function} onExitCallback
    * @param {Function} sendState
    */

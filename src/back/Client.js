@@ -45,7 +45,7 @@ class Client {
   /**
    * Request to send to opponent Server.
    * NOTE that it does not embed itemArray.
-   * @param {Record<string, import('../types.js').TiFrontItem>} items
+   * @param {Record<string, import('../types.js').TiItem>} items
    * @param {string} receiverIp
    * @param {string} receiverId
    * @returns {Promise.<number|boolean>} Index value of the Sender or false.

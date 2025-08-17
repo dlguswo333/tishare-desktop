@@ -5,11 +5,11 @@ import {printSize, WELL_KNOWN_IMAGE_EXTENSIONS} from '../../defs';
 import useFormattedDate from '../hook/useFormattedDate';
 import '../style/ItemDetail.scss';
 import Thumbnail from './Thumbnail';
-import {TiFrontItem} from '../../types';
+import {TiItemWithoutDir} from '../../types';
 
 type Props = {
   setItemDetail: Function;
-  item: TiFrontItem;
+  item: TiItemWithoutDir;
 };
 
 const ItemDetail = ({item, setItemDetail}: Props) => {

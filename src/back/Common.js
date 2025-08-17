@@ -1,11 +1,12 @@
+// @ts-check
 import path from 'path';
 import fs from 'fs/promises';
 /** Header must not and cannot exceed this length. @type {number} */
 const MAX_HEADER_LEN = 10000;
 const HEADER_END = '\n\n';
 /**
- * TODO Convert into typescript
- * @typedef {{dir:string; path:string; name: string; type:string; size:number;}} Item
+ * @typedef {import('../types').TiItemWithoutDir} TiItemWithoutDir
+ * @typedef {import('../types').TiItem} TiItem
  * @typedef {{app: string; version: string; class: string; id: string; numItems: number;}} SendRequestHeader
  * @typedef {{app: string; version: string; class: string; id: string;}} RecvRequestHeader
  */
@@ -28,25 +29,26 @@ function splitHeader (buf) {
 /**
  * Normalize tree structure items into serialized item array.
  * Before calling the function, be sure that this.itemArray is an empty array.
- * @param {Object.<string, import('../types').TiFrontItem>} items
- * @returns {Promise<Item[]>}
+ * @param {Object.<string, TiItem>} items
+ * @returns {Promise<TiItem[]>}
  */
 async function createItemArray (items) {
+  /** @type {TiItem[]} */
   let ret = [];
   await createItemArrayIntoParam(items, ret);
   return ret;
 }
 
 /**
- * @param {Object.<string, Item>} items
- * @param {any[]} ret
+ * @param {Object.<string, TiItem>} items
+ * @param {TiItem[]} ret
  */
 async function createItemArrayIntoParam (items, ret) {
   for (const itemName in items) {
     const item = items[itemName];
     if (item.type === 'directory') {
-      ret.push(createDirectoryHeader(item.path, item.name, item.dir));
-      /** @type {Object.<string, Item>} */
+      ret.push(createDirectoryHeader(item.path, item.name, item.dir, item.size));
+      /** @type {Object.<string, TiItem>} */
       const tmp = {};
       for (const subItemName of (await fs.readdir(item.path))) {
         const subItemPath = path.join(item.path, subItemName);
@@ -68,9 +70,10 @@ async function createItemArrayIntoParam (items, ret) {
  * @param {string} name Name of the item.
  * @param {string} dir Directory of the item.
  * @param {number} size Size of the item.
- * @returns {Item}
+ * @returns {TiItem}
  */
 function createFileHeader (path, name, dir, size) {
+  /** @type {TiItem} */
   const header = {path: path, name: name, dir: dir.split('\\').join('/'), type: 'file', size: size};
   return header;
 }
@@ -79,10 +82,12 @@ function createFileHeader (path, name, dir, size) {
  * @param {string} path Path of the item.
  * @param {string} name name of the item.
  * @param {string} dir Directory of the item.
- * @returns {{name:string, type: string}}
+ * @param {number} size Size of the item.
+ * @returns {TiItem}
  */
-function createDirectoryHeader (path, name, dir) {
-  const header = {path: path, name: name, dir: dir.split('\\').join('/'), type: 'directory'};
+function createDirectoryHeader (path, name, dir, size) {
+  /** @type {TiItem} */
+  const header = {path: path, name: name, dir: dir.split('\\').join('/'), type: 'directory', size};
   return header;
 }
 

@@ -119,7 +119,7 @@ app.on('window-all-closed', function () {
 
 /**
  * @param {string} itemPath
- * @param {Object<string, Object>} ret
+ * @param {Object<string, import('../types').TiItem>} ret
  */
 async function addDirectory (itemPath, ret) {
   try {
@@ -141,7 +141,7 @@ async function addDirectory (itemPath, ret) {
 
 /**
  * @param {string} itemPath
- * @param {Object<string, Object>} ret
+ * @param {Object<string, import('../types').TiItem>} ret
  */
 async function addFile (itemPath, ret) {
   try {

@@ -1,11 +1,15 @@
 import {IpcRendererEvent, IpcMainInvokeEvent} from 'electron';
 
-export type TiFrontItem = {
+export type TiItemWithoutDir = {
   name: string;
   type: 'directory' | 'file';
   path: string;
   mtime?: Date;
   size: number;
+}
+
+export type TiItem = TiItemWithoutDir & {
+  dir: string;
 }
 
 export type TiDevice = {
@@ -27,13 +31,13 @@ export type IpcRendererApis = {
   scan: (myIp: string, netmask: string, myId: string) => void,
   scanCallback: (callback: (deviceIp: string, deviceVersion: string, deviceId: string, deviceOs: string) => void) => void,
   removeScanCallback: () => void,
-  sendRequest: (items: Record<string, TiFrontItem>, receiverIp: string, receiverId: string) => void,
+  sendRequest: (items: Record<string, Tiitem>, receiverIp: string, receiverId: string) => void,
   preRecvRequest: (senderIp: string, senderId: string) => void,
   recvRequest: (ind: number, recvDir: string) => void,
   endJob: (ind: number) => Promise<boolean>,
   deleteJob: (ind: number) => Promise<boolean>,
   acceptSendRequest: (ind: number, recvDir: string) => void,
-  acceptRecvRequest: (ind: number, items: Record<string, TiFrontItem>) => void,
+  acceptRecvRequest: (ind: number, items: Record<string, TiItem>) => void,
   rejectRequest: (ind: number) => void,
   setRecvDir: () => Promise<string | null>,
   showMessage: (message: string) => void,
