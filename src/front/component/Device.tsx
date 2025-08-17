@@ -1,6 +1,7 @@
 import WindowsIcon from '../icons/Windows.svg?react';
 import AndroidIcon from '../icons/Android.svg?react';
 import LinuxIcon from '../icons/Linux.svg?react';
+import {TiDevice} from '../../types';
 
 type OsIconProps = {
   os: string;
@@ -24,7 +25,7 @@ const OsIcon = ({os}: OsIconProps) => {
 };
 
 type Props = {
-  device: Device;
+  device: TiDevice;
   isSelected: boolean;
   setSelectedIp: Function;
 };

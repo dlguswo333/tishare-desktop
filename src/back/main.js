@@ -1,3 +1,4 @@
+// @ts-check
 // Modules to control application life and create native browser window
 import {app, BrowserWindow, ipcMain, dialog, protocol, net, nativeImage} from 'electron';
 import fs from 'fs/promises';
@@ -8,23 +9,29 @@ import Client from './Client.js';
 import Indexer from './Indexer.js';
 import {OS} from './defs.js';
 
+/**
+ * @typedef {import('../types').IpcRendererApis} IpcRendererApis
+ */
+
 const isDev = !app.isPackaged;
 
-/** @type {BrowserWindow} */
-var mainWindow = null;
+/** @type {null | BrowserWindow} */
+let mainWindow = null;
 
 /**
  * Send state to renderer process.
+ * @param {Object} state
  */
 const sendState = (state) => {
-  mainWindow.webContents.send('jobState', state);
+  mainWindow?.webContents.send('jobState', state);
 };
 
 /**
  * Tell front to delete the job with ind.
+ * @param {number} ind
  */
 const deleteJobState = (ind) => {
-  mainWindow.webContents.send('deleteJobState', ind);
+  mainWindow?.webContents.send('deleteJobState', ind);
 };
 
 const indexer = new Indexer((numJobs) => {
@@ -44,7 +51,6 @@ function createMainWindow () {
     height: 600,
     webPreferences: {
       preload: path.join(import.meta.dirname, 'preload.js'),
-      enableRemoteModule: false,
       nodeIntegration: false,
       contextIsolation: true
     },
@@ -62,7 +68,6 @@ function createMainWindow () {
     ));
     mainWindow.setIcon(iconPath);
     mainWindow.loadURL('http://localhost:3000');
-    mainWindow.maximize();
   }
   else {
     // removeMenu will remove debugger menu too. Comment the below line if not wanted.
@@ -83,7 +88,7 @@ app.whenReady().then(() => {
   mainWindow = createMainWindow();
   mainWindow.once('ready-to-show', () => {
     // Show the window only after fully loaded.
-    mainWindow.show();
+    mainWindow?.show();
   });
 
   app.on('activate', function () {
@@ -113,7 +118,8 @@ app.on('window-all-closed', function () {
 });
 
 /**
- * @param {Object} ret
+ * @param {string} itemPath
+ * @param {Object<string, import('../types').TiItem>} ret
  */
 async function addDirectory (itemPath, ret) {
   try {
@@ -133,6 +139,10 @@ async function addDirectory (itemPath, ret) {
   return;
 }
 
+/**
+ * @param {string} itemPath
+ * @param {Object<string, import('../types').TiItem>} ret
+ */
 async function addFile (itemPath, ret) {
   try {
     const {size, mtime} = await fs.stat(itemPath);
@@ -150,36 +160,49 @@ async function addFile (itemPath, ret) {
   return;
 }
 
-// Handle inter process communications with renderer processes.
-ipcMain.handle('openFile', async () => {
+/** @type {IpcRendererApis['openFile']} */
+const openFile = async () => {
+  /** @type {Object<string, any>} */
+  let ret = {};
+  if (!mainWindow) {
+    return ret;
+  }
   let tmp = dialog.showOpenDialogSync(mainWindow, {
     title: 'Open File(s)',
     properties: ['openFile', 'multiSelections']
   });
-  let ret = {};
   if (!tmp)
     return ret;
   for (const item of tmp) {
     await addFile(item, ret);
   }
   return ret;
-});
+};
+ipcMain.handle('openFile', openFile);
 
-ipcMain.handle('openDirectory', async () => {
+/** @type {IpcRendererApis['openDirectory']} */
+const openDirectory = async () => {
+  /** @type {Object<string, any>} */
+  let ret = {};
+  if (!mainWindow) {
+    return ret;
+  }
   let tmp = dialog.showOpenDialogSync(mainWindow, {
     title: 'Open Directory(s)',
     properties: ['openDirectory', 'multiSelections']
   });
-  let ret = {};
   if (!tmp)
     return ret;
   for (let item of tmp) {
     await addDirectory(item, ret);
   }
   return ret;
-});
+};
+ipcMain.handle('openDirectory', openDirectory);
 
-ipcMain.handle('dragAndDrop', async (_, paths) => {
+/** @type {IpcRendererApis['dragAndDrop']} */
+const dragAndDrop = async (paths) => {
+  /** @type {Object<string, any>} */
   let ret = {};
   for (let itemPath of paths) {
     const stat = await fs.stat(itemPath);
@@ -191,58 +214,78 @@ ipcMain.handle('dragAndDrop', async (_, paths) => {
     }
   }
   return ret;
-});
+};
+ipcMain.handle('dragAndDrop', (_, paths) => dragAndDrop(paths));
 
-ipcMain.handle('getNetworks', () => {
+/** @type {IpcRendererApis['getNetworks']} */
+const getNetworks = async () => {
   return network.getNetworks();
-});
+};
+ipcMain.handle('getNetworks', getNetworks);
 
-ipcMain.handle('openServer', (event, myIp, netmask) => {
+/** @type {IpcRendererApis['openServer']} */
+const openServer = async (myIp, netmask) => {
   if (server.isOpen()) {
     return true;
   }
   return server.open(myIp, netmask);
-});
+};
+ipcMain.handle('openServer', (_, myIp, netmask) => openServer(myIp, netmask));
 
-ipcMain.handle('closeServer', () => {
+/** @type {IpcRendererApis['closeServer']} */
+const closeServer = async () => {
   let ret = server.close();
   if (ret)
     return ret;
   return false;
-});
+};
+ipcMain.handle('closeServer', closeServer);
 
-ipcMain.handle('isServerOpen', () => {
+/** @type {IpcRendererApis['isServerOpen']} */
+const isServerOpen = async () => {
   return server && server.isOpen();
-});
+};
+ipcMain.handle('isServerOpen', isServerOpen);
 
-ipcMain.handle('scan', (_, myIp, netmask, myId) => {
+/** @type {IpcRendererApis['scan']} */
+const scan = (myIp, netmask, myId) => {
   network.scan(myIp, netmask, myId, (deviceIp, deviceVersion, deviceId, deviceOs) => {
-    mainWindow.webContents.send('scannedDevice', deviceIp, deviceVersion, deviceId, deviceOs);
+    mainWindow?.webContents.send('scannedDevice', deviceIp, deviceVersion, deviceId, deviceOs);
   });
-});
+};
+ipcMain.handle('scan', (_, myIp, netmask, myId) => scan(myIp, netmask, myId));
 
-ipcMain.handle('setMyId', (event, myId) => {
+/** @type {IpcRendererApis['setMyId']} */
+const setMyId = async (myId) => {
   if (myId) {
     server.setMyId(myId);
     client.setMyId(myId);
     return true;
   }
   return false;
-});
+};
+ipcMain.handle('setMyId', (_, myId) => setMyId(myId));
 
-ipcMain.handle('sendRequest', (_, items, ip, id) => {
+/** @type {IpcRendererApis['sendRequest']} */
+const sendRequest = (items, ip, id) => {
   client.sendRequest(items, ip, id);
-});
+};
+ipcMain.handle('sendRequest', (_, items, ip, id) => sendRequest(items, ip, id));
 
-ipcMain.handle('preRecvRequest', (_, ip, id) => {
+/** @type {IpcRendererApis['preRecvRequest']} */
+const preRecvRequest = (ip, id) => {
   client.preRecvRequest(ip, id);
-});
+};
+ipcMain.handle('preRecvRequest', (_, ip, id) => preRecvRequest(ip, id));
 
-ipcMain.handle('recvRequest', (_, ind, recvDir) => {
+/** @type {IpcRendererApis['recvRequest']} */
+const recvRequest = (ind, recvDir) => {
   client.recvRequest(ind, recvDir);
-});
+};
+ipcMain.handle('recvRequest', (_, ind, recvDir) => recvRequest(ind, recvDir));
 
-ipcMain.handle('endJob', async (_, ind) => {
+/** @type {IpcRendererApis['endJob']} */
+const endJob = async (ind) => {
   let ret = await server.endJob(ind);
   if (ret)
     return ret;
@@ -250,10 +293,11 @@ ipcMain.handle('endJob', async (_, ind) => {
   if (ret)
     return ret;
   return false;
-});
+};
+ipcMain.handle('endJob', (_, ind) => endJob(ind));
 
-
-ipcMain.handle('deleteJob', (_, ind) => {
+/** @type {IpcRendererApis['deleteJob']} */
+const deleteJob = async (ind) => {
   let ret = server.deleteJob(ind);
   if (ret)
     return ret;
@@ -261,21 +305,32 @@ ipcMain.handle('deleteJob', (_, ind) => {
   if (ret)
     return ret;
   return false;
-});
+};
+ipcMain.handle('deleteJob', (_, ind) => deleteJob(ind));
 
-ipcMain.handle('acceptSendRequest', (_, ind, recvDir) => {
+/** @type {IpcRendererApis['acceptSendRequest']} */
+const acceptSendRequest = (ind, recvDir) => {
   server.acceptSendRequest(ind, recvDir);
-});
+};
+ipcMain.handle('acceptSendRequest', (_, ind, recvDir) => acceptSendRequest(ind, recvDir));
 
-ipcMain.handle('acceptRecvRequest', (_, ind, items) => {
+/** @type {IpcRendererApis['acceptRecvRequest']} */
+const acceptRecvRequest = (ind, items) => {
   server.acceptRecvRequest(ind, items);
-});
+};
+ipcMain.handle('acceptRecvRequest', (_, ind, items) => acceptRecvRequest(ind, items));
 
-ipcMain.handle('rejectRequest', (_, ind) => {
+/** @type {IpcRendererApis['rejectRequest']} */
+const rejectRequest = (ind) => {
   server.rejectRequest(ind);
-});
+};
+ipcMain.handle('rejectRequest', (_, ind) => rejectRequest(ind));
 
-ipcMain.handle('setRecvDir', () => {
+/** @type {IpcRendererApis['setRecvDir']} */
+const setRecvDir = async () => {
+  if (!mainWindow) {
+    return null;
+  }
   let ret = dialog.showOpenDialogSync(mainWindow, {
     title: 'Set Receive Directory',
     properties: ['openDirectory']
@@ -283,8 +338,14 @@ ipcMain.handle('setRecvDir', () => {
   if (ret)
     return ret[0];
   return null;
-});
+};
+ipcMain.handle('setRecvDir', setRecvDir);
 
-ipcMain.handle('showMessage', (_, message) => {
+/** @type {IpcRendererApis['showMessage']} */
+const showMessage = (message) => {
+  if (!mainWindow) {
+    return;
+  }
   dialog.showMessageBox(mainWindow, {title: 'tiShare', message: message});
-});
+};
+ipcMain.handle('showMessage', (_, message) => showMessage(message));

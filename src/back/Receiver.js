@@ -34,10 +34,10 @@ class Receiver {
   #haveParsedHeader;
   /**
    * Send Request header.
-   * @type {{app: string, version:string, class:string, id:string, itemArray: import('./Common').Item[]} | null}
+   * @type {{app: string, version:string, class:string, id:string, itemArray: import('../types').TiItem[]} | null}
    */
   #sendRequestHeader;
-  /** @type {{class: string} & import('./Common').Item | null} */
+  /** @type {{class: string} & import('../types').TiItem | null} */
   #recvHeader;
   /**
    * @type {'ok'|'next'}

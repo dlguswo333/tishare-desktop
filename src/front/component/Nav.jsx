@@ -24,8 +24,9 @@ function Nav ({toggleSettings, items}) {
   }, [grow]);
 
   useEffect(() => {
-    ipcRenderer.onJobState((_, job) => {
+    ipcRenderer.onJobState((job) => {
       setJobs((jobs) => {
+        /** @type {Record<string, any>} */
         let tmp = {};
         Object.assign(tmp, jobs);
         tmp[job['ind']] = job;
@@ -36,8 +37,9 @@ function Nav ({toggleSettings, items}) {
   }, []);
 
   useEffect(() => {
-    ipcRenderer.onDeleteJobState((_, ind) => {
+    ipcRenderer.onDeleteJobState((ind) => {
       setJobs((jobs) => {
+        /** @type {Record<string, any>} */
         let tmp = {};
         Object.assign(tmp, jobs);
         delete tmp[ind];
@@ -48,7 +50,7 @@ function Nav ({toggleSettings, items}) {
   }, []);
 
   useEffect(() => {
-    ipcRenderer.onNumJobs((_, numJobs) => {
+    ipcRenderer.onNumJobs((numJobs) => {
       setNumJobs(numJobs);
     });
     return () => { ipcRenderer.removeNumJobsCallback(); };
@@ -81,7 +83,7 @@ function Nav ({toggleSettings, items}) {
         <JobView state={{ state: STATE.SENDING, speed: 11033403, progress: 60, id: 'july', itemName: 'report about theme ui.docx', totalProgress: '1/2' }} /> */}
 
         {Object.entries(jobs).map(([ind, job]) => (
-          <JobView state={job} ind={ind} items={items} key={ind} />
+          <JobView state={job} ind={Number(ind)} items={items} key={ind} />
         ))}
       </div>
     </nav>

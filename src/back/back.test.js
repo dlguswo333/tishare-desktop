@@ -94,7 +94,7 @@ describe('Server and client', () => {
     });
   });
   describe('Client', () => {
-    /** @type {Object.<string, import('./Common').Item>} */
+    /** @type {Object.<string, import('../types').TiItem>} */
     let items = null;
     before(async () => {
       items = await createItems();
@@ -130,7 +130,7 @@ async function createItems () {
 }
 
 /**
- * @param {Object.<string, import('./Common').Item} items
+ * @param {Object.<string, import('./Common').TiBackItem} items
  */
 async function deleteItems (items) {
   for (let itemName in items) {

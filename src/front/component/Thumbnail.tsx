@@ -1,7 +1,9 @@
+import {TiItemWithoutDir} from '../../types';
+
 type Props = {
   isThumbnailVisible: boolean;
   onThumbnailError: () => unknown;
-  item: Item;
+  item: TiItemWithoutDir;
 }
 
 const Thumbnail = ({isThumbnailVisible, onThumbnailError, item}: Props) => {
