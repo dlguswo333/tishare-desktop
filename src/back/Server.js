@@ -279,7 +279,7 @@ class Server {
   /**
    * Accept receive request.
    * @param {number} ind
-   * @param {Object.<string, import('./Common').Item>} items
+   * @param {Record<string, import('../types.js').TiFrontItem>} items
    */
   async acceptRecvRequest (ind, items) {
     const requestee = this.jobs[ind];

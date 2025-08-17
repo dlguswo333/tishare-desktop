@@ -33,7 +33,7 @@ const ipcRendererApis = {
     ipcRenderer.invoke('scan', myIp, netmask, myId);
   },
   scanCallback: (callback) => {
-    ipcRenderer.on('scannedDevice', callback);
+    ipcRenderer.on('scannedDevice', (_, deviceIp, deviceVersion, deviceId, deviceOs) => callback(deviceIp, deviceVersion, deviceId, deviceOs));
   },
   removeScanCallback: () => {
     ipcRenderer.removeAllListeners('scannedDevice');
@@ -48,10 +48,10 @@ const ipcRendererApis = {
     ipcRenderer.invoke('recvRequest', ind, recvDir);
   },
   endJob: (ind) => {
-    ipcRenderer.invoke('endJob', ind);
+    return ipcRenderer.invoke('endJob', ind);
   },
   deleteJob: (ind) => {
-    ipcRenderer.invoke('deleteJob', ind);
+    return ipcRenderer.invoke('deleteJob', ind);
   },
   acceptSendRequest: (ind, recvDir) => {
     ipcRenderer.invoke('acceptSendRequest', ind, recvDir);
@@ -69,19 +69,19 @@ const ipcRendererApis = {
     ipcRenderer.invoke('showMessage', message);
   },
   onNumJobs: (callback) => {
-    ipcRenderer.on('numJobs', callback);
+    ipcRenderer.on('numJobs', (_, numJobs) => callback(numJobs));
   },
   removeNumJobsCallback: () => {
     ipcRenderer.removeAllListeners('numJobs');
   },
   onJobState: (callback) => {
-    ipcRenderer.on('jobState', callback);
+    ipcRenderer.on('jobState', (_, job) => callback(job));
   },
   removeJobStateCallback: () => {
     ipcRenderer.removeAllListeners('jobState');
   },
   onDeleteJobState: (callback) => {
-    ipcRenderer.on('deleteJobState', callback);
+    ipcRenderer.on('deleteJobState', (_, ind) => callback(ind));
   },
   removeDeleteJobStateCallback: () => {
     ipcRenderer.removeAllListeners('deleteJobState');

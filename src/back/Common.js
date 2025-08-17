@@ -4,6 +4,7 @@ import fs from 'fs/promises';
 const MAX_HEADER_LEN = 10000;
 const HEADER_END = '\n\n';
 /**
+ * TODO Convert into typescript
  * @typedef {{dir:string; path:string; name: string; type:string; size:number;}} Item
  * @typedef {{app: string; version: string; class: string; id: string; numItems: number;}} SendRequestHeader
  * @typedef {{app: string; version: string; class: string; id: string;}} RecvRequestHeader
@@ -27,7 +28,8 @@ function splitHeader (buf) {
 /**
  * Normalize tree structure items into serialized item array.
  * Before calling the function, be sure that this.itemArray is an empty array.
- * @param {Object.<string, Item>} items
+ * @param {Object.<string, import('../types').TiFrontItem>} items
+ * @returns {Promise<Item[]>}
  */
 async function createItemArray (items) {
   let ret = [];

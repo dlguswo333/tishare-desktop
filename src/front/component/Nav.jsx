@@ -24,7 +24,7 @@ function Nav ({toggleSettings, items}) {
   }, [grow]);
 
   useEffect(() => {
-    ipcRenderer.onJobState((_, job) => {
+    ipcRenderer.onJobState((job) => {
       setJobs((jobs) => {
         /** @type {Record<string, any>} */
         let tmp = {};
@@ -37,7 +37,7 @@ function Nav ({toggleSettings, items}) {
   }, []);
 
   useEffect(() => {
-    ipcRenderer.onDeleteJobState((_, ind) => {
+    ipcRenderer.onDeleteJobState((ind) => {
       setJobs((jobs) => {
         /** @type {Record<string, any>} */
         let tmp = {};
@@ -50,7 +50,7 @@ function Nav ({toggleSettings, items}) {
   }, []);
 
   useEffect(() => {
-    ipcRenderer.onNumJobs((_, numJobs) => {
+    ipcRenderer.onNumJobs((numJobs) => {
       setNumJobs(numJobs);
     });
     return () => { ipcRenderer.removeNumJobsCallback(); };

@@ -1,6 +1,6 @@
-import {IpcRendererEvent} from 'electron';
+import {IpcRendererEvent, IpcMainInvokeEvent} from 'electron';
 
-export type TiItem = {
+export type TiFrontItem = {
   name: string;
   type: 'directory' | 'file';
   path: string;
@@ -25,23 +25,23 @@ export type IpcRendererApis = {
   setMyId: (myId: string) => Promise<boolean>,
   isServerOpen: () => Promise<boolean>,
   scan: (myIp: string, netmask: string, myId: string) => void,
-  scanCallback: (callback: (_: IpcRendererEvent, deviceIp: string, deviceVersion: string, deviceId: string, deviceOs: string) => void) => void,
+  scanCallback: (callback: (deviceIp: string, deviceVersion: string, deviceId: string, deviceOs: string) => void) => void,
   removeScanCallback: () => void,
-  sendRequest: (items: TiItem[], receiverIp: string, receiverId: string) => void,
+  sendRequest: (items: Record<string, TiFrontItem>, receiverIp: string, receiverId: string) => void,
   preRecvRequest: (senderIp: string, senderId: string) => void,
   recvRequest: (ind: number, recvDir: string) => void,
-  endJob: (ind: number) => void,
-  deleteJob: (ind: number) => void,
+  endJob: (ind: number) => Promise<boolean>,
+  deleteJob: (ind: number) => Promise<boolean>,
   acceptSendRequest: (ind: number, recvDir: string) => void,
-  acceptRecvRequest: (ind: number, items: TiItem[]) => void,
+  acceptRecvRequest: (ind: number, items: Record<string, TiFrontItem>) => void,
   rejectRequest: (ind: number) => void,
   setRecvDir: () => Promise<string | null>,
   showMessage: (message: string) => void,
-  onNumJobs: (callback: (_: IpcRendererEvent, numJobs: number) => void) => void,
+  onNumJobs: (callback: (numJobs: number) => void) => void,
   removeNumJobsCallback: () => void,
-  onJobState: (callback: (_: IpcRendererEvent, job: any) => void) => void,
+  onJobState: (callback: (job: any) => void) => void,
   removeJobStateCallback: () => void,
-  onDeleteJobState: (callback: (_: IpcRendererEvent, ind: number) => void) => void,
+  onDeleteJobState: (callback: (ind: number) => void) => void,
   removeDeleteJobStateCallback: () => void,
   getFilePaths: (files: File[]) => string[] | undefined,
 }
