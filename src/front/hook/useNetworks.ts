@@ -1,15 +1,15 @@
 import {useCallback} from 'react';
+import type {Network} from '../component/App';
+
+type Props = {
+  isServerOpen: boolean;
+  closeServer: () => Promise<void>;
+  setNetworks: (networks: Network[]) => void;
+}
 
 const ipcRenderer = window.ipcRenderer;
 
-/**
- * @param {Object} props
- * @param {boolean} props.isServerOpen
- * @param {() => Promise<void>} props.closeServer
- * @param {(networks: (import('../component/App').Network)[]) => void} props.setNetworks
- *
- */
-const useNetworks = ({isServerOpen, closeServer, setNetworks}) => {
+const useNetworks = ({isServerOpen, closeServer, setNetworks}: Props) => {
   const getNetworks = useCallback(async () => {
     // Close server before refreshing networks.
     if (isServerOpen)

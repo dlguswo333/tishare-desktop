@@ -3,10 +3,8 @@ import {useMemo} from 'react';
 /**
  * Format `Date` object into fancy string.
  * 06-16-2024 pm 6:55
- * @param {Date | undefined} date
- * @returns {string}
  */
-const useFormattedDate = (date) => {
+const useFormattedDate = (date: undefined | Date) => {
   return useMemo(() => {
     if (!date) {
       return '';
@@ -18,13 +16,8 @@ const useFormattedDate = (date) => {
     const hour = (date.getHours() % 12) + (date.getHours() % 12 === 0 ? 12 : 0);
     const minute = date.getMinutes();
 
-    /**
-     * Pad `value` of `number` type with zeros and return the string.
-     * @param {number} value
-     * @param {number} maxLength
-     * @returns {string}
-     */
-    const padStartZero = (value, maxLength) => {
+    /** Pad `value` of `number` type with zeros and return the string. */
+    const padStartZero = (value: number, maxLength: number) => {
       return value.toString().padStart(maxLength, '0');
     };
 
