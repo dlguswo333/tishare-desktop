@@ -19,6 +19,16 @@ export type TiDevice = {
   version: string;
 }
 
+export type TiJob = {
+  ind: number;
+  state: string;
+  id: string;
+  speed?: number;
+  itemName?: string;
+  progress?: number;
+  totalProgress?: string;
+};
+
 export type IpcRendererApis = {
   openFile: () => Promise<Record<string, any>>,
   openDirectory: () => Promise<Record<string, any>>,
@@ -43,7 +53,7 @@ export type IpcRendererApis = {
   showMessage: (message: string) => void,
   onNumJobs: (callback: (numJobs: number) => void) => void,
   removeNumJobsCallback: () => void,
-  onJobState: (callback: (job: any) => void) => void,
+  onJobState: (callback: (job: TiJob) => void) => void,
   removeJobStateCallback: () => void,
   onDeleteJobState: (callback: (ind: number) => void) => void,
   removeDeleteJobStateCallback: () => void,

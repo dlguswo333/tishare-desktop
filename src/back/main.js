@@ -20,7 +20,7 @@ let mainWindow = null;
 
 /**
  * Send state to renderer process.
- * @param {Object} state
+ * @param {import('../types').TiJob} state
  */
 const sendState = (state) => {
   mainWindow?.webContents.send('jobState', state);
