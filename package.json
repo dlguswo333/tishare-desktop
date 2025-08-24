@@ -45,7 +45,9 @@
     "build": "npm run build:front && npm run build:back",
     "build:front": "vite build --config src/front/vite.config.js",
     "build:back": "electron-builder",
-    "test": "mocha ./src/back/back.test.js",
+    "test": "npm run test:front -- --run && npm run test:back",
+    "test:front": "vitest --root src/front",
+    "test:back": "mocha ./src/back/back.test.js",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p src/front/tsconfig.json && tsc --noEmit -p src/back/tsconfig.json",
     "lint": "eslint"
   },
