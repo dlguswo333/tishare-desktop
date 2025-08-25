@@ -9,6 +9,7 @@
   "private": false,
   "devDependencies": {
     "@dlguswo333/react-simple-spinner": "^0.6.0",
+    "@testing-library/react": "^16.3.0",
     "@types/eslint": "^8.44.7",
     "@types/mocha": "^10.0.10",
     "@types/node": "^22.10.1",
@@ -23,6 +24,7 @@
     "eslint-plugin-react": "^7.37.2",
     "eslint-plugin-react-hooks": "^5.1.0",
     "globals": "^15.13.0",
+    "jsdom": "^26.1.0",
     "mocha": "^9.2.2",
     "nodemon": "^3.1.7",
     "react": "^18.3.1",
@@ -31,7 +33,8 @@
     "typescript": "^5.7.2",
     "vite": "^6.0.2",
     "vite-plugin-commonjs": "^0.9.0",
-    "vite-plugin-svgr": "^4.3.0"
+    "vite-plugin-svgr": "^4.3.0",
+    "vitest": "^3.2.4"
   },
   "homepage": "./",
   "main": "src/back/main.js",
@@ -42,7 +45,9 @@
     "build": "npm run build:front && npm run build:back",
     "build:front": "vite build --config src/front/vite.config.js",
     "build:back": "electron-builder",
-    "test": "mocha ./src/back/back.test.js",
+    "test": "npm run test:front -- --run && npm run test:back",
+    "test:front": "vitest --root src/front",
+    "test:back": "mocha ./src/back/back.test.js",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p src/front/tsconfig.json && tsc --noEmit -p src/back/tsconfig.json",
     "lint": "eslint"
   },

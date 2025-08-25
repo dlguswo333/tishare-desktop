@@ -1,13 +1,11 @@
 import {useState, useCallback} from 'react';
+import {TiItem} from '../../types';
 
 const useItems = () => {
-  const [items, setItems] = useState({});
+  const [items, setItems] = useState<Record<string, TiItem>>({});
 
   const deleteChecked = useCallback(
-    /**
-     * @param {Object.<string, boolean>|undefined} checked
-     */
-    (checked) => {
+    (checked: undefined | Record<string, boolean>) => {
       const ret = {...items};
       if (checked === undefined) {
         setItems({});

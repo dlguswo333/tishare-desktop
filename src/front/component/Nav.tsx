@@ -4,19 +4,20 @@ import MenuIcon from '../icons/Menu.svg?react';
 import SettingsIcon from '../icons/Settings.svg?react';
 import {MAX_NUM_JOBS} from '../../defs';
 import '../style/Nav.scss';
+import {TiItem, TiJob} from '../../types';
 
 const ipcRenderer = window.ipcRenderer;
 
-/**
- * @param {object} props
- * @param {Function} props.toggleSettings
- * @param {object} props.items
- */
-function Nav ({toggleSettings, items}) {
+type Props = {
+  toggleSettings: () => unknown;
+  items: Record<string, TiItem>;
+}
+
+function Nav ({toggleSettings, items}: Props) {
   const [grow, setGrow] = useState(false);
   const [noti, setNoti] = useState(false);
   const [numJobs, setNumJobs] = useState(0);
-  const [jobs, setJobs] = useState({});
+  const [jobs, setJobs] = useState<Record<string, TiJob>>({});
 
   useEffect(() => {
     if (grow)
@@ -26,8 +27,7 @@ function Nav ({toggleSettings, items}) {
   useEffect(() => {
     ipcRenderer.onJobState((job) => {
       setJobs((jobs) => {
-        /** @type {Record<string, any>} */
-        let tmp = {};
+        let tmp: Record<string, TiJob> = {};
         Object.assign(tmp, jobs);
         tmp[job['ind']] = job;
         return tmp;
@@ -39,8 +39,7 @@ function Nav ({toggleSettings, items}) {
   useEffect(() => {
     ipcRenderer.onDeleteJobState((ind) => {
       setJobs((jobs) => {
-        /** @type {Record<string, any>} */
-        let tmp = {};
+        let tmp: Record<string, TiJob> = {};
         Object.assign(tmp, jobs);
         delete tmp[ind];
         return tmp;

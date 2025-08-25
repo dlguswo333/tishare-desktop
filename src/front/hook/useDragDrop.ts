@@ -1,18 +1,16 @@
 import {useCallback, useEffect, useState} from 'react';
 
+type Props = {
+  setItems: React.Dispatch<React.SetStateAction<{}>>;
+}
+
 const ipcRenderer = window.ipcRenderer;
 
-/**
- * @param {{setItems: React.Dispatch<React.SetStateAction<{}>>}} param0
- */
-const useDragDrop = ({setItems}) => {
+const useDragDrop = ({setItems}: Props) => {
   const [isDragging, setIsDragging] = useState(false);
 
   const onDragOver = useCallback(
-    /**
-     * @param {DragEvent} e
-     */
-    (e) => {
+    (e: DragEvent) => {
       e.stopPropagation();
       e.preventDefault();
       if (e.dataTransfer?.files)
@@ -21,26 +19,20 @@ const useDragDrop = ({setItems}) => {
     }, []);
 
   const onDragLeave = useCallback(
-    /**
-     * @param {DragEvent} e
-     */
-    (e) => {
+    (e: DragEvent) => {
       e.stopPropagation();
       e.preventDefault();
       // dragleave event fires on an element
       // when Blind component overlaps the element.
       // Checking if the target is Blind makes sure
       // that the mouse is out of entire window.
-      if (e.target?.className === 'Blind') {
+      if (e.target instanceof HTMLElement && e.target.className === 'Blind') {
         setIsDragging(false);
       }
     }, []);
 
   const onDrop = useCallback(
-    /**
-     * @param {DragEvent} e
-     */
-    (e) => {
+    (e: DragEvent) => {
       e.stopPropagation();
       e.preventDefault();
       setIsDragging(false);
@@ -50,6 +42,7 @@ const useDragDrop = ({setItems}) => {
       let paths = ipcRenderer.getFilePaths([...e.dataTransfer.files]);
       if (!paths) {
         ipcRenderer.showMessage('Unknown error occured. Could not retrieve files\' paths.');
+        return;
       }
       ipcRenderer.dragAndDrop(paths).then((ret) => {
         setItems((items) => Object.assign({}, ret, items));
