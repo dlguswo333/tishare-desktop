@@ -2,20 +2,21 @@ import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import ThemeButton from './ThemeButton';
 import Item from './Item';
 import '../style/ItemView.scss';
+import {TiItem, TiItemWithoutDir} from '../../types';
 
-/**
- * @param {object} props
- * @param {object} props.items
- * @param {function} props.openFile
- * @param {function} props.openDirectory
- * @param {function} props.deleteChecked
- * @param {function} props.setItemDetail
- */
-function ItemView ({items, openFile, openDirectory, deleteChecked, setItemDetail}) {
+type Props = {
+  items: Record<string, TiItem>;
+  openFile: () => unknown;
+  openDirectory: () => unknown;
+  deleteChecked: (_: undefined | Record<string, boolean>) => unknown;
+  setItemDetail: (_: null | TiItemWithoutDir) => unknown;
+}
+
+function ItemView ({items, openFile, openDirectory, deleteChecked, setItemDetail}: Props) {
   const [scrollable, setScrollable] = useState(false);
   const [checked, setChecked] = useState({});
-  const [lastClick, setLastClick] = useState(null);
-  const bodyRef = useRef(null);
+  const [lastClick, setLastClick] = useState<null | string>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
   const numItems = useMemo(() => Object.keys(items).length, [items]);
   const numCheckedItems = useMemo(() => Object.keys(checked).length, [checked]);
   const isCheckAll = useMemo(
@@ -71,7 +72,7 @@ function ItemView ({items, openFile, openDirectory, deleteChecked, setItemDetail
                   setChecked({});
                 }
                 else {
-                  const tmp = {};
+                  const tmp: Record<string, boolean> = {};
                   for (let itemName in items) {
                     tmp[itemName] = true;
                   }

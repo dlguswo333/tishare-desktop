@@ -6,7 +6,7 @@ import {TiItemWithoutDir} from '../../types';
 
 type Props = {
   checkAll: boolean;
-  lastClick: string;
+  lastClick: null | string;
   setLastClick: Function;
   setChecked: Function;
   setItemDetail: Function;
