@@ -19,11 +19,21 @@ export type TiDevice = {
   version: string;
 }
 
+export type TiJob = {
+  ind: number;
+  state: string;
+  id: string;
+  speed?: number;
+  itemName?: string;
+  progress?: number;
+  totalProgress?: string;
+};
+
 export type IpcRendererApis = {
   openFile: () => Promise<Record<string, any>>,
   openDirectory: () => Promise<Record<string, any>>,
   dragAndDrop: (paths: string[]) => Promise<Record<string, any>>,
-  getNetworks: () => Promise<{name:String, ip:String, netmask:String}[]>,
+  getNetworks: () => Promise<{name:string, ip:string, netmask:string}[]>,
   openServer: (myIp: string, myNetmask: string) => Promise<boolean>,
   closeServer: () => Promise<boolean>,
   setMyId: (myId: string) => Promise<boolean>,
@@ -43,7 +53,7 @@ export type IpcRendererApis = {
   showMessage: (message: string) => void,
   onNumJobs: (callback: (numJobs: number) => void) => void,
   removeNumJobsCallback: () => void,
-  onJobState: (callback: (job: any) => void) => void,
+  onJobState: (callback: (job: TiJob) => void) => void,
   removeJobStateCallback: () => void,
   onDeleteJobState: (callback: (ind: number) => void) => void,
   removeDeleteJobStateCallback: () => void,

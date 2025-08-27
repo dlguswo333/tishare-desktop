@@ -1,22 +1,14 @@
 import {useState} from 'react';
 import {STATE, printSize} from '../../defs';
 import style from '../style/JobView.module.scss';
+import {TiItem, TiJob} from '../../types';
 const ipcRenderer = window.ipcRenderer;
 
-/**
- * @typedef {object} State
- * @property {string} State.state
- * @property {string} State.speed
- * @property {string} State.progress
- * @property {string} State.totalProgress
- * @property {string} State.id
- */
+type HeadProps = {
+  state: TiJob;
+}
 
-/**
- * @param {object} props
- * @param {State} props.state
- */
-const JobHead = ({state}) => {
+const JobHead = ({state}: HeadProps) => {
   switch (state.state) {
   case STATE.RQE_SEND_REQUEST:
     return <>
@@ -86,13 +78,13 @@ const JobHead = ({state}) => {
   }
 };
 
-/**
- * @param {object} props
- * @param {State} props.state
- * @param {string} props.recvDir
- * @param {Function} props.setRecvDir
- */
-const JobBody = ({state, recvDir, setRecvDir}) => {
+type BodyProps = {
+  state: TiJob;
+  recvDir: string;
+  setRecvDir: (recvDir: string) => unknown;
+}
+
+const JobBody = ({state, recvDir, setRecvDir}: BodyProps) => {
   switch (state.state) {
   case STATE.RQE_SEND_REQUEST:
     return (
@@ -189,7 +181,7 @@ const JobBody = ({state, recvDir, setRecvDir}) => {
         </div>
         <div className={style.Element}>
           <span className={style.Left}>{state.totalProgress}</span>
-          <span className={style.Right}>{`${printSize(state.speed)}/S`}</span>
+          <span className={style.Right}>{`${printSize(state.speed ?? 0)}/S`}</span>
         </div>
       </>
     );
@@ -230,14 +222,14 @@ const JobBody = ({state, recvDir, setRecvDir}) => {
   }
 };
 
-/**
- * @param {object} props
- * @param {State} props.state
- * @param {number} props.ind
- * @param {string} props.recvDir
- * @param {object} props.items
- */
-const JobFoot = ({state, ind, recvDir, items}) => {
+type FootProps = {
+  state: TiJob;
+  ind: number;
+  recvDir: string;
+  items: Record<string, TiItem>;
+}
+
+const JobFoot = ({state, ind, recvDir, items}: FootProps) => {
   switch (state.state) {
   case STATE.RQE_SEND_REQUEST:
     return (
@@ -374,19 +366,16 @@ const JobFoot = ({state, ind, recvDir, items}) => {
   }
 };
 
-/**
- * @param {object} props
- * @param {object} props.state
- * @param {string} props.state.state
- * @param {string} props.state.speed
- * @param {string} props.state.progress
- * @param {string} props.state.totalProgress
- * @param {string} props.state.id
- * @param {number} props.ind
- * @param {object} props.items
- */
-function JobView ({state, ind, items}) {
-  const [recvDir, setRecvDir] = useState(localStorage.getItem('recvDir'));
+type Props = {
+  state: TiJob;
+  ind: number;
+  items: Record<string, TiItem>;
+}
+
+function JobView ({state, ind, items}: Props) {
+  const [recvDir, setRecvDir] = useState(() =>
+    localStorage.getItem('recvDir') || ''
+  );
 
   return (
     <div className={style.JobView + ' ' + style.JobView}>

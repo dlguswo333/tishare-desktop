@@ -12,6 +12,7 @@ import useNetworks from '../hook/useNetworks';
 import useItems from '../hook/useItems';
 import RefreshIcon from '../icons/Refresh.svg?react';
 import ItemDetail from './ItemDetail';
+import {TiItemWithoutDir} from '../../types';
 
 export type Network = {name: string; ip: string; netmask: string;};
 
@@ -29,7 +30,7 @@ function App () {
 
   const {items, setItems, deleteChecked} = useItems();
   const {isDragging} = useDragDrop({setItems});
-  const [itemDetail, setItemDetail] = useState(null);
+  const [itemDetail, setItemDetail] = useState<null | TiItemWithoutDir>(null);
   const {openServer, closeServer} = useServer({myIp, myNetmask});
   const {getNetworks} = useNetworks({isServerOpen, closeServer, setNetworks});
 

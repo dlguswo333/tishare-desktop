@@ -1,15 +1,17 @@
 import {useCallback} from 'react';
 
+type Props = {
+  myIp: string | null;
+  myNetmask: string | null;
+}
+
 const ipcRenderer = window.ipcRenderer;
 
-/**
- * @param {Object} props
- * @param {string | null} props.myIp
- * @param {string | null} props.myNetmask
- *
- */
-const useServer = ({myIp, myNetmask}) => {
+const useServer = ({myIp, myNetmask}: Props) => {
   const openServer = useCallback(async () => {
+    if (!(myIp && myNetmask)) {
+      throw new Error('Cannot open server: IP is not valid');
+    }
     const ret = await ipcRenderer.openServer(myIp, myNetmask);
     if (!ret)
       console.error('tried to open server but returned false');
