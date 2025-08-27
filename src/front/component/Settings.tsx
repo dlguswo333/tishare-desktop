@@ -5,7 +5,7 @@ import style from '../style/Settings.module.scss';
 import ThemeButton from './ThemeButton';
 
 type Props = {
-  setShowSettings: Function;
+  setShowSettings: (_: boolean) => unknown;
 };
 
 /*

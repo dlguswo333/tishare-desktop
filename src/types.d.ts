@@ -30,9 +30,9 @@ export type TiJob = {
 };
 
 export type IpcRendererApis = {
-  openFile: () => Promise<Record<string, any>>,
-  openDirectory: () => Promise<Record<string, any>>,
-  dragAndDrop: (paths: string[]) => Promise<Record<string, any>>,
+  openFile: () => Promise<Record<string, TiItem>>,
+  openDirectory: () => Promise<Record<string, TiItem>>,
+  dragAndDrop: (paths: string[]) => Promise<Record<string, TiItem>>,
   getNetworks: () => Promise<{name:string, ip:string, netmask:string}[]>,
   openServer: (myIp: string, myNetmask: string) => Promise<boolean>,
   closeServer: () => Promise<boolean>,

@@ -27,7 +27,7 @@ const OsIcon = ({os}: OsIconProps) => {
 type Props = {
   device: TiDevice;
   isSelected: boolean;
-  setSelectedIp: Function;
+  setSelectedIp: (_: string) => unknown;
 };
 
 const Device = ({device, isSelected, setSelectedIp}: Props) => {

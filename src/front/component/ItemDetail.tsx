@@ -8,7 +8,7 @@ import Thumbnail from './Thumbnail';
 import {TiItemWithoutDir} from '../../types';
 
 type Props = {
-  setItemDetail: Function;
+  setItemDetail: (_: null | TiItemWithoutDir) => unknown;
   item: TiItemWithoutDir;
 };
 
