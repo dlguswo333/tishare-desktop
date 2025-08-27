@@ -162,7 +162,7 @@ async function addFile (itemPath, ret) {
 
 /** @type {IpcRendererApis['openFile']} */
 const openFile = async () => {
-  /** @type {Object<string, any>} */
+  /** @type {Object<string, import('../types').TiItem>} */
   let ret = {};
   if (!mainWindow) {
     return ret;
@@ -182,7 +182,7 @@ ipcMain.handle('openFile', openFile);
 
 /** @type {IpcRendererApis['openDirectory']} */
 const openDirectory = async () => {
-  /** @type {Object<string, any>} */
+  /** @type {Object<string, import('../types').TiItem>} */
   let ret = {};
   if (!mainWindow) {
     return ret;
@@ -202,7 +202,7 @@ ipcMain.handle('openDirectory', openDirectory);
 
 /** @type {IpcRendererApis['dragAndDrop']} */
 const dragAndDrop = async (paths) => {
-  /** @type {Object<string, any>} */
+  /** @type {Object<string, import('../types').TiItem>} */
   let ret = {};
   for (let itemPath of paths) {
     const stat = await fs.stat(itemPath);

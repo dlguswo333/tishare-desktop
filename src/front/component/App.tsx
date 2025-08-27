@@ -12,7 +12,7 @@ import useNetworks from '../hook/useNetworks';
 import useItems from '../hook/useItems';
 import RefreshIcon from '../icons/Refresh.svg?react';
 import ItemDetail from './ItemDetail';
-import {TiItemWithoutDir} from '../../types';
+import {TiItem, TiItemWithoutDir} from '../../types';
 
 export type Network = {name: string; ip: string; netmask: string;};
 
@@ -36,13 +36,13 @@ function App () {
 
   // Select local files.
   const openFile = async () => {
-    const ret: Record<string, any> = await ipcRenderer.openFile();
+    const ret: Record<string, TiItem> = await ipcRenderer.openFile();
     setItems(Object.assign({}, ret, items));
   };
 
   // Select local directories.
   const openDirectory = async () => {
-    const ret: Record<string, any> = await ipcRenderer.openDirectory();
+    const ret: Record<string, TiItem> = await ipcRenderer.openDirectory();
     setItems(Object.assign({}, ret, items));
   };
 
