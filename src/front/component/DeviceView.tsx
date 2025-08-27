@@ -17,7 +17,7 @@ type Props = {
 function DeviceView ({items, myIp, myNetmask, myId}: Props) {
   const [devices, setDevices] = useState<Record<string, TiDevice>>({});
   // const [devices, setDevices] = useState({ '10.221.151.210': { ip: '10.221.151.210', id: 'linuxmachine', os: 'linux', version: '0.2.0' }, '10.221.151.200': { ip: '10.221.151.200', id: 'my phone', os: 'android', version: '0.2.0' } });
-  const [selectedIp, setSelectedIp] = useState(null);
+  const [selectedIp, setSelectedIp] = useState<null | string>(null);
   const [noDeviceWarn, setNoDeviceWarn] = useState(false);
   const [scanning, setScanning] = useState(false);
 
