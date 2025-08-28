@@ -72,11 +72,5 @@
       "oneClick": false
     },
     "extends": null
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
   }
 }
