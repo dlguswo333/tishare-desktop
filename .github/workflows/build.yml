@@ -1,0 +1,54 @@
+name: build
+on:
+  # Runs on releases.
+  push:
+    tags: ['*']
+
+  # Allows you to run this workflow manually from the Actions tab
+  # This event will only trigger a workflow run if the workflow file is on the default branch.
+  workflow_dispatch:
+
+jobs:
+  build-linux-x64:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Get raw version
+        run: RAW_VERSION=${GITHUB_REF_NAME/v//}
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'npm'
+      - run: npm ci
+      - name: build
+        run: npm run build
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: tiShare-$RAW_VERSION.AppImage
+          path: dist/linux-unpacked/tiShare-$RAW_VERSION.AppImage
+          if-no-files-found: 'error'
+
+  build-win-x64:
+    runs-on: windows-2025
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Get raw version
+        run: $RAW_VERSION=$ENV:GITHUB_REF_NAME.replace('v','')
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'npm'
+      - run: npm ci
+      - name: build
+        run: npm run build
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: tiShare Setup $RAW_VERSION.exe
+          path: dist/windows-unpacked/tiShare Setup $RAW_VERSION.exe
+          if-no-files-found: 'error'
