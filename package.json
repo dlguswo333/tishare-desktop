@@ -78,13 +78,5 @@
       "react-app",
       "react-app/jest"
     ]
-  },
-  "browserslist": {
-    "production": [
-      "chrome >= 90"
-    ],
-    "development": [
-      "chrome >= 90"
-    ]
   }
 }
