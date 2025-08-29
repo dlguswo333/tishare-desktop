@@ -44,7 +44,7 @@
     "start:back": "nodemon --exec electron --trace-warnings .",
     "build": "npm run build:front && npm run build:back",
     "build:front": "vite build --config src/front/vite.config.js",
-    "build:back": "electron-builder",
+    "build:back": "electron-builder --publish never",
     "test": "npm run test:front -- --run && npm run test:back",
     "test:front": "vitest --root src/front",
     "test:back": "mocha ./src/back/back.test.js",
