@@ -3,7 +3,7 @@
 # if the git tag and the version from package.json differ.
 name: build
 on:
-  # Runs on releases.
+  # Runs on tags pushed.
   push:
     tags: ['*']
 
