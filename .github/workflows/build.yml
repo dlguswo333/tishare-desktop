@@ -1,0 +1,67 @@
+# Runs build script and upload the artifacts.
+# Note that the version may not match
+# if the git tag and the version from package.json differ.
+name: build
+on:
+  # Runs on tags pushed.
+  push:
+    tags: ['*']
+
+  # Allows you to run this workflow manually from the Actions tab
+  # This event will only trigger a workflow run if the workflow file is on the default branch.
+  workflow_dispatch:
+
+jobs:
+  build-linux-x64:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Get raw version
+        run: |
+          RAW_VERSION=${GITHUB_REF_NAME/v/}
+          echo $RAW_VERSION
+          echo "RAW_VERSION=$RAW_VERSION" >> $GITHUB_ENV
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'npm'
+      - run: npm ci
+      - name: build
+        run: |
+          npm run build
+          ls dist/
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: tiShare-${{ env.RAW_VERSION }}.AppImage
+          path: dist/tiShare-*.AppImage
+          if-no-files-found: 'error'
+
+  build-win-x64:
+    runs-on: windows-2025
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Get raw version
+        run: |
+          $RAW_VERSION=$ENV:GITHUB_REF_NAME.replace('v','')
+          echo $ENV:RAW_VERSION
+          echo "RAW_VERSION=$ENV:RAW_VERSION" >> $ENV:GITHUB_ENV
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'npm'
+      - run: npm ci
+      - name: build
+        run: |
+          npm run build
+          ls dist/
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: tiShare Setup ${{ env.RAW_VERSION }}.exe
+          path: dist/tiShare Setup *.exe
+          if-no-files-found: 'error'
