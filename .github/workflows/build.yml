@@ -1,3 +1,6 @@
+# Runs build script and upload the artifacts.
+# Note that the version may not match
+# if the git tag and the version from package.json differ.
 name: build
 on:
   # Runs on releases.
@@ -33,7 +36,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: tiShare-${{ env.RAW_VERSION }}.AppImage
-          path: dist/tiShare-${{ env.RAW_VERSION }}.AppImage
+          path: dist/tiShare-*.AppImage
           if-no-files-found: 'error'
 
   build-win-x64:
@@ -60,5 +63,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: tiShare Setup ${{ env.RAW_VERSION }}.exe
-          path: dist/tiShare Setup ${{ env.RAW_VERSION }}.exe
+          path: dist/tiShare Setup *.exe
           if-no-files-found: 'error'
