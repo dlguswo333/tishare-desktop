@@ -55,7 +55,8 @@
     "productName": "tiShare",
     "files": [
       "build/**/*",
-      "src/back/**",
+      "public/**/*",
+      "src/back/**/*",
       "src/defs.js"
     ],
     "win": {
