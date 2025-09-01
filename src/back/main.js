@@ -57,16 +57,18 @@ function createMainWindow () {
     show: false
   });
 
+  const iconPath = path.resolve(path.join(
+    import.meta.dirname,
+    OS === 'win32' ? '../../public/icon.ico' : '../../public/icon.png'
+  ));
+  mainWindow.setIcon(nativeImage.createFromPath(iconPath));
+
   if (isDev) {
     // When in development, run react start first.
     // Then load the url from the main electron window.
     console.log('Running in development');
     // It seems like .icon is not supported in linux; it can't load image from the path.
     // Use .icon file on win32 only.
-    const iconPath = nativeImage.createFromPath(path.join(
-      import.meta.dirname, OS === 'win32' ? '../../public/icon.ico' : '../../public/icon.png'
-    ));
-    mainWindow.setIcon(iconPath);
     mainWindow.loadURL('http://localhost:3000');
   }
   else {
