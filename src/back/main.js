@@ -57,21 +57,29 @@ function createMainWindow () {
     show: false
   });
 
+  // It seems like .icon is not supported in linux; it can't load image from the path.
+  // Use .icon file on win32 only.
   const iconPath = path.resolve(path.join(
     import.meta.dirname,
-    OS === 'win32' ? '../../public/icon.ico' : '../../public/icon.png'
+    OS === 'win32'
+      ? '../../public/icon.ico'
+      : '../../public/icon.png'
   ));
-  mainWindow.setIcon(nativeImage.createFromPath(iconPath));
 
   if (isDev) {
     // When in development, run react start first.
     // Then load the url from the main electron window.
     console.log('Running in development');
-    // It seems like .icon is not supported in linux; it can't load image from the path.
-    // Use .icon file on win32 only.
     mainWindow.loadURL('http://localhost:3000');
+    mainWindow.setIcon(nativeImage.createFromPath(iconPath));
   }
   else {
+    // Setting icon on windows on production
+    // shows low quality icon on title bar.
+    // Don't know why, but evade it.
+    if (OS !== 'win32') {
+      mainWindow.setIcon(nativeImage.createFromPath(iconPath));
+    }
     // removeMenu will remove debugger menu too. Comment the below line if not wanted.
     mainWindow.removeMenu();
     // When in production, run react build first.
