@@ -1,9 +1,9 @@
 // @ts-check
 import dgram from 'dgram';
 import net from 'net';
-import Requestee from './Requestee.js';
-import Sender from './Sender.js';
-import Receiver from './Receiver.js';
+import Requestee from './task/Requestee.js';
+import Sender from './task/Sender.js';
+import Receiver from './task/Receiver.js';
 import {PORT, VERSION, STATE} from '../defs.js';
 import {OS} from './defs.js';
 import {getBroadcastIp} from './Network.js';

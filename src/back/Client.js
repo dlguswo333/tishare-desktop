@@ -2,9 +2,9 @@
 import {PORT, VERSION, STATE} from '../defs.js';
 import {HEADER_END, splitHeader, MAX_HEADER_LEN, createItemArray} from './Common.js';
 import net from 'net';
-import Sender from './Sender.js';
-import Requester from './Requester.js';
-import Receiver from './Receiver.js';
+import Sender from './task/Sender.js';
+import Requester from './task/Requester.js';
+import Receiver from './task/Receiver.js';
 
 class Client {
   /** @type {import('./Indexer').default} */

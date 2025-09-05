@@ -1,7 +1,7 @@
 // @ts-check
 import fs from 'fs/promises';
-import {STATE, CHUNKSIZE, SOCKET_TIMEOUT, STATE_INTERVAL} from '../defs.js';
-import {HEADER_END, splitHeader} from './Common.js';
+import {STATE, CHUNKSIZE, SOCKET_TIMEOUT, STATE_INTERVAL} from '../../defs.js';
+import {HEADER_END, splitHeader} from '../Common.js';
 
 class Sender {
   /** @type {number} */
@@ -13,7 +13,7 @@ class Sender {
   #receiverId;
   /**
      * Normalized item array.
-     * @type {import('../types').TiItem[]}
+     * @type {import('../../types.js').TiItem[]}
      */
   #itemArray;
   /**
@@ -79,7 +79,7 @@ class Sender {
    * @param {number} ind
    * @param {import('net').Socket} socket
    * @param {string!} receiverId
-   * @param {import('../types').TiItem[]} itemArray
+   * @param {import('../../types.js').TiItem[]} itemArray
    * @param {Function} onExitCallback
    * @param {Function} sendState
    */

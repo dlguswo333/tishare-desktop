@@ -1,8 +1,8 @@
 // @ts-check
 import fs from 'fs/promises';
 import path from 'path';
-import {HEADER_END, splitHeader} from './Common.js';
-import {STATE, SOCKET_TIMEOUT, STATE_INTERVAL} from '../defs.js';
+import {HEADER_END, splitHeader} from '../Common.js';
+import {STATE, SOCKET_TIMEOUT, STATE_INTERVAL} from '../../defs.js';
 
 class Receiver {
   /** @type {number} */
@@ -34,10 +34,10 @@ class Receiver {
   #haveParsedHeader;
   /**
    * Send Request header.
-   * @type {{app: string, version:string, class:string, id:string, itemArray: import('../types').TiItem[]} | null}
+   * @type {{app: string, version:string, class:string, id:string, itemArray: import('../../types.js').TiItem[]} | null}
    */
   #sendRequestHeader;
-  /** @type {{class: string} & import('../types').TiItem | null} */
+  /** @type {{class: string} & import('../../types.js').TiItem | null} */
   #recvHeader;
   /**
    * @type {'ok'|'next'}
