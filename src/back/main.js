@@ -7,7 +7,7 @@ import * as network from './Network.js';
 import Server from './Server.js';
 import Client from './Client.js';
 import Indexer from './Indexer.js';
-import {OS} from './defs.js';
+import {OS} from './common.js';
 
 /**
  * @typedef {import('../types').IpcRendererApis} IpcRendererApis

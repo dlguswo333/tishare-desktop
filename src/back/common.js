@@ -1,15 +1,19 @@
 // @ts-check
 import path from 'path';
 import fs from 'fs/promises';
-/** Header must not and cannot exceed this length. @type {number} */
-const MAX_HEADER_LEN = 10000;
-const HEADER_END = '\n\n';
+import os from 'os';
+
 /**
  * @typedef {import('../types').TiItemWithoutDir} TiItemWithoutDir
  * @typedef {import('../types').TiItem} TiItem
  * @typedef {{app: string; version: string; class: string; id: string; numItems: number;}} SendRequestHeader
  * @typedef {{app: string; version: string; class: string; id: string;}} RecvRequestHeader
  */
+
+/** Header must not and cannot exceed this length. @type {number} */
+const MAX_HEADER_LEN = 10000;
+const HEADER_END = '\n\n';
+const OS = os.platform();
 
 /**
  * split and separate a header from buf and return the header as string and sliced buf.
@@ -91,4 +95,4 @@ function createDirectoryHeader (path, name, dir, size) {
   return header;
 }
 
-export {MAX_HEADER_LEN, HEADER_END, createItemArray, splitHeader};
+export {OS, MAX_HEADER_LEN, HEADER_END, createItemArray, splitHeader};

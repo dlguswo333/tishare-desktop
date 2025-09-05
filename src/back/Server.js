@@ -5,9 +5,8 @@ import Requestee from './task/Requestee.js';
 import Sender from './task/Sender.js';
 import Receiver from './task/Receiver.js';
 import {PORT, VERSION, STATE} from '../defs.js';
-import {OS} from './defs.js';
 import {getBroadcastIp} from './Network.js';
-import {splitHeader, MAX_HEADER_LEN, createItemArray, HEADER_END} from './common.js';
+import {splitHeader, MAX_HEADER_LEN, createItemArray, HEADER_END, OS} from './common.js';
 
 class Server {
   /** @type {import('./Indexer').default} */
