@@ -7,7 +7,7 @@ import Receiver from './task/Receiver.js';
 import {PORT, VERSION, STATE} from '../defs.js';
 import {OS} from './defs.js';
 import {getBroadcastIp} from './Network.js';
-import {splitHeader, MAX_HEADER_LEN, createItemArray, HEADER_END} from './Common.js';
+import {splitHeader, MAX_HEADER_LEN, createItemArray, HEADER_END} from './common.js';
 
 class Server {
   /** @type {import('./Indexer').default} */
@@ -246,7 +246,7 @@ class Server {
     return this.#indexer.getInd();
   }
 
-  /** @param {import('./Common').SendRequestHeader | import('./Common').RecvRequestHeader} header */
+  /** @param {import('./common.js').SendRequestHeader | import('./common.js').RecvRequestHeader} header */
   #validateRequestHeader (header) {
     if (!header)
       return false;

@@ -1,7 +1,7 @@
 // @ts-check
 import fs from 'fs/promises';
 import path from 'path';
-import {HEADER_END, splitHeader} from '../Common.js';
+import {HEADER_END, splitHeader} from '../common.js';
 import {STATE, SOCKET_TIMEOUT, STATE_INTERVAL} from '../../defs.js';
 
 class Receiver {

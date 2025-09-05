@@ -130,7 +130,7 @@ async function createItems () {
 }
 
 /**
- * @param {Object.<string, import('./Common').TiBackItem} items
+ * @param {Object.<string, import('./common.js').TiBackItem} items
  */
 async function deleteItems (items) {
   for (let itemName in items) {

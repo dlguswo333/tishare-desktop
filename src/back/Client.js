@@ -1,6 +1,6 @@
 // @ts-check
 import {PORT, VERSION, STATE} from '../defs.js';
-import {HEADER_END, splitHeader, MAX_HEADER_LEN, createItemArray} from './Common.js';
+import {HEADER_END, splitHeader, MAX_HEADER_LEN, createItemArray} from './common.js';
 import net from 'net';
 import Sender from './task/Sender.js';
 import Requester from './task/Requester.js';
@@ -218,7 +218,7 @@ class Client {
   /**
    * Create and return send request header.
    * @param {number} numItems
-   * @returns {import('./Common').SendRequestHeader}
+   * @returns {import('./common.js').SendRequestHeader}
    */
   #createSendRequestHeader (numItems) {
     const header = {app: 'tiShare', version: VERSION, class: 'send-request', id: this.myId, numItems: numItems};
@@ -227,7 +227,7 @@ class Client {
 
   /**
    * Create and return recv request header.
-   * @returns {import('./Common').RecvRequestHeader}
+   * @returns {import('./common.js').RecvRequestHeader}
    */
   #createRecvRequestHeader () {
     const header = {app: 'tiShare', version: VERSION, class: 'recv-request', id: this.myId};

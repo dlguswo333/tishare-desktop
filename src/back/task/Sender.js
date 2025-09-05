@@ -1,7 +1,7 @@
 // @ts-check
 import fs from 'fs/promises';
 import {STATE, CHUNKSIZE, SOCKET_TIMEOUT, STATE_INTERVAL} from '../../defs.js';
-import {HEADER_END, splitHeader} from '../Common.js';
+import {HEADER_END, splitHeader} from '../common.js';
 
 class Sender {
   /** @type {number} */
