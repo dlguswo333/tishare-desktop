@@ -14,8 +14,8 @@ const HEADER_END = '\n\n';
 /**
  * split and separate a header from buf and return the header as string and sliced buf.
  * Return undefined if HEADER_END is not found.
- * @param {Buffer} buf
- * @returns {{header:string, buf:Buffer}|undefined}
+ * @param {Buffer<ArrayBuffer>} buf
+ * @returns {{header:string, buf:Buffer<ArrayBuffer>}|undefined}
  */
 function splitHeader (buf) {
   const endInd = buf.indexOf(HEADER_END, 0, 'utf-8');

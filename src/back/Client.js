@@ -54,7 +54,6 @@ class Client {
     const ind = this.#getNextInd();
     if (!this.myId || ind < 0)
       return false;
-    /** @type {Buffer} */
     let recvBuf = Buffer.from([]);
     const itemArray = await createItemArray(items);
     const socket = net.createConnection(PORT, receiverIp);
@@ -146,7 +145,6 @@ class Client {
     if (!(preRequester instanceof Requester)) {
       throw new Error(`Requester expected but got ${this.jobs[ind]}`);
     }
-    /** @type {Buffer} */
     let recvBuf = Buffer.from([]);
     const senderIp = preRequester.opponentIp;
     const senderId = preRequester.opponentId;
