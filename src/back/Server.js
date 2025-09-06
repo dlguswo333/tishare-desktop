@@ -1,13 +1,12 @@
 // @ts-check
 import dgram from 'dgram';
 import net from 'net';
-import Requestee from './Requestee.js';
-import Sender from './Sender.js';
-import Receiver from './Receiver.js';
+import Requestee from './task/Requestee.js';
+import Sender from './task/Sender.js';
+import Receiver from './task/Receiver.js';
 import {PORT, VERSION, STATE} from '../defs.js';
-import {OS} from './defs.js';
 import {getBroadcastIp} from './Network.js';
-import {splitHeader, MAX_HEADER_LEN, createItemArray, HEADER_END} from './Common.js';
+import {splitHeader, MAX_HEADER_LEN, createItemArray, HEADER_END, OS} from './common.js';
 
 class Server {
   /** @type {import('./Indexer').default} */
@@ -246,7 +245,7 @@ class Server {
     return this.#indexer.getInd();
   }
 
-  /** @param {import('./Common').SendRequestHeader | import('./Common').RecvRequestHeader} header */
+  /** @param {import('./common.js').SendRequestHeader | import('./common.js').RecvRequestHeader} header */
   #validateRequestHeader (header) {
     if (!header)
       return false;

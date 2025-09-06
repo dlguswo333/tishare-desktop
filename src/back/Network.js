@@ -1,7 +1,7 @@
 import {networkInterfaces} from 'os';
 import dgram from 'dgram';
 import {PORT, VERSION, SCANTIMEOUT} from '../defs.js';
-import {OS} from './defs.js';
+import {OS} from './common.js';
 
 /**
  * Return an array of dictionary each looks like: { name, ip, netmask }.

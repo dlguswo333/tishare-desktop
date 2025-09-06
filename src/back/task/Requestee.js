@@ -1,5 +1,5 @@
-import {STATE} from '../defs.js';
-import {HEADER_END} from './Common.js';
+import {STATE} from '../../defs.js';
+import {HEADER_END} from '../common.js';
 
 class Requestee {
   /** @type {number} */
@@ -7,7 +7,7 @@ class Requestee {
   /** @type {STATE[keyof STATE]} */
   #state;
   socket;
-  /** @type {import('./Common').SendRequestHeader} */
+  /** @type {import('../common.js').SendRequestHeader} */
   #requestHeader;
   #haveRejectedFlag;
   /** @type {Function} */

@@ -1,5 +1,5 @@
-import {STATE} from '../defs.js';
-import {HEADER_END} from './Common.js';
+import {STATE} from '../../defs.js';
+import {HEADER_END} from '../common.js';
 
 class Requester {
   /** @type {number} */

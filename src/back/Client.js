@@ -1,10 +1,10 @@
 // @ts-check
 import {PORT, VERSION, STATE} from '../defs.js';
-import {HEADER_END, splitHeader, MAX_HEADER_LEN, createItemArray} from './Common.js';
+import {HEADER_END, splitHeader, MAX_HEADER_LEN, createItemArray} from './common.js';
 import net from 'net';
-import Sender from './Sender.js';
-import Requester from './Requester.js';
-import Receiver from './Receiver.js';
+import Sender from './task/Sender.js';
+import Requester from './task/Requester.js';
+import Receiver from './task/Receiver.js';
 
 class Client {
   /** @type {import('./Indexer').default} */
@@ -54,7 +54,6 @@ class Client {
     const ind = this.#getNextInd();
     if (!this.myId || ind < 0)
       return false;
-    /** @type {Buffer} */
     let recvBuf = Buffer.from([]);
     const itemArray = await createItemArray(items);
     const socket = net.createConnection(PORT, receiverIp);
@@ -146,7 +145,6 @@ class Client {
     if (!(preRequester instanceof Requester)) {
       throw new Error(`Requester expected but got ${this.jobs[ind]}`);
     }
-    /** @type {Buffer} */
     let recvBuf = Buffer.from([]);
     const senderIp = preRequester.opponentIp;
     const senderId = preRequester.opponentId;
@@ -220,7 +218,7 @@ class Client {
   /**
    * Create and return send request header.
    * @param {number} numItems
-   * @returns {import('./Common').SendRequestHeader}
+   * @returns {import('./common.js').SendRequestHeader}
    */
   #createSendRequestHeader (numItems) {
     const header = {app: 'tiShare', version: VERSION, class: 'send-request', id: this.myId, numItems: numItems};
@@ -229,7 +227,7 @@ class Client {
 
   /**
    * Create and return recv request header.
-   * @returns {import('./Common').RecvRequestHeader}
+   * @returns {import('./common.js').RecvRequestHeader}
    */
   #createRecvRequestHeader () {
     const header = {app: 'tiShare', version: VERSION, class: 'recv-request', id: this.myId};
