@@ -11,8 +11,11 @@ function getNetworks () {
   var array = [];
   const interfaces = networkInterfaces();
   for (const network in interfaces) {
-    const one = interfaces[network];
-    for (const ip of one) {
+    const interfaceInfo = interfaces[network];
+    if (!interfaceInfo) {
+      continue;
+    }
+    for (const ip of interfaceInfo) {
       // Only IPv4 and external IP which falls into the local IP address range.
       if (ip['family'] === 'IPv4' && !ip['internal'] && isLocalIp(ip['address'])) {
         array.push({name: network, ip: ip['address'], netmask: ip['netmask']});
@@ -53,17 +56,11 @@ function scan (ip, netmask, myId, callback) {
   const broadcastIp = getBroadcastIp(ip, netmask);
   const socket = dgram.createSocket('udp4');
 
-  // Bind socket.
-  // Binding is necessary to set the socket broadcast mode.
+  // Binding socket is necessary to set the socket broadcast mode.
+  // https://nodejs.org/docs/latest-v22.x/api/dgram.html#socketsetbroadcastflag
   socket.bind({address: ip}, () => {
     socket.setBroadcast(true);
-    const header = {
-      app: 'tiShare',
-      version: VERSION,
-      class: 'scan',
-      id: myId,
-      os: OS
-    };
+
     socket.on('message', (msg, rinfo) => {
       if (rinfo.address === ip) {
         // Ignore myself.
@@ -77,6 +74,14 @@ function scan (ip, netmask, myId, callback) {
         return;
       }
     });
+
+    const header = {
+      app: 'tiShare',
+      version: VERSION,
+      class: 'scan',
+      id: myId,
+      os: OS
+    };
     socket.send(JSON.stringify(header), PORT, broadcastIp);
 
     // Close socket after some time.
