@@ -55,7 +55,7 @@ function scan (ip, netmask, myId, callback) {
 
   // Bind socket.
   // Binding is necessary to set the socket broadcast mode.
-  socket.bind(ip, () => {
+  socket.bind({address: ip}, () => {
     socket.setBroadcast(true);
     const header = {
       app: 'tiShare',
