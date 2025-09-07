@@ -7,7 +7,7 @@
     "strictNullChecks": true,
     "allowJs": true,
     "lib": ["ES2022"],
-    "module": "ES2022",
+    "module": "esnext",
     "outDir": "dist",
     "target": "ES2022",
     "skipLibCheck": true

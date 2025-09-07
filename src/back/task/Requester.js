@@ -6,7 +6,7 @@ class Requester {
   #ind;
   /** @type {STATE[keyof STATE]} */
   #state;
-  /** @param {import('net').Socket | null} */
+  /** @type {import('net').Socket | null} */
   #socket;
   /** @type {boolean} */
   #haveWrittenEndFlag;
@@ -39,7 +39,7 @@ class Requester {
   end () {
     this.#haveWrittenEndFlag = true;
     if (this.#state === STATE.RQR_SEND_REQUEST || this.#state === STATE.RQR_RECV_REQUEST) {
-      this.#socket.write(JSON.stringify({class: 'end'}) + HEADER_END, 'utf-8', this.#onSendError);
+      this.#socket?.write(JSON.stringify({class: 'end'}) + HEADER_END, 'utf-8', this.#onSendError);
     }
   }
 
@@ -71,10 +71,15 @@ class Requester {
     };
   }
 
-  #onSendError = () => {
-    // Silently ignore error because the only case that the requester sends data to the other is
-    // when it wants to cancel the request.
-    this.#socket.destroy();
+  /**
+   * @param {undefined | Error} err
+   */
+  #onSendError = (err) => {
+    if (err) {
+      // Silently ignore error because the only case that the requester sends data to the other is
+      // when it wants to cancel the request.
+      this.#socket?.destroy();
+    }
   };
 }
 
