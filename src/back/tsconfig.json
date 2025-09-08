@@ -3,7 +3,8 @@
   "compilerOptions": {
     "esModuleInterop": true,
     "outDir": "../../dist/back",
-    "noEmit": true
+    "noEmit": true,
+    "checkJs": true
   },
   "include": ["**/*"],
   "exclude": []

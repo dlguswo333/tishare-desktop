@@ -11,6 +11,7 @@ import {after, before} from 'mocha';
 
 describe('Indexer', () => {
   const indexer = new Indexer(() => { }, () => { });
+  /** @type {number[]} */
   const indices = [];
   it('Unique index', () => {
     for (let i = 0; i < MAX_NUM_JOBS; ++i) {
@@ -68,9 +69,9 @@ describe('Network', () => {
 });
 
 describe('Server and client', () => {
-  const indexer = new Indexer(() => { });
-  const server = new Server(indexer);
-  const client = new Client(indexer);
+  const indexer = new Indexer(() => {}, () => {});
+  const server = new Server(indexer, () => {});
+  const client = new Client(indexer, () => {});
   const ip = '127.0.0.1';
   const netmask = '255.0.0.0';
   const serverId = 'server';
@@ -93,12 +94,9 @@ describe('Server and client', () => {
       strictEqual(server.close(), true);
     });
   });
-  describe('Client', () => {
-    /** @type {Object.<string, import('../types').TiItem>} */
-    let items = null;
-    before(async () => {
-      items = await createItems();
-    });
+  describe('Client', async () => {
+    // /** @type {null | Object.<string, import('../types').TiItem>} */
+    let items = await createItems();
 
     it('not null', () => {
       ok(client);
@@ -118,11 +116,12 @@ describe('Server and client', () => {
 });
 
 async function createItems () {
+  /** @type {Object.<string, import('../types').TiItem>} */
   const items = {};
   const n1 = 'file1';
   const n1size = 100;
 
-  items[n1] = {dir: 'ddd', path: path.join(import.meta.dirname, n1), type: 'file', size: n1size};
+  items[n1] = {dir: 'ddd', name: n1, path: path.join(import.meta.dirname, n1), type: 'file', size: n1size};
   const n1handle = await fs.open(items[n1].path, 'w');
   await n1handle.write(randomBytes(n1size));
   await n1handle.close();
@@ -130,7 +129,7 @@ async function createItems () {
 }
 
 /**
- * @param {Object.<string, import('./common.js').TiBackItem} items
+ * @param {Object.<string, import('../types').TiItem>} items
  */
 async function deleteItems (items) {
   for (let itemName in items) {

@@ -17,7 +17,7 @@ class Requestee {
    * @param {number} ind
    * @param {string} state
    * @param {import('net').Socket} socket
-   * @param {string} requestHeader
+   * @param {import('../common.js').SendRequestHeader} requestHeader
    * @param {Function} sendState
    */
   constructor (ind, state, socket, requestHeader, sendState) {
@@ -79,6 +79,9 @@ class Requestee {
     };
   }
 
+  /**
+   * @param {undefined | Error} err
+   */
   #onSendError (err) {
     if (err) {
       console.error(err.message);
