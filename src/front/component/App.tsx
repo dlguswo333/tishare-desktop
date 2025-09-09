@@ -133,14 +133,16 @@ function App () {
               onClick={closeServer}
               title='Close this device from the network.'
             >
-              Close me <span className='Open'></span>
+              <span>Close me</span>
+              <span className='Circle Open' />
             </button>
             :
             <button className='ServerButton ServerClose'
               onClick={openServer}
               title='Open this device to the network.'
             >
-              Open me <span className='Close'></span>
+              <span>Open me</span>
+              <span className='Circle Close' />
             </button>
           }
         </div>

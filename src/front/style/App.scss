@@ -1,4 +1,14 @@
 @use "variables" as v;
+
+@keyframes LoopGradient {
+  0% {
+    background-position: 100% 0%;
+  }
+  50% {
+    background-position: 0% 0%;
+  }
+}
+
 * {
   box-sizing: border-box;
   outline: none;
@@ -79,25 +89,49 @@ img,button {
         position: absolute;
         top: 10px;
         right: 20px;
-        border: 2px solid #211a;
+        border: 1px solid #3229;
         background-color: #fff;
-        padding: 5px 10px;
-        border-radius: 25px;
+        padding: 4px 10px;
+        border-radius: 6px;
         min-height: 25px;
-        justify-content: center;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        justify-content: space-around;
         font-size: 1.05rem;
         font-weight: bold;
         line-height: 25px;
-        transition: v.$slowTransition;
+        transition: all v.$fastTransition;
         cursor: pointer;
         &:hover {
-          background-color: #ddd;
+          filter: brightness(0.9);
         }
         &:active {
-          transition: v.$fastTransition;
-          background-color: #bbb;
+          filter: brightness(1.1);
         }
-        span {
+        &.ServerOpen {
+          background: linear-gradient(to right,
+            #fff 20%,
+            #afa 30%,
+            #fff 40%
+          );
+          animation: LoopGradient 5s linear infinite;
+          background-color: #fff;
+          background-size: 500% 100%;
+          background-repeat: no-repeat;
+          box-shadow: 0 2px 3px #0b0;
+          &:hover {
+            box-shadow: 0 2px 3px #322;
+          }
+        }
+        &.ServerClose {
+          box-shadow: 0 2px 3px #322;
+          &:hover {
+            box-shadow: 0 2px 3px #0b0;
+          }
+        }
+
+        span.Circle {
           display: inline-block;
           width: 15px;
           height: 15px;
@@ -108,18 +142,6 @@ img,button {
           &.Close {
             background-color: #f00;
           }
-        }
-      }
-      .ServerOpen {
-        box-shadow: 0 2px 3px #0b0;
-        &:hover {
-          box-shadow: 0 2px 3px #322;
-        }
-      }
-      .ServerClose {
-        box-shadow: 0 2px 3px #322;
-        &:hover {
-          box-shadow: 0 2px 3px #0b0;
         }
       }
     }
