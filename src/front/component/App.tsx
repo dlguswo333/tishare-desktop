@@ -128,23 +128,22 @@ function App () {
             <span>My ID:</span>
             <span>{myId}</span>
           </span>
-          {isServerOpen ?
-            <button className='ServerButton ServerOpen'
+          <div className='ServerButtonContainer'>
+            <button className={'ServerButton ServerOpen ' + (isServerOpen ? '' : 'Hide')}
               onClick={closeServer}
               title='Close this device from the network.'
             >
               <span>Close me</span>
               <span className='Circle Open' />
             </button>
-            :
-            <button className='ServerButton ServerClose'
+            <button className={'ServerButton ServerClose ' + (isServerOpen ? 'Hide' : '')}
               onClick={openServer}
               title='Open this device to the network.'
             >
               <span>Open me</span>
               <span className='Circle Close' />
             </button>
-          }
+          </div>
         </div>
         <div className='MainBody'>
           <div className='ItemGrid'>

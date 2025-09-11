@@ -85,62 +85,72 @@ img,button {
           }
         }
       }
-      .ServerButton {
+      .ServerButtonContainer {
+        display: inline-grid;
+        width: max-content;
+        align-items: center;
         position: absolute;
         top: 10px;
         right: 20px;
-        border: 1px solid #3229;
-        background-color: #fff;
-        padding: 4px 10px;
-        border-radius: 6px;
-        min-height: 25px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        justify-content: space-around;
-        font-size: 1.05rem;
-        font-weight: bold;
-        line-height: 25px;
-        transition: all v.$fastTransition;
-        cursor: pointer;
-        &:hover {
-          filter: brightness(0.9);
-        }
-        &:active {
-          filter: brightness(1.1);
-        }
-        &.ServerOpen {
-          background: linear-gradient(to right,
-            #fff 20%,
-            #afa 30%,
-            #fff 40%
-          );
-          animation: LoopGradient 5s linear infinite;
+        .ServerButton {
+          grid-area: 1 / 1;
+          text-wrap: nowrap;;
+          border: 1px solid #3229;
           background-color: #fff;
-          background-size: 500% 100%;
-          background-repeat: no-repeat;
-          box-shadow: 0 2px 3px #0b0;
+          padding: 4px 10px;
+          border-radius: 6px;
+          min-height: 25px;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          justify-content: space-around;
+          font-size: 1.05rem;
+          font-weight: bold;
+          line-height: 25px;
+          transition: all v.$fastTransition;
+          cursor: pointer;
           &:hover {
-            box-shadow: 0 2px 3px #322;
+            filter: brightness(0.9);
           }
-        }
-        &.ServerClose {
-          box-shadow: 0 2px 3px #322;
-          &:hover {
+          &:active {
+            filter: brightness(1.1);
+          }
+          &.ServerOpen {
+            background: linear-gradient(to right,
+              #fff 20%,
+              #afa 30%,
+              #fff 40%
+            );
+            animation: LoopGradient 5s linear infinite;
+            background-color: #fff;
+            background-size: 500% 100%;
+            background-repeat: no-repeat;
             box-shadow: 0 2px 3px #0b0;
+            &:hover {
+              box-shadow: 0 2px 3px #322;
+            }
           }
-        }
+          &.ServerClose {
+            box-shadow: 0 2px 3px #322;
+            &:hover {
+              box-shadow: 0 2px 3px #0b0;
+            }
+          }
+          &.Hide {
+            visibility: hidden;
+          }
 
-        span.Circle {
-          display: inline-block;
-          width: 15px;
-          height: 15px;
-          border-radius: 50%;
-          &.Open {
-            background-color: #0b0;
-          }
-          &.Close {
-            background-color: #f00;
+          span.Circle {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            &.Open {
+              background-color: #0b0;
+            }
+            &.Close {
+              background-color: #f00;
+            }
           }
         }
       }
