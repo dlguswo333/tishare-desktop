@@ -1,4 +1,14 @@
 @use "variables" as v;
+
+@keyframes LoopGradient {
+  0% {
+    background-position: 100% 0%;
+  }
+  50% {
+    background-position: 0% 0%;
+  }
+}
+
 * {
   box-sizing: border-box;
   outline: none;
@@ -75,51 +85,77 @@ img,button {
           }
         }
       }
-      .ServerButton {
+      .ServerButtonContainer {
         position: absolute;
         top: 10px;
         right: 20px;
-        border: 2px solid #211a;
-        background-color: #fff;
-        padding: 5px 10px;
-        border-radius: 25px;
-        min-height: 25px;
-        justify-content: center;
-        font-size: 1.05rem;
-        font-weight: bold;
-        line-height: 25px;
-        transition: v.$slowTransition;
-        cursor: pointer;
-        &:hover {
-          background-color: #ddd;
-        }
-        &:active {
-          transition: v.$fastTransition;
-          background-color: #bbb;
-        }
-        span {
-          display: inline-block;
-          width: 15px;
-          height: 15px;
-          border-radius: 50%;
-          &.Open {
-            background-color: #0b0;
+        .ServerButton {
+          text-wrap: nowrap;;
+          border: 1px solid #3229;
+          background-color: #fff;
+          padding: 4px 10px;
+          border-radius: 6px;
+          min-height: 25px;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          justify-content: space-around;
+          font-size: 1.05rem;
+          font-weight: bold;
+          line-height: 25px;
+          transition: all v.$fastTransition;
+          cursor: pointer;
+          &:hover {
+            filter: brightness(0.9);
           }
-          &.Close {
-            background-color: #f00;
+          &:active {
+            filter: brightness(1.1);
           }
-        }
-      }
-      .ServerOpen {
-        box-shadow: 0 2px 3px #0b0;
-        &:hover {
-          box-shadow: 0 2px 3px #322;
-        }
-      }
-      .ServerClose {
-        box-shadow: 0 2px 3px #322;
-        &:hover {
-          box-shadow: 0 2px 3px #0b0;
+          &.ServerOpen {
+            background: linear-gradient(to right,
+              #fff 20%,
+              #afa 30%,
+              #fff 40%
+            );
+            animation: LoopGradient 5s linear infinite;
+            background-color: #fff;
+            background-size: 500% 100%;
+            background-repeat: no-repeat;
+            box-shadow: 0 2px 3px #0b0;
+            &:hover {
+              box-shadow: 0 2px 3px #322;
+            }
+          }
+          &.ServerClose {
+            box-shadow: 0 2px 3px #322;
+            &:hover {
+              box-shadow: 0 2px 3px #0b0;
+            }
+          }
+
+          .TextContainer {
+            display: inline-grid;
+            width: max-content;
+            align-items: center;
+            .Text {
+              grid-area: 1 / 1;
+              &.Hide {
+              visibility: hidden;
+            }
+          }
+          }
+          .Circle {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            &.Open {
+              background-color: #0b0;
+            }
+            &.Close {
+              background-color: #f00;
+            }
+          }
         }
       }
     }

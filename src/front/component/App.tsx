@@ -1,4 +1,5 @@
 import {useState, useEffect} from 'react';
+import classNames from 'classnames';
 import Nav from './Nav';
 import ItemView from './ItemView';
 import DeviceView from './DeviceView';
@@ -128,21 +129,18 @@ function App () {
             <span>My ID:</span>
             <span>{myId}</span>
           </span>
-          {isServerOpen ?
-            <button className='ServerButton ServerOpen'
-              onClick={closeServer}
-              title='Close this device from the network.'
+          <div className='ServerButtonContainer'>
+            <button className={classNames('ServerButton', {ServerOpen: isServerOpen, ServerClose: !isServerOpen})}
+              onClick={isServerOpen ? closeServer : openServer}
+              title={isServerOpen ? 'Close this device from the network.' : 'Open this device to the network.'}
             >
-              Close me <span className='Open'></span>
+              <div className='TextContainer'>
+                <span className={classNames('Text', {Hide: isServerOpen})}>Open me</span>
+                <span className={classNames('Text', {Hide: !isServerOpen})}>Close me</span>
+              </div>
+              <span className={classNames('Circle', {Open: isServerOpen, Close: !isServerOpen})} />
             </button>
-            :
-            <button className='ServerButton ServerClose'
-              onClick={openServer}
-              title='Open this device to the network.'
-            >
-              Open me <span className='Close'></span>
-            </button>
-          }
+          </div>
         </div>
         <div className='MainBody'>
           <div className='ItemGrid'>
