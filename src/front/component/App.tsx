@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useMemo} from 'react';
 import classNames from 'classnames';
 import Nav from './Nav';
 import ItemView from './ItemView';
@@ -34,6 +34,17 @@ function App () {
   const [itemDetail, setItemDetail] = useState<null | TiItemWithoutDir>(null);
   const {openServer, closeServer} = useServer({myIp, myNetmask});
   const {getNetworks} = useNetworks({isServerOpen, closeServer, setNetworks});
+  const serverButtonDisabled = !myIp;
+
+  const serverButtonTitle = useMemo(() => {
+    if (serverButtonDisabled) {
+      return 'No network is available.';
+    }
+    if (isServerOpen) {
+      return 'Close this device from the network.';
+    }
+    return 'Open this device to the network.';
+  }, [isServerOpen, serverButtonDisabled]);
 
   // Select local files.
   const openFile = async () => {
@@ -130,9 +141,14 @@ function App () {
             <span>{myId}</span>
           </span>
           <div className='ServerButtonContainer'>
-            <button className={classNames('ServerButton', {ServerOpen: isServerOpen, ServerClose: !isServerOpen})}
+            <button
+              className={classNames('ServerButton', {
+                ServerOpen: !serverButtonDisabled && isServerOpen,
+                ServerClose: !serverButtonDisabled && !isServerOpen
+              })}
               onClick={isServerOpen ? closeServer : openServer}
-              title={isServerOpen ? 'Close this device from the network.' : 'Open this device to the network.'}
+              title={serverButtonTitle}
+              disabled={serverButtonDisabled}
             >
               <div className='TextContainer'>
                 <span className={classNames('Text', {Hide: isServerOpen})}>Open me</span>
