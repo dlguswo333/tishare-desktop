@@ -18,8 +18,8 @@ const OS = os.platform();
 /**
  * split and separate a header from buf and return the header as string and sliced buf.
  * Return undefined if HEADER_END is not found.
- * @param {Buffer<ArrayBuffer>} buf
- * @returns {{header:string, buf:Buffer<ArrayBuffer>}|undefined}
+ * @param {Buffer<ArrayBufferLike>} buf
+ * @returns {{header:string, buf:Buffer<ArrayBufferLike>}|undefined}
  */
 function splitHeader (buf) {
   const endInd = buf.indexOf(HEADER_END, 0, 'utf-8');
