@@ -444,7 +444,7 @@ class Receiver {
   }
 
   /**
-   * @param {Error | undefined} err
+   * @param {Error | null | undefined} err
    */
   #onSendError (err) {
     if (err) {

@@ -72,7 +72,7 @@ class Requester {
   }
 
   /**
-   * @param {undefined | Error} err
+   * @param {Error | null | undefined} err
    */
   #onSendError = (err) => {
     if (err) {
