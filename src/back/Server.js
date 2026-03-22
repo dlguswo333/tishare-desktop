@@ -77,6 +77,7 @@ class Server {
         socket.destroy();
         return;
       }
+      /** @type {Buffer<ArrayBufferLike>} */
       let recvBuf = Buffer.from([]);
 
       socket.on('data', (data) => {
