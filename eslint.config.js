@@ -2,6 +2,7 @@ import globals from 'globals';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import reactPlugin from 'eslint-plugin-react';
 import tsParser from "@typescript-eslint/parser";
+import js from "@eslint/js";
 
 /** @type {import('eslint').Linter.Config.RulesRecord} */
 const globalRules = {
@@ -78,19 +79,17 @@ export default [
   },
   {
     name: 'back',
-    files: ['back/**/*.js'],
-    extends: ['eslint:recommended'],
+    files: ['src/back/**/*.js'],
     languageOptions: {
-      parserOptions: {
-        globals: {
-          ...globals.commonjs,
-          ...globals.node,
-          ...globals.mocha,
-        }
+      globals: {
+        ...globals.commonjs,
+        ...globals.node,
+        ...globals.mocha,
       }
     },
     rules: {
       ...globalRules,
+      ...js.configs.recommended.rules,
     }
   }
 ];
