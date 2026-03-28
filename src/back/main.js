@@ -143,7 +143,7 @@ async function addDirectory (itemPath, ret) {
       size,
       mtime,
     };
-  } catch (err) {
+  } catch {
     // Do nothing.
   }
   return;
@@ -164,7 +164,7 @@ async function addFile (itemPath, ret) {
       size,
       mtime,
     };
-  } catch (err) {
+  } catch {
     // Do nothing.
   }
   return;

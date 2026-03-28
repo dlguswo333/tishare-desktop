@@ -94,7 +94,7 @@ class Server {
         }
         try {
           recvHeader = JSON.parse(ret.header);
-        } catch (err) {
+        } catch {
           // HEADER_END is met but is not JSON format.
           // Abort and ignore this suspicious connection.
           this.#handleNetworkErr(ind);

@@ -82,7 +82,7 @@ class Client {
       }
       try {
         recvHeader = JSON.parse(ret.header);
-      } catch (err) {
+      } catch {
         // HEADER_END is met but is not JSON format.
         // Abort this suspicious connection.
         this.#handleNetworkErr(ind);
@@ -173,7 +173,7 @@ class Client {
       }
       try {
         recvHeader = JSON.parse(ret.header);
-      } catch (err) {
+      } catch {
         // HEADER_END is met but is not JSON format.
         // Abort this suspicious connection.
         this.#handleNetworkErr(ind);
