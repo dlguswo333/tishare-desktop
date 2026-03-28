@@ -36,7 +36,7 @@ class Receiver {
    * Send Request header.
    * @type {{app: string, version:string, class:string, id:string, itemArray: import('../../types.js').TiItem[]} | null}
    */
-  #sendRequestHeader;
+  // #sendRequestHeader;
   /** @type {{class: string} & import('../../types.js').TiItem | null} */
   #recvHeader;
   /**
@@ -121,7 +121,7 @@ class Receiver {
     this.#recvBufArray = [];
     this.#recvBufArrayLen = 0;
     this.#haveParsedHeader = false;
-    this.#sendRequestHeader = null;
+    // this.#sendRequestHeader = null;
     this.#recvHeader = null;
     this.#itemFlag = 'ok';
     this.#endFlag = false;
@@ -171,7 +171,7 @@ class Receiver {
         }
         try {
           this.#recvHeader = JSON.parse(ret.header);
-        } catch (err) {
+        } catch {
           this.#setState(STATE.ERR_NETWORK);
           console.error('Header parsing error. Not JSON format.');
           this.#socket.destroy();
@@ -200,7 +200,7 @@ class Receiver {
                 throw new Error('#itemHandle is null and this should not be occur.');
               }
               await this.#itemHandle.appendFile(Buffer.concat(this.#recvBufArray));
-            } catch (err) {
+            } catch {
               // Appending to file error.
               // In this error, there is nothing tiShare can do about it.
               // Better delete what has been written so far,
@@ -258,7 +258,7 @@ class Receiver {
                 await this.#itemHandle.close();
               }
               this.#itemHandle = await fs.open(path.join(this.#recvPath, this.#itemName), 'wx');
-            } catch (err) {
+            } catch {
               // File already exists.
               // TODO Implement handling.
               // 1. Ignore the file.

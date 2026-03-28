@@ -7,7 +7,7 @@ import Server from './Server.js';
 import Client from './Client.js';
 import {MAX_NUM_JOBS} from '../defs.js';
 import {getBroadcastIp, isLocalIp} from './Network.js';
-import {after, before} from 'mocha';
+import {after} from 'mocha';
 
 describe('Indexer', () => {
   const indexer = new Indexer(() => { }, () => { });

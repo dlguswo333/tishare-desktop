@@ -157,7 +157,7 @@ class Sender {
       }
       try {
         recvHeader = JSON.parse(ret.header);
-      } catch (err) {
+      } catch {
         this.#handleNetworkErr();
         return;
       }
@@ -352,7 +352,7 @@ class Sender {
             size: itemStat.size
           };
         }
-      } catch (err) {
+      } catch {
         // Go to next item.
         this.#goToNextItem();
         setTimeout(this.#send, 0);
@@ -385,7 +385,7 @@ class Sender {
           this.#speedBytes += chunk.byteLength;
           this.#onSendError(err);
         });
-      } catch (err) {
+      } catch {
         // Go to next item.
         this.#goToNextItem();
         setTimeout(this.#send, 0);
