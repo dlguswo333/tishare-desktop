@@ -1,8 +1,9 @@
-import {useState} from 'react';
+import {useRef, useState} from 'react';
 import {printSize, WELL_KNOWN_IMAGE_EXTENSIONS} from '../../defs';
 import useFormattedDate from '../hook/useFormattedDate';
 import Thumbnail from './Thumbnail';
 import {TiItem} from '../../types';
+import useIsIntersecting from '../hook/useIsIntersecting';
 
 type Props = {
   checkAll: boolean;
@@ -20,6 +21,8 @@ const Item = ({item, items, checkAll, lastClick, setLastClick, checked, setCheck
     item.type !== 'directory' &&
     WELL_KNOWN_IMAGE_EXTENSIONS.some(ext => item.path.toLowerCase().endsWith(`.${ext}`))
   );
+  const itemElementRef = useRef<HTMLDivElement | null>(null);
+  const isIntersecting = useIsIntersecting(itemElementRef);
   const onThumbnailError = () => setIsThumbnailVisible(false);
   const formattedMtime = useFormattedDate(item.mtime);
 
@@ -63,10 +66,10 @@ const Item = ({item, items, checkAll, lastClick, setLastClick, checked, setCheck
     setChecked(newChecked);
   };
 
-  return <div className='ItemElement' key={item.name}>
+  return <div className='ItemElement' key={item.name} ref={itemElementRef}>
     <button className='ItemThumbnailHolder' onClick={() => setItemDetail(item)}>
       <Thumbnail
-        isThumbnailVisible={isThumbnailVisible}
+        isThumbnailVisible={isIntersecting && isThumbnailVisible}
         onThumbnailError={onThumbnailError}
         item={item}
       />
