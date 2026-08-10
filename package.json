@@ -75,5 +75,10 @@
       "oneClick": false
     },
     "extends": null
+  },
+  "allowScripts": {
+    "@parcel/watcher@2.5.6": true,
+    "electron@41.0.3": true,
+    "esbuild@0.25.12": true
   }
 }
