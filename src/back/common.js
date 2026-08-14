@@ -6,8 +6,8 @@ import os from 'os';
 /**
  * @typedef {import('../types').TiItemWithoutDir} TiItemWithoutDir
  * @typedef {import('../types').TiItem} TiItem
- * @typedef {{app: string; version: string; class: string; id: string; numItems: number;}} SendRequestHeader
- * @typedef {{app: string; version: string; class: string; id: string;}} RecvRequestHeader
+ * @typedef {import('../types').SendRequestHeader} SendRequestHeader
+ * @typedef {import('../types').RecvRequestHeader} RecvRequestHeader
  */
 
 /** Header must not and cannot exceed this length. @type {number} */

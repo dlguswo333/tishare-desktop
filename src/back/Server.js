@@ -4,16 +4,17 @@ import net from 'net';
 import Requestee from './task/Requestee.js';
 import Sender from './task/Sender.js';
 import Receiver from './task/Receiver.js';
-import {PORT, VERSION, STATE} from '../defs.js';
+import {PORT, VERSION, STATE, MIN_COMPATIBLE_VERSION} from '../defs.js';
 import {getBroadcastIp} from './Network.js';
 import {splitHeader, MAX_HEADER_LEN, createItemArray, HEADER_END, OS} from './common.js';
+import semver from 'semver';
 
 class Server {
   /** @type {import('./Indexer').default} */
   #indexer;
   /** @type {Function} */
   #sendState;
-  /** @type {STATE[keyof STATE]} */
+  /** @type {typeof STATE[keyof typeof STATE]} */
   #state;
   /** @type {dgram.Socket | null} */
   #scannee = null;
@@ -75,29 +76,44 @@ class Server {
       if (ind < 0 || this.#state.startsWith('ERR')) {
         // Do not accept more than limit or Server is in error state.
         socket.destroy();
+        if (!(ind < 0)) {
+          this.#indexer.returnInd(ind);
+        }
         return;
       }
       /** @type {Buffer<ArrayBufferLike>} */
       let recvBuf = Buffer.from([]);
 
       socket.on('data', (data) => {
+        /** @type {import('../types').SendRequestHeader | import('../types').RecvRequestHeader | null} */
         let recvHeader = null;
         recvBuf = Buffer.concat([recvBuf, data]);
         const ret = splitHeader(recvBuf);
         if (!ret) {
           if (recvBuf.length > MAX_HEADER_LEN) {
             // Abort this suspicious connection.
-            this.#handleNetworkErr(ind);
+            socket.destroy();
+            this.deleteJob(ind);
           }
           // Has not received header yet. just exit the function here for more data by return.
           return;
         }
         try {
           recvHeader = JSON.parse(ret.header);
+          if (recvHeader === null) {
+            throw new Error('recvHeader is null');
+          }
+          if (recvHeader.app !== 'tiShare') {
+            throw new Error('recvHeader is invalid');
+          }
+          const isIncompatibleVersion = semver.lt(recvHeader.version, MIN_COMPATIBLE_VERSION);
+          if (isIncompatibleVersion) {
+            throw new Error('incompatible version');
+          }
         } catch {
-          // HEADER_END is met but is not JSON format.
-          // Abort and ignore this suspicious connection.
-          this.#handleNetworkErr(ind);
+          // Abort and ignore this suspicious or invalid connection.
+          socket.destroy();
+          this.deleteJob(ind);
           return;
         }
         recvBuf = ret.buf;
@@ -105,18 +121,32 @@ class Server {
         case 'send-request':
           if (!this.#validateRequestHeader(recvHeader)) {
             // Abort and ignore this suspicious connection.
-            this.#handleNetworkErr(ind);
+            socket.destroy();
+            this.deleteJob(ind);
             return;
           }
-          this.jobs[ind] = new Requestee(ind, STATE.RQE_SEND_REQUEST, socket, recvHeader, this.#sendState);
+          this.jobs[ind] = new Requestee(
+            ind,
+            STATE.RQE_SEND_REQUEST,
+            socket,
+            /** @type {import('./common.js').SendRequestHeader} */ (recvHeader),
+            this.#sendState
+          );
           break;
         case 'recv-request':
           if (!this.#validateRequestHeader(recvHeader)) {
             // Abort and ignore this suspicious connection.
-            this.#handleNetworkErr(ind);
+            socket.destroy();
+            this.deleteJob(ind);
             return;
           }
-          this.jobs[ind] = new Requestee(ind, STATE.RQE_RECV_REQUEST, socket, recvHeader, this.#sendState);
+          this.jobs[ind] = new Requestee(
+            ind,
+            STATE.RQE_RECV_REQUEST,
+            socket,
+            /** @type {import('./common.js').RecvRequestHeader} */ (recvHeader),
+            this.#sendState
+          );
           break;
         case 'end':
           if (this.jobs[ind] instanceof Requestee)
@@ -125,7 +155,8 @@ class Server {
           break;
         default:
           // Abort and ignore this suspicious connection.
-          this.#handleNetworkErr(ind);
+          socket.destroy();
+          this.deleteJob(ind);
         }
       });
 
@@ -146,8 +177,11 @@ class Server {
 
       socket.on('error', (err) => {
         if (err) {
-          socket.destroy();
-          this.#handleNetworkErr(ind);
+          if (this.jobs[ind] instanceof Requestee) {
+            this.#handleNetworkErr(ind);
+          } else {
+            this.deleteJob(ind);
+          }
         }
       });
     });
@@ -322,9 +356,9 @@ class Server {
    * @returns {boolean} Whether the execution has been successful.
    */
   deleteJob (ind) {
+    this.#indexer.returnInd(ind);
     if (this.jobs[ind]) {
       delete this.jobs[ind];
-      this.#indexer.returnInd(ind);
       return true;
     }
     return false;

@@ -14,7 +14,7 @@ test('Render Device', () => {
     id: '1234',
     ip: '1.2.3.4',
     os: 'linux',
-    version: '0.5.2',
+    version: '0.6.0',
   };
   render(
     <Device
