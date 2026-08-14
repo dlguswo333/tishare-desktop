@@ -76,6 +76,7 @@ class Server {
       if (ind < 0 || this.#state.startsWith('ERR')) {
         // Do not accept more than limit or Server is in error state.
         socket.destroy();
+        this.#indexer.returnInd(ind);
         return;
       }
       /** @type {Buffer<ArrayBufferLike>} */
@@ -108,7 +109,8 @@ class Server {
           }
         } catch {
           // Abort and ignore this suspicious or invalid connection.
-          this.#handleNetworkErr(ind);
+          socket.destroy();
+          this.deleteJob(ind);
           return;
         }
         recvBuf = ret.buf;
@@ -345,9 +347,9 @@ class Server {
    * @returns {boolean} Whether the execution has been successful.
    */
   deleteJob (ind) {
+    this.#indexer.returnInd(ind);
     if (this.jobs[ind]) {
       delete this.jobs[ind];
-      this.#indexer.returnInd(ind);
       return true;
     }
     return false;
