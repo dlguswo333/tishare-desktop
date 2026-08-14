@@ -4,6 +4,7 @@ import packageJson from '../package.json' with {type: 'json'};
 const PORT = 9238;
 const CHUNKSIZE = 2097152;
 const {version: VERSION} = packageJson;
+const MIN_COMPATIBLE_VERSION = '0.6.0';
 const SCANTIMEOUT = 3000;
 const SOCKET_TIMEOUT = 5000;
 const STATE_INTERVAL = 1000;
@@ -67,4 +68,4 @@ const printSize = (size) => {
   return size.toFixed(2) + ' B';
 };
 
-export {PORT, CHUNKSIZE, STATE, VERSION, SCANTIMEOUT, SOCKET_TIMEOUT, STATE_INTERVAL, MAX_NUM_JOBS, printSize, WELL_KNOWN_IMAGE_EXTENSIONS};
+export {PORT, CHUNKSIZE, STATE, VERSION, MIN_COMPATIBLE_VERSION, SCANTIMEOUT, SOCKET_TIMEOUT, STATE_INTERVAL, MAX_NUM_JOBS, printSize, WELL_KNOWN_IMAGE_EXTENSIONS};

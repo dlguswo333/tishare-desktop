@@ -2,10 +2,14 @@ import WindowsIcon from '../icons/Windows.svg?react';
 import AndroidIcon from '../icons/Android.svg?react';
 import LinuxIcon from '../icons/Linux.svg?react';
 import {TiDevice} from '../../types';
+import semver from 'semver';
+import {MIN_COMPATIBLE_VERSION} from '../../defs';
 
 type OsIconProps = {
   os: string;
 };
+
+const ipcRenderer = window.ipcRenderer;
 
 const OsIcon = ({os}: OsIconProps) => {
   os = String(os).toLowerCase();
@@ -31,10 +35,15 @@ type Props = {
 };
 
 const Device = ({device, isSelected, setSelectedIp}: Props) => {
+  const isIncompatibleVersion = !semver.valid(device.version) || semver.lt(device.version, MIN_COMPATIBLE_VERSION);
   return <div
     key={device.ip}
     className={'DeviceElement' + (isSelected ? ' Selected' : '')}
     onClick={() => {
+      if (isIncompatibleVersion) {
+        ipcRenderer.showMessage('An incompatible version of the app is installed on this device.');
+        return;
+      }
       setSelectedIp(device.ip);
     }}
   >
@@ -46,7 +55,7 @@ const Device = ({device, isSelected, setSelectedIp}: Props) => {
         {device.id}
       </div>
       <div className='DeviceInfo'>
-        {`IP: ${device.ip} Version: ${device.version}`}
+        {`IP: ${device.ip} Version: ${device.version}${isIncompatibleVersion ? ' ⚠️' : ''}`}
       </div>
     </div>
   </div>;

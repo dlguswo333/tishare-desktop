@@ -4,10 +4,10 @@ import {HEADER_END} from '../common.js';
 class Requestee {
   /** @type {number} */
   #ind;
-  /** @type {STATE[keyof STATE]} */
+  /** @type {typeof STATE[keyof typeof STATE]} */
   #state;
   socket;
-  /** @type {import('../common.js').SendRequestHeader} */
+  /** @type {import('../common.js').SendRequestHeader | import('../common.js').RecvRequestHeader} */
   #requestHeader;
   #haveRejectedFlag;
   /** @type {Function} */
@@ -17,7 +17,7 @@ class Requestee {
    * @param {number} ind
    * @param {string} state
    * @param {import('net').Socket} socket
-   * @param {import('../common.js').SendRequestHeader} requestHeader
+   * @param {import('../common.js').SendRequestHeader | import('../common.js').RecvRequestHeader} requestHeader
    * @param {Function} sendState
    */
   constructor (ind, state, socket, requestHeader, sendState) {
@@ -65,7 +65,7 @@ class Requestee {
   }
 
   getNumItems () {
-    return (this.#requestHeader.numItems ? this.#requestHeader.numItems : 0);
+    return ('numItems' in this.#requestHeader ? this.#requestHeader.numItems : 0);
   }
 
   /**

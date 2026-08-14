@@ -4,16 +4,17 @@ import net from 'net';
 import Requestee from './task/Requestee.js';
 import Sender from './task/Sender.js';
 import Receiver from './task/Receiver.js';
-import {PORT, VERSION, STATE} from '../defs.js';
+import {PORT, VERSION, STATE, MIN_COMPATIBLE_VERSION} from '../defs.js';
 import {getBroadcastIp} from './Network.js';
 import {splitHeader, MAX_HEADER_LEN, createItemArray, HEADER_END, OS} from './common.js';
+import semver from 'semver';
 
 class Server {
   /** @type {import('./Indexer').default} */
   #indexer;
   /** @type {Function} */
   #sendState;
-  /** @type {STATE[keyof STATE]} */
+  /** @type {typeof STATE[keyof typeof STATE]} */
   #state;
   /** @type {dgram.Socket | null} */
   #scannee = null;
@@ -81,6 +82,7 @@ class Server {
       let recvBuf = Buffer.from([]);
 
       socket.on('data', (data) => {
+        /** @type {import('../types').SendRequestHeader | import('../types').RecvRequestHeader | null} */
         let recvHeader = null;
         recvBuf = Buffer.concat([recvBuf, data]);
         const ret = splitHeader(recvBuf);
@@ -94,9 +96,18 @@ class Server {
         }
         try {
           recvHeader = JSON.parse(ret.header);
+          if (recvHeader === null) {
+            throw new Error('recvHeader is null');
+          }
+          if (recvHeader.app !== 'tiShare') {
+            throw new Error('recvHeader is invalid');
+          }
+          const isIncompatibleVersion = semver.lt(recvHeader.version, MIN_COMPATIBLE_VERSION);
+          if (isIncompatibleVersion) {
+            throw new Error('incompatible version');
+          }
         } catch {
-          // HEADER_END is met but is not JSON format.
-          // Abort and ignore this suspicious connection.
+          // Abort and ignore this suspicious or invalid connection.
           this.#handleNetworkErr(ind);
           return;
         }
@@ -108,7 +119,13 @@ class Server {
             this.#handleNetworkErr(ind);
             return;
           }
-          this.jobs[ind] = new Requestee(ind, STATE.RQE_SEND_REQUEST, socket, recvHeader, this.#sendState);
+          this.jobs[ind] = new Requestee(
+            ind,
+            STATE.RQE_SEND_REQUEST,
+            socket,
+            /** @type {import('./common.js').SendRequestHeader} */ (recvHeader),
+            this.#sendState
+          );
           break;
         case 'recv-request':
           if (!this.#validateRequestHeader(recvHeader)) {
@@ -116,7 +133,13 @@ class Server {
             this.#handleNetworkErr(ind);
             return;
           }
-          this.jobs[ind] = new Requestee(ind, STATE.RQE_RECV_REQUEST, socket, recvHeader, this.#sendState);
+          this.jobs[ind] = new Requestee(
+            ind,
+            STATE.RQE_RECV_REQUEST,
+            socket,
+            /** @type {import('./common.js').RecvRequestHeader} */ (recvHeader),
+            this.#sendState
+          );
           break;
         case 'end':
           if (this.jobs[ind] instanceof Requestee)

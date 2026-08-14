@@ -19,6 +19,21 @@ export type TiDevice = {
   version: string;
 }
 
+export type SendRequestHeader = {
+  app: string;
+  version: string;
+  class: string;
+  id: string;
+  numItems: number;
+};
+
+export type RecvRequestHeader = {
+  app: string;
+  version: string;
+  class: string;
+  id: string;
+};
+
 export type TiJob = {
   ind: number;
   state: string;
