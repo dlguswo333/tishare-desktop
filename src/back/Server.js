@@ -76,7 +76,9 @@ class Server {
       if (ind < 0 || this.#state.startsWith('ERR')) {
         // Do not accept more than limit or Server is in error state.
         socket.destroy();
-        this.#indexer.returnInd(ind);
+        if (!(ind < 0)) {
+          this.#indexer.returnInd(ind);
+        }
         return;
       }
       /** @type {Buffer<ArrayBufferLike>} */
