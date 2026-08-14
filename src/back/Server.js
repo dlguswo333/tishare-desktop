@@ -92,7 +92,8 @@ class Server {
         if (!ret) {
           if (recvBuf.length > MAX_HEADER_LEN) {
             // Abort this suspicious connection.
-            this.#handleNetworkErr(ind);
+            socket.destroy();
+            this.deleteJob(ind);
           }
           // Has not received header yet. just exit the function here for more data by return.
           return;
@@ -120,7 +121,8 @@ class Server {
         case 'send-request':
           if (!this.#validateRequestHeader(recvHeader)) {
             // Abort and ignore this suspicious connection.
-            this.#handleNetworkErr(ind);
+            socket.destroy();
+            this.deleteJob(ind);
             return;
           }
           this.jobs[ind] = new Requestee(
@@ -134,7 +136,8 @@ class Server {
         case 'recv-request':
           if (!this.#validateRequestHeader(recvHeader)) {
             // Abort and ignore this suspicious connection.
-            this.#handleNetworkErr(ind);
+            socket.destroy();
+            this.deleteJob(ind);
             return;
           }
           this.jobs[ind] = new Requestee(
@@ -152,7 +155,8 @@ class Server {
           break;
         default:
           // Abort and ignore this suspicious connection.
-          this.#handleNetworkErr(ind);
+          socket.destroy();
+          this.deleteJob(ind);
         }
       });
 
@@ -173,8 +177,11 @@ class Server {
 
       socket.on('error', (err) => {
         if (err) {
-          socket.destroy();
-          this.#handleNetworkErr(ind);
+          if (this.jobs[ind] instanceof Requestee) {
+            this.#handleNetworkErr(ind);
+          } else {
+            this.deleteJob(ind);
+          }
         }
       });
     });
