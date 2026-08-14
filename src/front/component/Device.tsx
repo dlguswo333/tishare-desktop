@@ -2,7 +2,8 @@ import WindowsIcon from '../icons/Windows.svg?react';
 import AndroidIcon from '../icons/Android.svg?react';
 import LinuxIcon from '../icons/Linux.svg?react';
 import {TiDevice} from '../../types';
-import semver from 'semver';
+import semverValid from 'semver/functions/valid';
+import semverLt from 'semver/functions/lt';
 import {MIN_COMPATIBLE_VERSION} from '../../defs';
 
 type OsIconProps = {
@@ -35,7 +36,7 @@ type Props = {
 };
 
 const Device = ({device, isSelected, setSelectedIp}: Props) => {
-  const isIncompatibleVersion = !semver.valid(device.version) || semver.lt(device.version, MIN_COMPATIBLE_VERSION);
+  const isIncompatibleVersion = !semverValid(device.version) || semverLt(device.version, MIN_COMPATIBLE_VERSION);
   return <div
     key={device.ip}
     className={'DeviceElement' + (isSelected ? ' Selected' : '')}
