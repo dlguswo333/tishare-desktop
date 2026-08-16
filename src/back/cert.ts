@@ -64,7 +64,7 @@ export const loadCert = async () => {
     const loaded = JSON.parse(await fs.readFile(CERT_STORE_PATH, 'utf8'));
 
     return {
-      cert: loaded.cert,
+      cert: loaded.cert as string,
       key: safeStorage.decryptString(Buffer.from(loaded.encryptedKey, CERT_ENCODING)),
       fingerprint: getCertFingerprintFromPem(loaded.cert),
     };
