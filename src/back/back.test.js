@@ -95,13 +95,21 @@ describe('Server and client', () => {
     });
   });
   describe('Client', async () => {
-    // /** @type {null | Object.<string, import('../types').TiItem>} */
-    let items = await createItems();
+    /** @type {null | Object.<string, import('../types').TiItem>} */
+    let items = null;
+
+    before(async () => {
+      items = await createItems();
+    });
 
     it('not null', () => {
       ok(client);
+      ok(items);
     });
     it('reject initiating if ID is empty', async () => {
+      if (!items) {
+        return ok(items);
+      }
       strictEqual(await client.sendRequest(items, ip, serverId), false);
     });
     it('set ID', () => {
@@ -110,7 +118,9 @@ describe('Server and client', () => {
     });
 
     after(async () => {
-      await deleteItems(items);
+      if (items !== null) {
+        await deleteItems(items);
+      }
     });
   });
 });
