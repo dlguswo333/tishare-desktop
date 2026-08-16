@@ -1,6 +1,6 @@
 // @ts-check
 import dgram from 'dgram';
-import net from 'net';
+import tls from 'node:tls';
 import Requestee from './task/Requestee.js';
 import Sender from './task/Sender.js';
 import Receiver from './task/Receiver.js';
@@ -16,9 +16,11 @@ class Server {
   #sendState;
   /** @type {typeof STATE[keyof typeof STATE]} */
   #state;
+  /** @type {import('../types.d.ts').Cert} */
+  #cert;
   /** @type {dgram.Socket | null} */
   #scannee = null;
-  /** @type {net.Server | null} */
+  /** @type {tls.Server | null} */
   #serverSocket;
   /** @type {Object.<number, (Sender|Receiver|Requestee)>} */
   jobs;
@@ -26,11 +28,13 @@ class Server {
   /**
    * @param {import('./Indexer').default} indexer
    * @param {Function} sendState
+   * @param {import('../types.d.ts').Cert} cert
    */
-  constructor (indexer, sendState) {
+  constructor (indexer, sendState, cert) {
     this.#indexer = indexer;
     this.#sendState = sendState;
     this.#state = STATE.IDLE;
+    this.#cert = cert;
     this.myId = '';
     this.#scannee = null;
     this.#serverSocket = null;
@@ -69,9 +73,15 @@ class Server {
     this.#initScannee(ip, getBroadcastIp(ip, netmask));
     if (this.#serverSocket)
       return true;
-    this.#serverSocket = net.createServer();
+    this.#serverSocket = tls.createServer({
+      key: this.#cert.key,
+      cert: this.#cert.cert,
+      requestCert: true,
+      rejectUnauthorized: false,
+      minVersion: 'TLSv1.2',
+    });
 
-    this.#serverSocket.on('connection', async (socket) => {
+    this.#serverSocket.on('secureConnection', async (socket) => {
       const ind = this.#getNextInd();
       if (ind < 0 || this.#state.startsWith('ERR')) {
         // Do not accept more than limit or Server is in error state.

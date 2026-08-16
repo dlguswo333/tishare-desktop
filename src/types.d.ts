@@ -27,6 +27,12 @@ export type SendRequestHeader = {
   numItems: number;
 };
 
+export type Cert = {
+  cert: string;
+  key: string;
+  fingerprint: string;
+}
+
 export type RecvRequestHeader = {
   app: string;
   version: string;

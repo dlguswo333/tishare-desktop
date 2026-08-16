@@ -8,6 +8,7 @@ import Client from './Client.js';
 import {MAX_NUM_JOBS} from '../defs.js';
 import {getBroadcastIp, isLocalIp} from './Network.js';
 import {after} from 'mocha';
+import {createCert} from './cert.js';
 
 describe('Indexer', () => {
   const indexer = new Indexer(() => { }, () => { });
@@ -68,9 +69,13 @@ describe('Network', () => {
   });
 });
 
-describe('Server and client', () => {
+describe('Server and client', async () => {
+  const cert = await createCert();
+  if (cert === null) {
+    throw new Error('creating certificates failed');
+  }
   const indexer = new Indexer(() => {}, () => {});
-  const server = new Server(indexer, () => {});
+  const server = new Server(indexer, () => {}, cert);
   const client = new Client(indexer, () => {});
   const ip = '127.0.0.1';
   const netmask = '255.0.0.0';

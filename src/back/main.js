@@ -1,6 +1,6 @@
 // @ts-check
 // Modules to control application life and create native browser window
-import {app, BrowserWindow, ipcMain, dialog, protocol, net, nativeImage} from 'electron';
+import {app, BrowserWindow, ipcMain, dialog, protocol, net, nativeImage, safeStorage} from 'electron';
 import fs from 'fs/promises';
 import path from 'path';
 import * as network from './Network.js';
@@ -15,6 +15,8 @@ import {createCert, loadCert, storeCert} from './cert.js';
  */
 
 const isDev = !app.isPackaged;
+
+const CERT_STORE_PATH = path.join(app.getPath('userData'), 'cert');
 
 /** @type {null | BrowserWindow} */
 let mainWindow = null;
@@ -118,7 +120,7 @@ app.whenReady().then(async () => {
   });
 
   const cert = await (async () => {
-    const storedCert = await loadCert();
+    const storedCert = await loadCert(CERT_STORE_PATH, safeStorage);
     if (storedCert !== null) {
       return storedCert;
     }
@@ -128,7 +130,7 @@ app.whenReady().then(async () => {
         title: 'Created New Fingerprint',
         message: 'Created a new fingerprint since previous one cannot be found or invalid.\nYour device should be accepted to the opponent to share files.',
       });
-      await storeCert(createdCert.pems);
+      await storeCert(createdCert.pems, CERT_STORE_PATH, safeStorage);
       return createdCert;
     }
     dialog.showMessageBoxSync({
@@ -147,7 +149,7 @@ app.whenReady().then(async () => {
     mainWindow?.webContents.send('numJobs', numJobs);
   }, deleteJobState);
 
-  server = new Server(indexer, sendState);
+  server = new Server(indexer, sendState, cert);
   const client = new Client(indexer, sendState);
 
   initIpc(server, client);

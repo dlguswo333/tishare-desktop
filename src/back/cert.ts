@@ -1,12 +1,10 @@
 import fs from 'node:fs/promises';
-import tls, { TLSSocket } from 'node:tls';
+import {TLSSocket} from 'node:tls';
 import {BinaryLike, createHash, X509Certificate} from 'node:crypto';
 import selfsigned from 'selfsigned';
-import {app, safeStorage} from 'electron';
-import path from 'path';
+import type {SafeStorage} from 'electron';
 
 const CERT_ENCODING = 'base64' as const;
-const CERT_STORE_PATH = path.join(app.getPath('userData'), 'cert');
 
 export const sha256Base64Url = (bytes: BinaryLike) => {
   return createHash('sha256').update(bytes).digest('base64url');
@@ -59,9 +57,9 @@ export const createCert = async () => {
   }
 }
 
-export const loadCert = async () => {
+export const loadCert = async (path: string, safeStorage: SafeStorage) => {
   try {
-    const loaded = JSON.parse(await fs.readFile(CERT_STORE_PATH, 'utf8'));
+    const loaded = JSON.parse(await fs.readFile(path, 'utf8'));
 
     return {
       cert: loaded.cert as string,
@@ -74,10 +72,10 @@ export const loadCert = async () => {
   }
 }
 
-export const storeCert = async (pems: selfsigned.GenerateResult) => {
+export const storeCert = async (pems: selfsigned.GenerateResult, path: string, safeStorage: SafeStorage) => {
   try {
     await fs.writeFile(
-      CERT_STORE_PATH,
+      path,
       JSON.stringify({
         cert: pems.cert,
         encryptedKey: safeStorage.encryptString(pems.private).toString(CERT_ENCODING),
