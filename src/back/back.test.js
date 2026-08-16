@@ -76,7 +76,7 @@ describe('Server and client', async () => {
   }
   const indexer = new Indexer(() => {}, () => {});
   const server = new Server(indexer, () => {}, cert);
-  const client = new Client(indexer, () => {});
+  const client = new Client(indexer, () => {}, cert);
   const ip = '127.0.0.1';
   const netmask = '255.0.0.0';
   const serverId = 'server';

@@ -150,7 +150,7 @@ app.whenReady().then(async () => {
   }, deleteJobState);
 
   server = new Server(indexer, sendState, cert);
-  const client = new Client(indexer, sendState);
+  const client = new Client(indexer, sendState, cert);
 
   initIpc(server, client);
 
