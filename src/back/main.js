@@ -8,6 +8,7 @@ import Server from './Server.js';
 import Client from './Client.js';
 import Indexer from './Indexer.js';
 import {OS} from './common.js';
+import {createCert, loadCert, storeCert} from './cert.js';
 
 /**
  * @typedef {import('../types').IpcRendererApis} IpcRendererApis
@@ -33,6 +34,31 @@ const sendState = (state) => {
 const deleteJobState = (ind) => {
   mainWindow?.webContents.send('deleteJobState', ind);
 };
+
+const cert = (async () => {
+  const storedCert = await loadCert();
+  if (storedCert !== null) {
+    return storedCert;
+  }
+  const createdCert = await createCert();
+  if (createdCert !== null) {
+    storeCert(createdCert.pems);
+    dialog.showMessageBox({
+      title: 'Created New Fingerprint',
+      message: 'Created a new fingerprint since previous one cannot be found or invalid.\nYour device should be accepted to the opponent to share files.',
+    });
+    return createdCert;
+  }
+  await dialog.showMessageBox({
+    title: 'Failed to Create Fingerprint',
+    message: 'Creating a new fingerprint failed. tiShare Cannot execute without one.',
+  });
+  process.exit(1);
+})();
+
+if (cert === null) {
+  process.exit(1);
+}
 
 const indexer = new Indexer((numJobs) => {
   mainWindow?.webContents.send('numJobs', numJobs);

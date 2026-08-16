@@ -45,10 +45,10 @@
   "scripts": {
     "start": "concurrently --kill-others \"npm run start:front\" \"npm run start:back\"",
     "start:front": "vite --config src/front/vite.config.js",
-    "start:back": "nodemon --exec electron --trace-warnings .",
+    "start:back": "tsc -p src/back/tsconfig.build.json && nodemon -e js,ts --exec electron --trace-warnings .",
     "build": "npm run build:front && npm run build:back",
     "build:front": "vite build --config src/front/vite.config.js",
-    "build:back": "electron-builder --publish never",
+    "build:back": "tsc -p src/back/tsconfig.build.json && electron-builder --publish never",
     "test": "npm run test:front -- --run && npm run test:back",
     "test:front": "vitest --root src/front",
     "test:back": "mocha ./src/back/back.test.js",
