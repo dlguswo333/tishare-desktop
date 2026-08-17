@@ -49,7 +49,7 @@ class Client {
   /**
    * @param ip {string}
    */
-  connect (ip) {
+  #connect (ip) {
     return tls.connect({
       port: PORT,
       host: ip,
@@ -74,7 +74,7 @@ class Client {
       return false;
     let recvBuf = Buffer.from([]);
     const itemArray = await createItemArray(items);
-    const socket = this.connect(receiverIp);
+    const socket = this.#connect(receiverIp);
 
     const requester = new Requester(ind, STATE.RQR_SEND_REQUEST, socket, receiverIp, receiverId, this.#sendState);
     this.jobs[ind] = requester;
@@ -165,7 +165,7 @@ class Client {
     let recvBuf = Buffer.from([]);
     const senderIp = preRequester.opponentIp;
     const senderId = preRequester.opponentId;
-    const socket = this.connect(senderIp);
+    const socket = this.#connect(senderIp);
 
     const requester = new Requester(ind, STATE.RQR_RECV_REQUEST, socket, senderIp, senderId, this.#sendState);
     this.jobs[ind] = requester;
