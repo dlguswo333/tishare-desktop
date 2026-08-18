@@ -60,6 +60,10 @@ export const createCert = async () => {
 export const loadCert = async (path: string, safeStorage: SafeStorage) => {
   try {
     const loaded = JSON.parse(await fs.readFile(path, 'utf8'));
+    const {validToDate} = new X509Certificate(loaded.cert);
+    if (Date.now() >= validToDate.getTime()) {
+      throw new Error('loaded cert is expired');
+    }
 
     return {
       cert: loaded.cert as string,
