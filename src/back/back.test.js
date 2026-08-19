@@ -1,11 +1,12 @@
 import {notStrictEqual, strictEqual, ok} from 'assert';
 import fs from 'fs/promises';
+import os from 'os';
 import path from 'path';
 import {randomBytes} from 'crypto';
 import Indexer from './Indexer.js';
 import Server from './Server.js';
 import Client from './Client.js';
-import {MAX_NUM_JOBS} from '../defs.js';
+import {MAX_NUM_JOBS, STATE} from '../defs.js';
 import {getBroadcastIp, isLocalIp} from './Network.js';
 import {after} from 'mocha';
 import {createCert} from './cert.js';
@@ -81,6 +82,7 @@ describe('Server and client', async () => {
   const netmask = '255.0.0.0';
   const serverId = 'server';
   const clientId = 'client';
+
   describe('Server', () => {
     it('not null', () => {
       ok(server);
@@ -99,6 +101,7 @@ describe('Server and client', async () => {
       strictEqual(server.close(), true);
     });
   });
+
   describe('Client', async () => {
     /** @type {null | Object.<string, import('../types').TiItem>} */
     let items = null;
@@ -128,7 +131,78 @@ describe('Server and client', async () => {
       }
     });
   });
+
+  describe('Transfer', () => {
+    it('Transfer a 10MiB file', async function () {
+      this.timeout(30000);
+      const fileName = 'file';
+      const fileSize = 10 * 1024 * 1024;
+      const srcDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tiShare-test-src'));
+      const recvDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tiShare-test-recv'));
+      try {
+        const filePath = path.join(srcDir, fileName);
+        const handle = await fs.open(filePath, 'w');
+        const srcBytes = randomBytes(fileSize);
+        await handle.write(srcBytes);
+        await handle.close();
+
+        server.setMyId(serverId);
+        server.open(ip, netmask);
+
+        /** @type {Object.<string, import('../types').TiItem>} */
+        const items = {[fileName]: {dir: '.', name: fileName, path: filePath, type: 'file', size: fileSize}};
+        client.setMyId(clientId);
+        const ret = await client.sendRequest(items, ip, serverId);
+        notStrictEqual(ret, false);
+        const clientInd = /** @type {number} */ (ret);
+
+        /** @type {number} */
+        let serverInd = -1;
+        await waitFor(() => {
+          for (const [key, job] of Object.entries(server.jobs)) {
+            if (job.getState().state === STATE.RQE_SEND_REQUEST) {
+              serverInd = Number(key);
+              return true;
+            }
+          }
+          return false;
+        }, 'Server did not receive the send request');
+
+        server.acceptSendRequest(serverInd, recvDir);
+
+        await waitFor(() => {
+          const clientState = client.jobs[clientInd]?.getState().state;
+          const serverState = server.jobs[serverInd]?.getState().state;
+          return clientState === STATE.SEND_COMPLETE && serverState === STATE.RECV_COMPLETE;
+        }, 'Transfer did not complete');
+
+        const recvPath = path.join(recvDir, fileName);
+        const recvBytes = await fs.readFile(recvPath);
+        ok(srcBytes.equals(recvBytes));
+      } finally {
+        server.close();
+        await fs.rm(srcDir, {recursive: true, force: true});
+        await fs.rm(recvDir, {recursive: true, force: true});
+      }
+    });
+  });
 });
+
+/**
+ * Wait until the condition becomes true or the timeout expires. Busy waiting.
+ * @param {() => boolean} cond
+ * @param {string} message
+ * @param {number} timeout
+ */
+async function waitFor (cond, message, timeout = 10000) {
+  const start = Date.now();
+  while (!cond()) {
+    if (Date.now() - start > timeout) {
+      throw new Error(message);
+    }
+    await new Promise((r) => setTimeout(r, 100));
+  }
+}
 
 async function createItems () {
   /** @type {Object.<string, import('../types').TiItem>} */
