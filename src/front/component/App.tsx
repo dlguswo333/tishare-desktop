@@ -24,6 +24,7 @@ const ipcRenderer = window.ipcRenderer;
 function App () {
   const [showSettings, setShowSettings] = useState(false);
   const [myId, _setMyId] = useState('');
+  const [myFingerprint, setMyFingerprint] = useState('');
   const [myIp, setMyIp] = useState<string | null>('');
   const [myNetmask, setMyNetmask] = useState<string | null>('');
   const [networks, setNetworks] = useState<Network[]>([]);
@@ -78,6 +79,9 @@ function App () {
 
   useMountEffect(() => {
     getNetworks();
+    ipcRenderer.getMyFingerprint().then((fingerprint) => {
+      setMyFingerprint(fingerprint);
+    });
   });
 
   useEffect(() => {
@@ -135,6 +139,10 @@ function App () {
             <button className='NetworkRefreshButton' onClick={getNetworks} title='Refresh'>
               <RefreshIcon />
             </button>
+          </span>
+          <span className='Item'>
+            <span>My Fingerprint:</span>
+            <span className='Monospace'>{myFingerprint}</span>
           </span>
           <span className='Item'>
             <span>My ID:</span>

@@ -58,6 +58,7 @@ export type IpcRendererApis = {
   openServer: (myIp: string, myNetmask: string) => Promise<boolean>,
   closeServer: () => Promise<boolean>,
   setMyId: (myId: string) => Promise<boolean>,
+  getMyFingerprint: () => Promise<string>,
   isServerOpen: () => Promise<boolean>,
   scan: (myIp: string, netmask: string, myId: string) => void,
   scanCallback: (callback: (deviceIp: string, deviceVersion: string, deviceId: string, deviceOs: string) => void) => void,

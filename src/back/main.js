@@ -24,6 +24,9 @@ let mainWindow = null;
 /** @type {null | Server} */
 let server = null;
 
+/** @type {null | import('../types').Cert} */
+let cert = null;
+
 /**
  * Send state to renderer process.
  * @param {import('../types').TiJob} state
@@ -119,7 +122,7 @@ app.whenReady().then(async () => {
     return net.fetch('file:' + req.url.slice('app:'.length));
   });
 
-  const cert = await (async () => {
+  cert = await (async () => {
     const storedCert = await loadCert(CERT_STORE_PATH, safeStorage);
     if (storedCert !== null) {
       return storedCert;
@@ -314,6 +317,15 @@ const initIpc = (server, client) => {
     return false;
   };
   ipcMain.handle('setMyId', (_, myId) => setMyId(myId));
+
+  /** @type {IpcRendererApis['getMyFingerprint']} */
+  const getMyFingerPrint = async () => {
+    if (cert === null) {
+      throw new Error('cert not available');
+    }
+    return cert.fingerprint;
+  };
+  ipcMain.handle('getMyFingerPrint', () => getMyFingerPrint());
 
   /** @type {IpcRendererApis['sendRequest']} */
   const sendRequest = (items, ip, id) => {

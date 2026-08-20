@@ -26,6 +26,9 @@ const ipcRendererApis = {
   setMyId: async (myId) => {
     return (await ipcRenderer.invoke('setMyId', myId));
   },
+  getMyFingerprint: async () => {
+    return (await ipcRenderer.invoke('getMyFingerPrint'));
+  },
   isServerOpen: async () => {
     return (await ipcRenderer.invoke('isServerOpen'));
   },
