@@ -84,6 +84,17 @@ type BodyProps = {
   setRecvDir: (recvDir: string) => unknown;
 }
 
+type FingerprintProps = {
+  fingerprint: string | null;
+}
+
+const Fingerprint = ({fingerprint}: FingerprintProps) => {
+  return fingerprint !== null && <div className={style.FingerprintView}>
+    <span title='Fingerprint' className={style.Emoji}>🫆</span>
+    <span className={style.Fingerprint}>{fingerprint}</span>
+  </div>;
+};
+
 const JobBody = ({state, recvDir, setRecvDir}: BodyProps) => {
   switch (state.state) {
   case STATE.RQE_SEND_REQUEST:
@@ -105,6 +116,7 @@ const JobBody = ({state, recvDir, setRecvDir}: BodyProps) => {
                 setRecvDir(ret);
             }}
           >Find</button>
+          <Fingerprint fingerprint={state.fingerprint} />
         </div>
       </>
     );
@@ -114,6 +126,7 @@ const JobBody = ({state, recvDir, setRecvDir}: BodyProps) => {
         <div className={style.Element}>
           {'Opponent wants to receive files from you.'}
         </div>
+        <Fingerprint fingerprint={state.fingerprint} />
       </>
     );
   case STATE.RQE_CANCEL:
@@ -131,6 +144,7 @@ const JobBody = ({state, recvDir, setRecvDir}: BodyProps) => {
         <div className={style.Element}>
           {'Waiting for the opponent to accept...'}
         </div>
+        <Fingerprint fingerprint={state.fingerprint} />
       </>
     );
   case STATE.RQR_SEND_REJECT:

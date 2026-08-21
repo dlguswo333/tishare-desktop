@@ -65,6 +65,30 @@
         margin-left: auto;
       }
     }
+    .FingerprintView {
+      display: flex;
+      align-self: center;
+      justify-content: flex-start;
+      width: 95%;
+      padding: 5px;
+      padding-top: 15px;
+      .Emoji {
+        margin-right: 5px;
+        flex: 0 0 auto;
+        font-size: 0.9rem;
+      }
+      .Fingerprint {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow-x: auto;
+        font-family: monospace;
+        margin: 0px 2px;
+        padding: 1px 2px;
+        border-radius: 4px;
+        background-color: #eee;
+        scrollbar-width: thin;
+      }
+    }
     input[type="text"] {
       border-radius: 8px;
       border: 1px solid #333;
