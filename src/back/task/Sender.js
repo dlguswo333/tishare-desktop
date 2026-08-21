@@ -7,7 +7,7 @@ class Sender {
   /** @type {number} */
   #ind;
   #state;
-  /** @type {import('net').Socket} */
+  /** @type {import('tls').TLSSocket} */
   #socket;
   /** @type {string} receiver ID. */
   #receiverId;
@@ -77,7 +77,7 @@ class Sender {
 
   /**
    * @param {number} ind
-   * @param {import('net').Socket} socket
+   * @param {import('tls').TLSSocket} socket
    * @param {string!} receiverId
    * @param {import('../../types.js').TiItem[]} itemArray
    * @param {Function} onExitCallback

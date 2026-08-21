@@ -1,4 +1,5 @@
 import {STATE} from '../../defs.js';
+import {getPeerFingerprintFromSocket} from '../cert.js';
 import {HEADER_END} from '../common.js';
 
 class Requestee {
@@ -10,15 +11,15 @@ class Requestee {
   /** @type {import('../common.js').SendRequestHeader | import('../common.js').RecvRequestHeader} */
   #requestHeader;
   #haveRejectedFlag;
-  /** @type {Function} */
+  /** @type {(_: import('../../types.d.ts').TiJob) => void} */
   #sendState;
 
   /**
    * @param {number} ind
    * @param {string} state
-   * @param {import('net').Socket} socket
+   * @param {import('tls').TLSSocket} socket
    * @param {import('../common.js').SendRequestHeader | import('../common.js').RecvRequestHeader} requestHeader
-   * @param {Function} sendState
+   * @param {(_: import('../../types.d.ts').TiJob) => void} sendState
    */
   constructor (ind, state, socket, requestHeader, sendState) {
     this.#ind = ind;
@@ -69,13 +70,15 @@ class Requestee {
   }
 
   /**
+   * @returns {import('../../types.d.ts').TiJob}
    * Return the current state.
    */
   getState () {
     return {
       ind: this.#ind,
       state: this.#state,
-      id: this.#requestHeader.id
+      id: this.#requestHeader.id,
+      fingerprint: getPeerFingerprintFromSocket(this.socket),
     };
   }
 

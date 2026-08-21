@@ -44,6 +44,7 @@ export type TiJob = {
   ind: number;
   state: string;
   id: string;
+  fingerprint: string | null;
   speed?: number;
   itemName?: string;
   progress?: number;

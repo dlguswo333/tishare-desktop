@@ -12,7 +12,7 @@ import semver from 'semver';
 class Server {
   /** @type {import('./Indexer').default} */
   #indexer;
-  /** @type {Function} */
+  /** @type {(_: import('../types.d.ts').TiJob) => void} */
   #sendState;
   /** @type {typeof STATE[keyof typeof STATE]} */
   #state;
@@ -27,7 +27,7 @@ class Server {
 
   /**
    * @param {import('./Indexer').default} indexer
-   * @param {Function} sendState
+   * @param {(_: import('../types.d.ts').TiJob) => void} sendState
    * @param {import('../types.d.ts').Cert} cert
    */
   constructor (indexer, sendState, cert) {

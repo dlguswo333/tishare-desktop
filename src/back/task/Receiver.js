@@ -3,13 +3,18 @@ import fs from 'fs/promises';
 import path from 'path';
 import {HEADER_END, splitHeader} from '../common.js';
 import {STATE, SOCKET_TIMEOUT, STATE_INTERVAL} from '../../defs.js';
+import {getPeerFingerprintFromSocket} from '../cert.js';
+
+/**
+ * @typedef {import('../../types.d.ts').TiJob} TiJob
+ */
 
 class Receiver {
   /** @type {number} */
   #ind;
   /** @type {STATE[keyof STATE]} */
   #state;
-  /** @type {import('net').Socket} */
+  /** @type {import('tls').TLSSocket} */
   #socket;
   /** @type {string} */
   #senderId;
@@ -22,7 +27,7 @@ class Receiver {
    * @type {Function}
    */
   #onEnd;
-  /** @type {Function} */
+  /** @type {(_: TiJob) => void} */
   #sendState;
   /** @type {Buffer} */
   #recvBuf;
@@ -101,12 +106,12 @@ class Receiver {
 
   /**
    * @param {number} ind
-   * @param {import('net').Socket} socket
+   * @param {import('tls').TLSSocket} socket
    * @param {string!} senderId
    * @param {string!} recvDir
    * @param {number!} numItems
    * @param {Function} onExitCallback
-   * @param {Function} sendState
+   * @param {(_: TiJob) => void} sendState
    */
   constructor (ind, socket, senderId, recvDir, numItems, onExitCallback, sendState) {
     this.#ind = ind;
@@ -376,13 +381,15 @@ class Receiver {
         progress: this.getItemProgress(),
         totalProgress: this.getTotalProgress(),
         id: this.#senderId,
-        itemName: this.#itemName,
+        fingerprint: getPeerFingerprintFromSocket(this.#socket),
+        itemName: this.#itemName ?? undefined,
       };
     }
     return {
       ind: this.#ind,
       state: this.#state,
-      id: this.#senderId
+      id: this.#senderId,
+      fingerprint: getPeerFingerprintFromSocket(this.#socket),
     };
   }
 

@@ -1,25 +1,30 @@
 import {STATE} from '../../defs.js';
+import {getPeerFingerprintFromSocket} from '../cert.js';
 import {HEADER_END} from '../common.js';
+
+/**
+ * @typedef {import('../../types.d.ts').TiJob} TiJob
+ */
 
 class Requester {
   /** @type {number} */
   #ind;
   /** @type {STATE[keyof STATE]} */
   #state;
-  /** @type {import('net').Socket | null} */
+  /** @type {import('tls').TLSSocket | null} */
   #socket;
   /** @type {boolean} */
   #haveWrittenEndFlag;
-  /** @type {Function} */
+  /** @type {(_: TiJob) => void} */
   #sendState;
 
   /**
    * @param {number} ind
    * @param {string} state
-   * @param {import('net').Socket | null} socket Can be `null` if it is pre-receive request.
+   * @param {import('tls').TLSSocket | null} socket Can be `null` if it is pre-receive request.
    * @param {string} opponentIp
    * @param {string} opponentId
-   * @param {Function} sendState
+   * @param {(_: TiJob) => void} sendState
    */
   constructor (ind, state, socket, opponentIp, opponentId, sendState) {
     /** @type {number} */
@@ -61,13 +66,15 @@ class Requester {
   }
 
   /**
+   * @returns {TiJob}
    * Return the current state.
    */
   getState () {
     return {
       ind: this.#ind,
       state: this.#state,
-      id: this.opponentId
+      id: this.opponentId,
+      fingerprint: this.#socket ? getPeerFingerprintFromSocket(this.#socket) : null,
     };
   }
 

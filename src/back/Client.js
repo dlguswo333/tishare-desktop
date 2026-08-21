@@ -6,10 +6,14 @@ import Sender from './task/Sender.js';
 import Requester from './task/Requester.js';
 import Receiver from './task/Receiver.js';
 
+/**
+ * @typedef {import('../types.d.ts').TiJob} TiJob
+ */
+
 class Client {
   /** @type {import('./Indexer').default} */
   #indexer;
-  /** @type {Function} */
+  /** @type {(_: TiJob) => void} */
   #sendState;
   /** @type {import('../types.d.ts').Cert} */
   #cert;
@@ -20,7 +24,7 @@ class Client {
 
   /**
    * @param {import('./Indexer').default} indexer
-   * @param {Function} sendState
+   * @param {(_: TiJob) => void} sendState
    * @param {import('../types.d.ts').Cert} cert
    */
   constructor (indexer, sendState, cert) {
@@ -131,6 +135,7 @@ class Client {
     });
 
     socket.on('error', (err) => {
+      console.error(err);
       if (err) {
         socket.destroy();
         this.#handleNetworkErr(ind);
