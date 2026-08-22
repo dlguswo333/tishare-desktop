@@ -116,8 +116,8 @@ const JobBody = ({state, recvDir, setRecvDir}: BodyProps) => {
                 setRecvDir(ret);
             }}
           >Find</button>
-          <Fingerprint fingerprint={state.fingerprint} />
         </div>
+        <Fingerprint fingerprint={state.fingerprint} />
       </>
     );
   case STATE.RQE_RECV_REQUEST:

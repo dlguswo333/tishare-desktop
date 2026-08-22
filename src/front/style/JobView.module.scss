@@ -1,5 +1,6 @@
 @use "variables" as v;
 .JobView {
+  flex-shrink: 0;
   width: 95%;
   min-height: 150px;
   margin-top: 10px;
