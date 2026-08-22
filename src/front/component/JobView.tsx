@@ -90,8 +90,8 @@ type FingerprintProps = {
 
 const Fingerprint = ({fingerprint}: FingerprintProps) => {
   return fingerprint !== null && <div className={style.FingerprintView}>
-    <span title='Fingerprint' className={style.Emoji}>🫆</span>
-    <span className={style.Fingerprint}>{fingerprint}</span>
+    <div title='Fingerprint' className={style.Emoji}>🫆</div>
+    <div className={style.Fingerprint}>{fingerprint}</div>
   </div>;
 };
 
