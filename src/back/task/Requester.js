@@ -70,12 +70,22 @@ class Requester {
    * Return the current state.
    */
   getState () {
-    return {
+    /** @type {TiJob} */
+    const state = {
       ind: this.#ind,
       state: this.#state,
       id: this.opponentId,
-      fingerprint: this.#socket ? getPeerFingerprintFromSocket(this.#socket) : null,
+      fingerprint: null,
     };
+    try {
+      if (this.#socket) {
+        const fingerprint = getPeerFingerprintFromSocket(this.#socket);
+        state.fingerprint = fingerprint;
+      }
+    } catch {
+      // peer certificates may not be available before handshake.
+    }
+    return state;
   }
 
   /**
