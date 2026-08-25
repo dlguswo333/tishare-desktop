@@ -14,6 +14,8 @@ class Requester {
   /** @type {import('tls').TLSSocket | null} */
   #socket;
   /** @type {boolean} */
+  #isConnected;
+  /** @type {boolean} */
   #haveWrittenEndFlag;
   /** @type {(_: TiJob) => void} */
   #sendState;
@@ -31,11 +33,13 @@ class Requester {
     this.#ind = ind;
     this.#state = state;
     this.#socket = socket;
+    this.#isConnected = false;
     this.opponentIp = opponentIp;
     this.opponentId = opponentId;
     this.#haveWrittenEndFlag = false;
     this.#sendState = sendState;
     this.#sendState(this.getState());
+    this.#handleSocketConnection();
   }
 
   /**
@@ -78,12 +82,16 @@ class Requester {
       fingerprint: null,
     };
     try {
-      if (this.#socket) {
+      if (this.#isConnected && this.#socket) {
         const fingerprint = getPeerFingerprintFromSocket(this.#socket);
         state.fingerprint = fingerprint;
       }
-    } catch {
-      // peer certificates may not be available before handshake.
+    } catch (e) {
+      // This cannot be happening.
+      console.error(e);
+      this.#socket?.destroy();
+      this.#isConnected = false;
+      this.setState(STATE.ERR_NETWORK);
     }
     return state;
   }
@@ -98,6 +106,13 @@ class Requester {
       this.#socket?.destroy();
     }
   };
+
+  #handleSocketConnection () {
+    this.#socket?.once('secureConnect', () => {
+      this.#isConnected = true;
+      this.#sendState(this.getState());
+    });
+  }
 }
 
 export default Requester;
