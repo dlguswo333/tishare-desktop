@@ -89,7 +89,7 @@ type BodyProps = {
 
 type FingerprintProps = {
   fingerprint: string | null;
-}
+};
 
 const Fingerprint = ({fingerprint}: FingerprintProps) => {
   if (fingerprint === null) {
@@ -105,7 +105,7 @@ const Fingerprint = ({fingerprint}: FingerprintProps) => {
         </Popover.Trigger>
         <Popover.Portal>
           <Popover.Content className='InformationContent'>
-				    <h1 className='Title'>Fingerprint</h1>
+            <h1 className='Title'>Fingerprint</h1>
             <div className='Content'>
               Fingerprint is a unique text (key) that identifies each device.
               For secure data transfer, make sure that the fingerprint here matches
