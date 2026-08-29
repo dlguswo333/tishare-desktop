@@ -6,7 +6,7 @@ const ipcRenderer = window.ipcRenderer;
 
 type HeadProps = {
   state: TiJob;
-}
+};
 
 const JobHead = ({state}: HeadProps) => {
   switch (state.state) {
@@ -82,7 +82,7 @@ type BodyProps = {
   state: TiJob;
   recvDir: string;
   setRecvDir: (recvDir: string) => unknown;
-}
+};
 
 const JobBody = ({state, recvDir, setRecvDir}: BodyProps) => {
   switch (state.state) {
@@ -205,7 +205,7 @@ const JobBody = ({state, recvDir, setRecvDir}: BodyProps) => {
     return (
       <>
         <div className={style.Element}>
-            Network Error
+          Network Error
         </div>
       </>
     );
@@ -213,7 +213,7 @@ const JobBody = ({state, recvDir, setRecvDir}: BodyProps) => {
     return (
       <>
         <div className={style.Element}>
-            Network Error
+          Network Error
         </div>
       </>
     );
@@ -227,7 +227,7 @@ type FootProps = {
   ind: number;
   recvDir: string;
   items: Record<string, TiItem>;
-}
+};
 
 const JobFoot = ({state, ind, recvDir, items}: FootProps) => {
   switch (state.state) {
@@ -370,7 +370,7 @@ type Props = {
   state: TiJob;
   ind: number;
   items: Record<string, TiItem>;
-}
+};
 
 function JobView ({state, ind, items}: Props) {
   const [recvDir, setRecvDir] = useState(() =>

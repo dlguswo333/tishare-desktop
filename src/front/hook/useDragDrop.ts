@@ -2,7 +2,7 @@ import {useCallback, useEffect, useState} from 'react';
 
 type Props = {
   setItems: React.Dispatch<React.SetStateAction<{}>>;
-}
+};
 
 const ipcRenderer = window.ipcRenderer;
 

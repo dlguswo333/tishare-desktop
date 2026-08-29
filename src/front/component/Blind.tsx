@@ -3,7 +3,7 @@ import '../style/Blind.scss';
 
 type Props = {
   children?: ReactNode;
-}
+};
 
 function Blind ({children}: Props) {
   return (
