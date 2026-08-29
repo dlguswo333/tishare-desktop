@@ -7,7 +7,7 @@ import js from "@eslint/js";
 
 /** @type {import('eslint').Linter.Config.RulesRecord} */
 const globalRules = {
-  '@stylistic/indent': ['error', 2],
+  '@stylistic/indent': ['error', 2, {'SwitchCase': 0}],
   '@stylistic/quotes': ['error', 'single'],
   '@stylistic/semi': ['error', 'always'],
   '@stylistic/space-infix-ops': 'error',
