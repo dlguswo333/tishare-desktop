@@ -9,6 +9,7 @@
   "private": false,
   "devDependencies": {
     "@dlguswo333/react-simple-spinner": "^0.6.0",
+    "@stylistic/eslint-plugin": "^5.10.0",
     "@testing-library/react": "^16.3.0",
     "@types/eslint": "^8.44.7",
     "@types/mocha": "^10.0.10",
