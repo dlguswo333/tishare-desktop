@@ -14,7 +14,7 @@ type Props = {
   checked: Record<string, boolean>;
   items: object;
   item: TiItem;
-}
+};
 
 const Item = ({item, items, checkAll, lastClick, setLastClick, checked, setChecked, setItemDetail}: Props) => {
   const [isThumbnailVisible, setIsThumbnailVisible] = useState(

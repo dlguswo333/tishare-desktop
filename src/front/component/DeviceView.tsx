@@ -12,7 +12,7 @@ type Props = {
   myIp: null | string;
   myNetmask: null | string;
   myId: string;
-}
+};
 
 function DeviceView ({items, myIp, myNetmask, myId}: Props) {
   const [devices, setDevices] = useState<Record<string, TiDevice>>({});

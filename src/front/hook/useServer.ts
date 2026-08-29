@@ -3,7 +3,7 @@ import {useCallback} from 'react';
 type Props = {
   myIp: string | null;
   myNetmask: string | null;
-}
+};
 
 const ipcRenderer = window.ipcRenderer;
 

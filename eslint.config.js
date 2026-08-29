@@ -1,4 +1,5 @@
 import globals from 'globals';
+import stylistic from '@stylistic/eslint-plugin'
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import reactPlugin from 'eslint-plugin-react';
 import tsParser from "@typescript-eslint/parser";
@@ -6,14 +7,14 @@ import js from "@eslint/js";
 
 /** @type {import('eslint').Linter.Config.RulesRecord} */
 const globalRules = {
-  indent: ['error', 2],
-  quotes: ['error', 'single'],
-  semi: ['error', 'always'],
-  'space-infix-ops': 'error',
-  'keyword-spacing': 'error',
-  'eol-last': 'error',
+  '@stylistic/indent': ['error', 2, {'SwitchCase': 0}],
+  '@stylistic/quotes': ['error', 'single'],
+  '@stylistic/semi': ['error', 'always'],
+  '@stylistic/space-infix-ops': 'error',
+  '@stylistic/keyword-spacing': 'error',
+  '@stylistic/eol-last': 'error',
 
-  'comma-dangle': ['error', {
+  '@stylistic/comma-dangle': ['error', {
     arrays: 'never',
     objects: 'only-multiline',
     imports: 'never',
@@ -21,10 +22,10 @@ const globalRules = {
     functions: 'never',
   }],
 
-  'object-curly-spacing': 'error',
-  'space-before-function-paren': ['error', 'always'],
-  'space-before-blocks': ['error', 'always'],
-  'arrow-spacing': 'error',
+  '@stylistic/object-curly-spacing': 'error',
+  '@stylistic/space-before-function-paren': ['error', 'always'],
+  '@stylistic/space-before-blocks': ['error', 'always'],
+  '@stylistic/arrow-spacing': 'error',
 };
 
 /** @type {import('eslint').Linter.Config[]} */
@@ -41,6 +42,9 @@ export default [
           jsx: true,
         },
       },
+    },
+    plugins: {
+      '@stylistic': stylistic,
     },
     rules: globalRules,
   },
@@ -59,6 +63,7 @@ export default [
       },
     },
     plugins: {
+      '@stylistic': stylistic,
       'react': reactPlugin,
       'react-hooks': reactHooksPlugin,
     },
@@ -68,7 +73,7 @@ export default [
       },
     },
     rules: {
-      'jsx-quotes': ['error', 'prefer-single'],
+      '@stylistic/jsx-quotes': ['error', 'prefer-single'],
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
       'react/prop-types': 'off',

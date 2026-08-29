@@ -11,7 +11,7 @@ const ipcRenderer = window.ipcRenderer;
 type Props = {
   toggleSettings: () => unknown;
   items: Record<string, TiItem>;
-}
+};
 
 function Nav ({toggleSettings, items}: Props) {
   const [grow, setGrow] = useState(false);

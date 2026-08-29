@@ -6,7 +6,7 @@ type Props = {
   onClick: MouseEventHandler;
   opaqueText?: boolean;
   disabled?: boolean;
-}
+};
 
 function ThemeButton ({children, onClick, opaqueText, disabled}: Props) {
   return (

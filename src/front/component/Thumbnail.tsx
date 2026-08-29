@@ -4,7 +4,7 @@ type Props = {
   isThumbnailVisible: boolean;
   onThumbnailError: () => unknown;
   item: TiItemWithoutDir;
-}
+};
 
 const Thumbnail = ({isThumbnailVisible, onThumbnailError, item}: Props) => {
   const itemTypeText = item.type === 'directory' ? '📁 ' : '📄 ';
