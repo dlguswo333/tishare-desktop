@@ -5,7 +5,7 @@ type Props = {
   isServerOpen: boolean;
   closeServer: () => Promise<void>;
   setNetworks: (networks: Network[]) => void;
-}
+};
 
 const ipcRenderer = window.ipcRenderer;
 

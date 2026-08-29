@@ -10,7 +10,7 @@ type Props = {
   openDirectory: () => unknown;
   deleteChecked: (_: undefined | Record<string, boolean>) => unknown;
   setItemDetail: (_: null | TiItemWithoutDir) => unknown;
-}
+};
 
 function ItemView ({items, openFile, openDirectory, deleteChecked, setItemDetail}: Props) {
   const [scrollable, setScrollable] = useState(false);
