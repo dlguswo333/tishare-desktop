@@ -3,7 +3,6 @@ import fs from 'fs/promises';
 import path from 'path';
 import {HEADER_END, splitHeader} from '../common.js';
 import {STATE, SOCKET_TIMEOUT, STATE_INTERVAL} from '../../defs.js';
-import {getPeerFingerprintFromSocket} from '../cert.js';
 
 /**
  * @typedef {import('../../types.d.ts').TiJob} TiJob
@@ -381,7 +380,7 @@ class Receiver {
         progress: this.getItemProgress(),
         totalProgress: this.getTotalProgress(),
         id: this.#senderId,
-        fingerprint: getPeerFingerprintFromSocket(this.#socket),
+        fingerprint: null,
         itemName: this.#itemName ?? undefined,
       };
     }
@@ -389,7 +388,7 @@ class Receiver {
       ind: this.#ind,
       state: this.#state,
       id: this.#senderId,
-      fingerprint: getPeerFingerprintFromSocket(this.#socket),
+      fingerprint: null,
     };
   }
 
