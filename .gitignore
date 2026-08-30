@@ -13,7 +13,7 @@ file
 # production
 /build
 /dist
-/src/back/cert.js
+/src/back/ts/*.js
 
 # misc
 .DS_Store

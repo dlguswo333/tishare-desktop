@@ -8,7 +8,7 @@ import Server from './Server.js';
 import Client from './Client.js';
 import Indexer from './Indexer.js';
 import {OS} from './common.js';
-import {createCert, loadCert, storeCert} from './cert.js';
+import {createCert, loadCert, storeCert} from './ts/cert.js';
 
 /**
  * @typedef {import('../types').IpcRendererApis} IpcRendererApis

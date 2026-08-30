@@ -1,5 +1,5 @@
 import {STATE} from '../../defs.js';
-import {getPeerFingerprintFromSocket} from '../cert.js';
+import {getPeerFingerprintFromSocket} from '../ts/cert.js';
 import {HEADER_END} from '../common.js';
 
 class Requestee {

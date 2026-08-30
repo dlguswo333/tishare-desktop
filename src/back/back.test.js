@@ -9,7 +9,7 @@ import Client from './Client.js';
 import {MAX_NUM_JOBS, STATE} from '../defs.js';
 import {getBroadcastIp, isLocalIp} from './Network.js';
 import {after} from 'mocha';
-import {createCert} from './cert.js';
+import {createCert} from './ts/cert.js';
 
 describe('Indexer', () => {
   const indexer = new Indexer(() => { }, () => { });

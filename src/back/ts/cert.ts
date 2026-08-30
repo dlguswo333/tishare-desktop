@@ -8,12 +8,12 @@ const CERT_ENCODING = 'base64' as const;
 
 export const sha256Base64Url = (bytes: BinaryLike) => {
   return createHash('sha256').update(bytes).digest('base64url');
-}
+};
 
 export const getCertFingerprintFromPem = (certPem: BinaryLike) => {
   // Fingerprint DER bytes, not PEM text.
   return sha256Base64Url(new X509Certificate(certPem).raw);
-}
+};
 
 export const getPeerFingerprintFromSocket = (socket: TLSSocket) => {
   const peer = socket.getPeerCertificate(true);
@@ -23,14 +23,14 @@ export const getPeerFingerprintFromSocket = (socket: TLSSocket) => {
   }
 
   return sha256Base64Url(peer.raw);
-}
+};
 
 export const createCert = async () => {
   try {
     const oneYearInMs = 365 * 24 * 60 * 60 * 1000;
 
     const pems = await selfsigned.generate(
-      [{ name: 'commonName', value: 'tiShare' }],
+      [{name: 'commonName', value: 'tiShare'}],
       {
         keyType: 'ec',
         curve: 'P-256',
@@ -38,9 +38,9 @@ export const createCert = async () => {
         notAfterDate: new Date(Date.now() + oneYearInMs),
 
         extensions: [
-          { name: 'basicConstraints', cA: false },
-          { name: 'keyUsage', digitalSignature: true, critical: true },
-          { name: 'extKeyUsage', serverAuth: true, clientAuth: true },
+          {name: 'basicConstraints', cA: false},
+          {name: 'keyUsage', digitalSignature: true, critical: true},
+          {name: 'extKeyUsage', serverAuth: true, clientAuth: true}
         ],
       }
     );
@@ -55,7 +55,7 @@ export const createCert = async () => {
     console.error(e);
     return null;
   }
-}
+};
 
 export const loadCert = async (path: string, safeStorage: SafeStorage) => {
   try {
@@ -74,7 +74,7 @@ export const loadCert = async (path: string, safeStorage: SafeStorage) => {
     console.error(e);
     return null;
   }
-}
+};
 
 export const storeCert = async (pems: selfsigned.GenerateResult, path: string, safeStorage: SafeStorage) => {
   try {
@@ -83,7 +83,7 @@ export const storeCert = async (pems: selfsigned.GenerateResult, path: string, s
       JSON.stringify({
         cert: pems.cert,
         encryptedKey: safeStorage.encryptString(pems.private).toString(CERT_ENCODING),
-      }),
+      })
     );
     return true;
   } catch (e) {
