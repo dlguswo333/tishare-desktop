@@ -3,6 +3,10 @@ import fs from 'fs/promises';
 import {STATE, CHUNKSIZE, SOCKET_TIMEOUT, STATE_INTERVAL} from '../../defs.js';
 import {HEADER_END, splitHeader} from '../common.js';
 
+/**
+ * @typedef {import('../../types.d.ts').TiJob} TiJob
+ */
+
 class Sender {
   /** @type {number} */
   #ind;
@@ -21,7 +25,7 @@ class Sender {
    * @type {Function}
    */
   #onEnd;
-  /** @type {Function} */
+  /** @type {(_: TiJob) => void} */
   #sendState;
   /** @type {boolean} */
   #endFlag;
@@ -81,7 +85,7 @@ class Sender {
    * @param {string!} receiverId
    * @param {import('../../types.js').TiItem[]} itemArray
    * @param {Function} onExitCallback
-   * @param {Function} sendState
+   * @param {(_: TiJob) => void} sendState
    */
   constructor (ind, socket, receiverId, itemArray, onExitCallback, sendState) {
     this.#ind = ind;
@@ -284,13 +288,15 @@ class Sender {
         progress: this.getItemProgress(),
         totalProgress: this.getTotalProgress(),
         id: this.#receiverId,
-        itemName: itemName
+        fingerprint: null,
+        itemName: itemName,
       };
     }
     return {
       ind: this.#ind,
       state: this.#state,
-      id: this.#receiverId
+      id: this.#receiverId,
+      fingerprint: null,
     };
   }
 
