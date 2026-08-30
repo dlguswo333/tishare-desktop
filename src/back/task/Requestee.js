@@ -78,7 +78,7 @@ class Requestee {
       ind: this.#ind,
       state: this.#state,
       id: this.#requestHeader.id,
-      fingerprint: getPeerFingerprintFromSocket(this.socket),
+      fingerprint: this.socket.readyState === 'open' ? getPeerFingerprintFromSocket(this.socket) : null,
     };
   }
 

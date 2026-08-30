@@ -82,7 +82,7 @@ class Requester {
       fingerprint: null,
     };
     try {
-      if (this.#isConnected && this.#socket) {
+      if (this.#isConnected && this.#socket?.readyState === 'open') {
         const fingerprint = getPeerFingerprintFromSocket(this.#socket);
         state.fingerprint = fingerprint;
       }
