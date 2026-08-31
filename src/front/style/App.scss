@@ -179,3 +179,32 @@ img,button {
     }
   }
 }
+.Monospace {
+  font-family: monospace;
+}
+
+.InformationContent {
+  border-radius: 4px;
+  padding: 8px 16px;
+  background-color: white;
+  box-shadow: 0 2px 3px #322;
+  .Title {
+    font-size: 1.1rem;
+  }
+  .Content {
+    font-size: 1rem;
+    max-width: 300px;
+  }
+}
+.InformationArrow {
+  transform: translateY(-2px);
+  fill: white;
+  [data-side="top"] & {
+    filter: drop-shadow(0 2px 3px #322);
+    clip-path: inset(1px -10px 0 -10px);
+  }
+  [data-side="bottom"] & {
+    filter: drop-shadow(0 2px 3px #322);
+    clip-path: inset(1px -10px -10px -10px);
+  }
+}

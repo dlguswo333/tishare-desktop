@@ -1,0 +1,6 @@
+{
+  "watch": ["src/back"],
+  "ext": "js,ts",
+  "ignore": ["src/back/ts/**/*.js"],
+  "exec": "npm run build:back && electron --trace-warnings ."
+}

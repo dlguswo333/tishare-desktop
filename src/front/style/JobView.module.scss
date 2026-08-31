@@ -1,5 +1,6 @@
 @use "variables" as v;
 .JobView {
+  flex-shrink: 0;
   width: 95%;
   min-height: 150px;
   margin-top: 10px;
@@ -47,6 +48,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    padding: 10px 0;
     .Element {
       display: flex;
       align-items: center;
@@ -65,13 +67,60 @@
         margin-left: auto;
       }
     }
+    .FingerprintView {
+      display: flex;
+      flex-direction: column;
+      align-self: center;
+      justify-content: center;
+      align-items: center;
+      width: 90%;
+      padding: 5px;
+      margin: 10px 0;
+      border-radius: 4px;
+      background-color: #f0f0f0;
+      .FingerprintHead {
+        position: relative;
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        .Emoji {
+          font-size: 0.9rem;
+        }
+        .InformationButton {
+          position: absolute;
+          right: 0px;
+          justify-self: flex-end;
+          width: 24px;
+          height: 24px;
+          padding: 2px;
+          border-radius: 2px;
+          border: none;
+          cursor: pointer;
+          &:hover {
+            filter: brightness(1.1);
+          }
+          &:active {
+            filter: brightness(1.2);
+          }
+        }
+      }
+      .Fingerprint {
+        max-width: 100%;
+        overflow-x: auto;
+        scrollbar-width: thin;
+        padding: 1px;
+        font-family: monospace;
+      }
+    }
     input[type="text"] {
       border-radius: 8px;
       border: 1px solid #333;
       padding: 5px;
       margin: 0 5px;
     }
-    button {
+    .PathButton {
       padding: 5px 10px;
       color: white;
       font-weight: bold;

@@ -2,6 +2,9 @@ import {useState} from 'react';
 import {STATE, printSize} from '../../defs';
 import style from '../style/JobView.module.scss';
 import {TiItem, TiJob} from '../../types';
+import InfoIcon from '../icons/Information.svg?react';
+import {Popover} from 'radix-ui';
+
 const ipcRenderer = window.ipcRenderer;
 
 type HeadProps = {
@@ -84,6 +87,39 @@ type BodyProps = {
   setRecvDir: (recvDir: string) => unknown;
 };
 
+type FingerprintProps = {
+  fingerprint: string | null;
+};
+
+const Fingerprint = ({fingerprint}: FingerprintProps) => {
+  if (fingerprint === null) {
+    return null;
+  }
+
+  return <div className={style.FingerprintView}>
+    <div className={style.FingerprintHead}>
+      <div title='Fingerprint' className={style.Emoji}>🫆</div>
+      <Popover.Root>
+        <Popover.Trigger className={style.InformationButton}>
+          <InfoIcon />
+        </Popover.Trigger>
+        <Popover.Portal>
+          <Popover.Content className='InformationContent'>
+            <h1 className='Title'>Fingerprint</h1>
+            <div className='Content'>
+              Fingerprint is a unique text (key) that identifies each device.
+              For secure data transfer, make sure that the fingerprint here matches
+              the fingerprint you want to share with.
+            </div>
+            <Popover.Arrow className='InformationArrow' height={8} />
+          </Popover.Content>
+        </Popover.Portal>
+      </Popover.Root>
+    </div>
+    <div className={style.Fingerprint}>{fingerprint}</div>
+  </div>;
+};
+
 const JobBody = ({state, recvDir, setRecvDir}: BodyProps) => {
   switch (state.state) {
   case STATE.RQE_SEND_REQUEST:
@@ -99,6 +135,7 @@ const JobBody = ({state, recvDir, setRecvDir}: BodyProps) => {
             value={recvDir}
           />
           <button
+            className={style.PathButton}
             onClick={async () => {
               const ret = await ipcRenderer.setRecvDir();
               if (ret)
@@ -106,6 +143,7 @@ const JobBody = ({state, recvDir, setRecvDir}: BodyProps) => {
             }}
           >Find</button>
         </div>
+        <Fingerprint fingerprint={state.fingerprint} />
       </>
     );
   case STATE.RQE_RECV_REQUEST:
@@ -114,6 +152,7 @@ const JobBody = ({state, recvDir, setRecvDir}: BodyProps) => {
         <div className={style.Element}>
           {'Opponent wants to receive files from you.'}
         </div>
+        <Fingerprint fingerprint={state.fingerprint} />
       </>
     );
   case STATE.RQE_CANCEL:
@@ -131,6 +170,7 @@ const JobBody = ({state, recvDir, setRecvDir}: BodyProps) => {
         <div className={style.Element}>
           {'Waiting for the opponent to accept...'}
         </div>
+        <Fingerprint fingerprint={state.fingerprint} />
       </>
     );
   case STATE.RQR_SEND_REJECT:
@@ -152,6 +192,7 @@ const JobBody = ({state, recvDir, setRecvDir}: BodyProps) => {
             value={recvDir}
           />
           <button
+            className={style.PathButton}
             onClick={async () => {
               const ret = await ipcRenderer.setRecvDir();
               if (ret)

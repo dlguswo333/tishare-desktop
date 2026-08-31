@@ -33,7 +33,7 @@ export default [
   {
     name: 'global',
     files: ['src/**/*'],
-    ignores: ['**/*.d.ts', 'build/**/*', 'dist/**/*', 'node_modules/**/*'],
+    ignores: ['**/*.d.ts', 'build/**/*', 'dist/**/*', 'node_modules/**/*', 'src/back/ts/**/*.js'],
     languageOptions: {
       ecmaVersion: 2025,
       sourceType: 'module',
@@ -84,8 +84,10 @@ export default [
   },
   {
     name: 'back',
-    files: ['src/back/**/*.js'],
+    files: ['src/back/**/*.{js,ts}'],
+    ignores: ['src/back/ts/**/*.js'],
     languageOptions: {
+      parser: tsParser,
       globals: {
         ...globals.commonjs,
         ...globals.node,

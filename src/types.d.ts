@@ -27,6 +27,12 @@ export type SendRequestHeader = {
   numItems: number;
 };
 
+export type Cert = {
+  cert: string;
+  key: string;
+  fingerprint: string;
+}
+
 export type RecvRequestHeader = {
   app: string;
   version: string;
@@ -38,6 +44,7 @@ export type TiJob = {
   ind: number;
   state: string;
   id: string;
+  fingerprint: string | null;
   speed?: number;
   itemName?: string;
   progress?: number;
@@ -52,6 +59,7 @@ export type IpcRendererApis = {
   openServer: (myIp: string, myNetmask: string) => Promise<boolean>,
   closeServer: () => Promise<boolean>,
   setMyId: (myId: string) => Promise<boolean>,
+  getMyFingerprint: () => Promise<string>,
   isServerOpen: () => Promise<boolean>,
   scan: (myIp: string, netmask: string, myId: string) => void,
   scanCallback: (callback: (deviceIp: string, deviceVersion: string, deviceId: string, deviceOs: string) => void) => void,

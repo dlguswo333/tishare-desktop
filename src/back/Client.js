@@ -1,16 +1,22 @@
 // @ts-check
 import {PORT, VERSION, STATE} from '../defs.js';
 import {HEADER_END, splitHeader, MAX_HEADER_LEN, createItemArray} from './common.js';
-import net from 'net';
+import tls from 'node:tls';
 import Sender from './task/Sender.js';
 import Requester from './task/Requester.js';
 import Receiver from './task/Receiver.js';
 
+/**
+ * @typedef {import('../types.d.ts').TiJob} TiJob
+ */
+
 class Client {
   /** @type {import('./Indexer').default} */
   #indexer;
-  /** @type {Function} */
+  /** @type {(_: TiJob) => void} */
   #sendState;
+  /** @type {import('../types.d.ts').Cert} */
+  #cert;
   /** @type {string} */
   myId;
   /** @type {Object.<number, (Sender|Receiver|Requester)>} */
@@ -18,11 +24,13 @@ class Client {
 
   /**
    * @param {import('./Indexer').default} indexer
-   * @param {Function} sendState
+   * @param {(_: TiJob) => void} sendState
+   * @param {import('../types.d.ts').Cert} cert
    */
-  constructor (indexer, sendState) {
+  constructor (indexer, sendState, cert) {
     this.#indexer = indexer;
     this.#sendState = sendState;
+    this.#cert = cert;
     this.myId = '';
     this.jobs = {};
     // Other objects may call this method so bind the function.
@@ -43,6 +51,20 @@ class Client {
   }
 
   /**
+   * @param ip {string}
+   */
+  #connect (ip) {
+    return tls.connect({
+      port: PORT,
+      host: ip,
+      key: this.#cert.key,
+      cert: this.#cert.cert,
+      rejectUnauthorized: false,
+      minVersion: 'TLSv1.2',
+    });
+  }
+
+  /**
    * Request to send to opponent Server.
    * NOTE that it does not embed itemArray.
    * @param {Record<string, import('../types.js').TiItem>} items
@@ -56,13 +78,12 @@ class Client {
       return false;
     let recvBuf = Buffer.from([]);
     const itemArray = await createItemArray(items);
-    const socket = net.createConnection(PORT, receiverIp);
-
+    const socket = this.#connect(receiverIp);
 
     const requester = new Requester(ind, STATE.RQR_SEND_REQUEST, socket, receiverIp, receiverId, this.#sendState);
     this.jobs[ind] = requester;
 
-    socket.once('connect', async () => {
+    socket.once('secureConnect', async () => {
       console.log('sendRequest: connected to ' + socket.remoteAddress);
       const requestHeader = this.#createSendRequestHeader(itemArray.length);
       socket.write(JSON.stringify(requestHeader) + HEADER_END, 'utf-8', (err) => { if (err) this.#handleNetworkErr(ind); });
@@ -114,6 +135,7 @@ class Client {
     });
 
     socket.on('error', (err) => {
+      console.error(err);
       if (err) {
         socket.destroy();
         this.#handleNetworkErr(ind);
@@ -148,12 +170,12 @@ class Client {
     let recvBuf = Buffer.from([]);
     const senderIp = preRequester.opponentIp;
     const senderId = preRequester.opponentId;
-    const socket = net.createConnection(PORT, senderIp);
+    const socket = this.#connect(senderIp);
 
     const requester = new Requester(ind, STATE.RQR_RECV_REQUEST, socket, senderIp, senderId, this.#sendState);
     this.jobs[ind] = requester;
 
-    socket.once('connect', async () => {
+    socket.once('secureConnect', async () => {
       console.log('recvRequest: connected to ' + socket.remoteAddress);
       const requestHeader = this.#createRecvRequestHeader();
       socket.write(JSON.stringify(requestHeader) + HEADER_END, 'utf-8', (err) => { if (err) this.#handleNetworkErr(ind); });
