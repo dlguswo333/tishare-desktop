@@ -11,7 +11,7 @@ import {STATE, SOCKET_TIMEOUT, STATE_INTERVAL} from '../../defs.js';
 class Receiver {
   /** @type {number} */
   #ind;
-  /** @type {STATE[keyof STATE]} */
+  /** @type {typeof STATE[keyof typeof STATE]} */
   #state;
   /** @type {import('tls').TLSSocket} */
   #socket;
@@ -211,7 +211,6 @@ class Receiver {
               // mark it failed, and go to next item.
               // TODO mark the item failed.
               try {
-
                 if (this.#itemHandle) {
                   await this.#itemHandle.close();
                 }
@@ -294,10 +293,9 @@ class Receiver {
         case 'end':
           this.#setState(STATE.OTHER_END);
           // Close previous item handle and delete.
-          if (this.#itemHandle) {
+          if (this.#itemHandle && this.#itemName) {
             await this.#itemHandle.close();
-          }
-          if (this.#itemName) {
+            this.#itemHandle = null;
             await fs.rm(path.join(this.#recvPath, this.#itemName), {force: true});
           }
           this.#socket.end();
