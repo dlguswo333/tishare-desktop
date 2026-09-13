@@ -11,7 +11,7 @@ import {STATE, SOCKET_TIMEOUT, STATE_INTERVAL} from '../../defs.js';
 class Receiver {
   /** @type {number} */
   #ind;
-  /** @type {STATE[keyof STATE]} */
+  /** @type {typeof STATE[keyof typeof STATE]} */
   #state;
   /** @type {import('tls').TLSSocket} */
   #socket;
@@ -73,7 +73,7 @@ class Receiver {
    */
   #itemWrittenBytes;
   /**
-   * Number of received items so far.
+   * Number of completely received, skipped, or errored items so far.
    * @type {number}
    */
   #numRecvItem;
@@ -211,15 +211,13 @@ class Receiver {
               // mark it failed, and go to next item.
               // TODO mark the item failed.
               try {
-
-                if (this.#itemHandle) {
+                if (this.#itemHandle && this.#itemName) {
                   await this.#itemHandle.close();
-                }
-                if (this.#itemName) {
                   await fs.rm(path.join(this.#recvPath, this.#itemName), {force: true});
                 }
               } finally {
                 this.#itemHandle = null;
+                this.#itemName = null;
                 this.#itemFlag = 'next';
                 this.#numRecvItem++;
                 this.sendHeader();
@@ -235,11 +233,16 @@ class Receiver {
           break;
 
         case 'new':
+          if (this.#itemHandle) {
+            // Close previous item handle.
+            await this.#itemHandle.close();
+            this.#itemHandle = null;
+            this.#numRecvItem++;
+          }
           this.#itemName = path.join(this.#recvHeader.dir, this.#recvHeader.name);
           if (this.#recvHeader.type === 'directory') {
             this.#haveParsedHeader = false;
             this.#itemSize = 0;
-            this.#numRecvItem++;
             try {
               await fs.mkdir(path.join(this.#recvPath, this.#itemName));
             } catch (err) {
@@ -252,15 +255,11 @@ class Receiver {
               }
             }
             this.#itemFlag = 'ok';
+            this.#numRecvItem++;
             this.sendHeader();
           }
           else if (this.#recvHeader.type === 'file') {
             try {
-              if (this.#itemHandle) {
-                this.#numRecvItem++;
-                // Close previous item handle.
-                await this.#itemHandle.close();
-              }
               this.#itemHandle = await fs.open(path.join(this.#recvPath, this.#itemName), 'wx');
             } catch {
               // File already exists.
@@ -268,6 +267,7 @@ class Receiver {
               // 1. Ignore the file.
               // 2. Create the file with another name.
               this.#itemHandle = null;
+              this.#itemName = null;
               this.#itemFlag = 'next';
               this.#numRecvItem++;
               this.sendHeader();
@@ -294,10 +294,11 @@ class Receiver {
         case 'end':
           this.#setState(STATE.OTHER_END);
           // Close previous item handle and delete.
-          if (this.#itemHandle) {
+          // When deleting the file the handle should be truthy,
+          // to make sure the file is actually written by tiShare.
+          if (this.#itemHandle && this.#itemName) {
             await this.#itemHandle.close();
-          }
-          if (this.#itemName) {
+            this.#itemHandle = null;
             await fs.rm(path.join(this.#recvPath, this.#itemName), {force: true});
           }
           this.#socket.end();

@@ -179,6 +179,150 @@ describe('Server and client', async () => {
         const recvPath = path.join(recvDir, fileName);
         const recvBytes = await fs.readFile(recvPath);
         ok(srcBytes.equals(recvBytes));
+        server.deleteJob(serverInd);
+        client.deleteJob(clientInd);
+      } finally {
+        server.close();
+        await fs.rm(srcDir, {recursive: true, force: true});
+        await fs.rm(recvDir, {recursive: true, force: true});
+      }
+    });
+
+    it('Transfer an already-existing file', async function () {
+      this.timeout(30000);
+      const fileName = 'file';
+      const fileSize = 1024;
+      const srcDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tiShare-test-src'));
+      const recvDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tiShare-test-recv'));
+      try {
+        const srcFilePath = path.join(srcDir, fileName);
+        const dstFilePath = path.join(recvDir, fileName);
+        const srcBytes = randomBytes(fileSize);
+        const dstBytes = randomBytes(fileSize);
+        await fs.writeFile(srcFilePath, srcBytes);
+        await fs.writeFile(dstFilePath, dstBytes);
+
+        server.setMyId(serverId);
+        server.open(ip, netmask);
+
+        /** @type {Object.<string, import('../types').TiItem>} */
+        const items = {[fileName]: {dir: '.', name: fileName, path: srcFilePath, type: 'file', size: fileSize}};
+        client.setMyId(clientId);
+        const ret = await client.sendRequest(items, ip, serverId);
+        notStrictEqual(ret, false);
+        const clientInd = /** @type {number} */ (ret);
+
+        /** @type {number} */
+        let serverInd = -1;
+        await waitFor(() => {
+          for (const [key, job] of Object.entries(server.jobs)) {
+            if (job.getState().state === STATE.RQE_SEND_REQUEST) {
+              serverInd = Number(key);
+              return true;
+            }
+          }
+          return false;
+        }, 'Server did not receive the send request');
+
+        server.acceptSendRequest(serverInd, recvDir);
+
+        await waitFor(() => {
+          const clientState = client.jobs[clientInd]?.getState().state;
+          const serverState = server.jobs[serverInd]?.getState().state;
+          return clientState === STATE.SEND_COMPLETE && serverState === STATE.RECV_COMPLETE;
+        }, 'Transfer did not complete');
+
+        ok(dstBytes.equals(await fs.readFile(dstFilePath)));
+        server.deleteJob(serverInd);
+        client.deleteJob(clientInd);
+      } finally {
+        server.close();
+        await fs.rm(srcDir, {recursive: true, force: true});
+        await fs.rm(recvDir, {recursive: true, force: true});
+      }
+    });
+
+    it('Preserve an already-existing file when the sender cancels after it is skipped', async function () {
+      this.timeout(30000);
+      const fileName = 'file';
+      const fileSize = 1024;
+      const srcDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tiShare-test-src'));
+      const recvDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tiShare-test-recv'));
+      try {
+        const srcFilePath = path.join(srcDir, fileName);
+        const dstFilePath = path.join(recvDir, fileName);
+        const srcBytes = randomBytes(fileSize);
+        const dstBytes = randomBytes(fileSize);
+        await fs.writeFile(srcFilePath, srcBytes);
+        await fs.writeFile(dstFilePath, dstBytes);
+
+        server.setMyId(serverId);
+        server.open(ip, netmask);
+
+        /** @type {Object.<string, import('../types').TiItem>} */
+        const items = {[fileName]: {dir: '.', name: fileName, path: srcFilePath, type: 'file', size: fileSize}};
+        client.setMyId(clientId);
+        const ret = await client.sendRequest(items, ip, serverId);
+        notStrictEqual(ret, false);
+        const clientInd = /** @type {number} */ (ret);
+
+        /** @type {number} */
+        let serverInd = -1;
+        await waitFor(() => {
+          for (const [key, job] of Object.entries(server.jobs)) {
+            if (job.getState().state === STATE.RQE_SEND_REQUEST) {
+              serverInd = Number(key);
+              return true;
+            }
+          }
+          return false;
+        }, 'Server did not receive the send request');
+
+        // Cancel as soon as the receiver skips the existing file. Intercept the
+        // acknowledgement to make the ordering deterministic, before the sender
+        // can finish the transfer in response to 'next'.
+        const requestee = server.jobs[serverInd];
+        ok('socket' in requestee);
+        let skippedExistingFile = false;
+        const requesteeSocket = requestee.socket;
+        const origWrite = requesteeSocket.write;
+        /**
+         * @param {string | Uint8Array} arg1
+         * @param {BufferEncoding | ((err?: Error | null) => void)} [arg2]
+         * @param {(err?: Error | null) => void} [arg3]
+         */
+        const interceptWrite = function (arg1, arg2, arg3) {
+          const header = JSON.parse(arg1.toString());
+          if (header.class === 'next') {
+            skippedExistingFile = true;
+            client.endJob(clientInd);
+            requesteeSocket.write = origWrite;
+          }
+          if (typeof arg2 === 'function') {
+            return Reflect.apply(origWrite, requesteeSocket, [arg1, arg2]);
+          }
+          if (arg2 !== undefined) {
+            return Reflect.apply(origWrite, requesteeSocket, [arg1, arg2, arg3]);
+          }
+          return Reflect.apply(origWrite, requesteeSocket, [arg1]);
+        };
+        requesteeSocket.write = interceptWrite;
+
+        server.acceptSendRequest(serverInd, recvDir);
+
+        await waitFor(() => {
+          return server.jobs[serverInd]?.getState().state === STATE.OTHER_END;
+        }, 'Receiver did not handle cancellation after skipping the existing file');
+
+        // OTHER_END is published before the asynchronous removal finishes.
+        // Wait for the socket to close before inspecting the destination.
+        await waitFor(() => requesteeSocket.destroyed, 'Receiver did not close the cancelled connection');
+        ok(skippedExistingFile, 'Receiver must skip the duplicate before cancellation');
+        const remainFile = await fs.stat(dstFilePath).catch(() => null);
+        ok(remainFile, 'The pre-existing file is deleted.');
+        const remainingBytes = await fs.readFile(dstFilePath);
+        ok(dstBytes.equals(remainingBytes), 'The pre-existing file has been modified.');
+        server.deleteJob(serverInd);
       } finally {
         server.close();
         await fs.rm(srcDir, {recursive: true, force: true});

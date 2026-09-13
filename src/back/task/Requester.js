@@ -9,7 +9,7 @@ import {HEADER_END} from '../common.js';
 class Requester {
   /** @type {number} */
   #ind;
-  /** @type {STATE[keyof STATE]} */
+  /** @type {typeof STATE[keyof typeof STATE]} */
   #state;
   /** @type {import('tls').TLSSocket | null} */
   #socket;
