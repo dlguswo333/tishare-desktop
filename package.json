@@ -21,7 +21,7 @@
     "@vitejs/plugin-react": "^4.7.0",
     "classnames": "^2.5.1",
     "concurrently": "^9.1.0",
-    "electron": "^41.0.3",
+    "electron": "^45.4.1",
     "electron-builder": "^25.1.8",
     "eslint": "^9.16.0",
     "eslint-plugin-react": "^7.37.2",
