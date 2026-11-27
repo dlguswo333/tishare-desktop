@@ -1,6 +1,5 @@
 import {defineConfig} from 'vite';
 import react from '@vitejs/plugin-react';
-import commonjs from 'vite-plugin-commonjs';
 import svgr from 'vite-plugin-svgr';
 import process from 'node:process';
 
@@ -22,5 +21,5 @@ export default defineConfig({
   resolve: {
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
   },
-  plugins: [commonjs(), svgr(), react()],
+  plugins: [svgr(), react()],
 });
