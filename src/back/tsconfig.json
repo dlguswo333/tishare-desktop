@@ -4,7 +4,8 @@
     "esModuleInterop": true,
     "outDir": "../../dist/back",
     "noEmit": true,
-    "checkJs": true
+    "checkJs": true,
+    "rootDir": "../.."
   },
   "include": ["**/*"],
   "exclude": []

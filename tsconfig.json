@@ -10,8 +10,7 @@
     "module": "esnext",
     "outDir": "dist",
     "target": "ES2022",
-    "skipLibCheck": true,
-    "rootDir": "../.."
+    "skipLibCheck": true
   },
   "include": ["src"],
   "exclude": ["node_modules", "src/front", "src/back"]

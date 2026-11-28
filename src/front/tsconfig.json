@@ -5,7 +5,8 @@
     "jsx": "react-jsx",
     "outDir": "../../build",
     "types": ["./types.d.ts"],
-    "noEmit": true
+    "noEmit": true,
+    "rootDir": "../.."
   },
   "include": ["**/*"],
   "exclude": []
